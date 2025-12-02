@@ -109,23 +109,18 @@ docker-compose up --build
 
 🔥 실행되면 자동으로 아래 서버가 생성됨:
 
-서비스	URL	설명
-Backend	http://localhost:8000/docs
-	FastAPI 백엔드
-User Front	http://localhost
-	사용자 웹앱
-Admin Front	http://localhost/admin
-	관리자 웹앱
-Next ML	http://localhost:9001/docs
-	다음 소비 예측 모델
-Fraud ML	http://localhost:9002/docs
-	이상 결제 탐지
-Category LLM	http://localhost:9101/docs
-	LLM 기반 MCC/카테고리 분류
-Analysis LLM	http://localhost:9102/docs
-	LLM 기반 소비 분석
-CLEO LLM	http://localhost:9103/docs
-	(옵션 챗봇 기능)
+| 서비스 이름 | URL | 설명 |
+|------------|-----|------|
+| **Backend (FastAPI)** | http://localhost:8000/docs | 백엔드 API |
+| **User Front (React)** | http://localhost:3000 | 사용자 웹앱 |
+| **Admin Front (React)** | http://localhost:3001 | 관리자 웹앱 |
+| **ML Next** | http://localhost:9001/docs | 다음 소비 예측 모델 |
+| **ML Fraud** | http://localhost:9002/docs | 이상 결제 탐지 모델 |
+| **LLM Category** | http://localhost:9011/docs | LLM 기반 MCC/카테고리 분류 |
+| **LLM Analysis** | http://localhost:9012/docs | 소비 분석 LLM |
+| **LLM Cleo (옵션)** | http://localhost:9013/docs | 대화형 챗봇/LLM |
+
+---
 📌 Step 5. 첫 실행 시 필요한 도커 이미지 자동 설치
 
 docker-compose up --build 실행 시 자동으로:
