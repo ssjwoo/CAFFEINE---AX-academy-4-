@@ -5,7 +5,7 @@ on:
     branches: ["front-sjw"]              # 지금은 front-sjw에서만 배포
     paths:
       - "20_frontend_user/**"
-      - ".github/workflows/20-frontend-user.yml"
+      - ".github/workflows/20_frontend_user.yml"
   workflow_dispatch:                      # Actions 탭에서 수동 실행도 가능
 
 jobs:

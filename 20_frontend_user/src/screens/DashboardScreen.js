@@ -42,7 +42,7 @@ const MOCK_DATA = {
     ],
     predictedTransaction: {
         category: '식비',
-        merchant: '스타벅스',
+        merchant: '이디야',
         predictedAmount: 15000,
         couponDiscount: 2000,
         confidence: 85,

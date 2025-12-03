@@ -50,7 +50,7 @@ function MainTabs() {
         headerTintColor: colors.text,
         headerTitleStyle: { fontWeight: 'bold' },
       })}>
-      <Tab.Screen name="대시보" component={DashboardScreen} />
+      <Tab.Screen name="대시보드" component={DashboardScreen} />
       <Tab.Screen name="거래내역" component={TransactionScreen} />
       <Tab.Screen name="쿠폰함" component={CouponScreen} />
       <Tab.Screen name="프로필" component={ProfileScreen} />
