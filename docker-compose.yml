@@ -1,0 +1,46 @@
+services:
+  backend:
+    build: ./01_backend
+    ports:
+      - "8000:8000"
+
+  ml_next:
+    build: ./02_ml_next
+    ports:
+      - "9001:9001"
+
+  ml_fraud:
+    build: ./03_ml_fraud
+    ports:
+      - "9002:9002"
+
+  app_front:
+    build: ./04_app_front
+    ports:
+      - "5173:5173"
+
+  admin_front:
+    build: ./05_admin_front
+    ports:
+      - "5174:5174"
+
+  nginx:
+    build: ./06_nginx
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+      - ml_next
+      - ml_fraud
+      - llm_category
+      - llm_analysis
+
+  llm_category:
+    build: ./07_llm_category
+    ports:
+      - "9100:9100"
+
+  llm_analysis:
+    build: ./08_llm_analysis
+    ports:
+      - "9101:9101"

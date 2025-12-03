@@ -1,0 +1,129 @@
+# ------------------------------------------------------------
+# GitHub Actions 워크플로우 이름
+# (Actions 탭에서 표시되는 제목)
+# ------------------------------------------------------------
+name: Build & Push to ECR (dev/prod)
+
+# ------------------------------------------------------------
+# 언제 이 워크플로우가 실행될지 정의
+# push 이벤트가 발생할 때, dev1 브랜치에서만 실행됨
+# ------------------------------------------------------------
+on:
+  push:
+    branches: ["dev1"]
+
+# ------------------------------------------------------------
+# 실제 작업(job) 정의
+# build-and-push = 워크플로우의 Job 이름
+# ubuntu-latest = GitHub이 제공하는 리눅스 가상머신에서 실행됨
+# ------------------------------------------------------------
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+      # --------------------------------------------------------
+      # 1. Checkout
+      # GitHub 저장소 코드를 현재 워크플로우 실행 환경으로 가져오기
+      # --------------------------------------------------------
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # --------------------------------------------------------
+      # 2. AWS 인증 설정
+      # GitHub Secrets에 저장해둔 ACCESS_KEY / SECRET_KEY / REGION 값을 사용함
+      # -> 이 값으로 AWS CLI 로그인할 수 있게 설정됨
+      # --------------------------------------------------------
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}         # IAM Access Key
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }} # IAM Secret Key
+          aws-region: ${{ secrets.AWS_REGION }}                       # ex: ap-northeast-2
+
+      # --------------------------------------------------------
+      # 3. Docker CLI가 AWS ECR에 접근할 수 있게 로그인
+      # (AWS ECR = AWS의 Docker 이미지 저장소)
+      # --------------------------------------------------------
+      - name: Login to Amazon ECR
+        uses: aws-actions/amazon-ecr-login@v2
+
+      # --------------------------------------------------------
+      # 4. 현재 브랜치(dev? main?)에 따라
+      #    사용할 ECR Repository 이름을 자동으로 선택
+      #
+      # 예시:
+      #  - dev 브랜치 → secrets.ECR_REPO_DEV
+      #  - main 브랜치 → secrets.ECR_REPO_PROD
+      #
+      # ENV_NAME = dev or prod 값 설정
+      # --------------------------------------------------------
+      - name: Set environment variables
+        id: env
+        run: |
+          if [ "${GITHUB_REF_NAME}" = "dev" ]; then
+            # 개발 환경
+            echo "ECR_REPO_NAME=${{ secrets.ECR_REPO_DEV }}" >> $GITHUB_OUTPUT
+            echo "ENV_NAME=dev" >> $GITHUB_OUTPUT
+          else
+            # 운영 환경
+            echo "ECR_REPO_NAME=${{ secrets.ECR_REPO_PROD }}" >> $GITHUB_OUTPUT
+            echo "ENV_NAME=prod" >> $GITHUB_OUTPUT
+          fi
+
+      # --------------------------------------------------------
+      # 5. 이미지 태그 생성
+      #    이미지 이름에 timestamp를 붙여 버전 관리
+      #
+      # ex: dev-20251124091530
+      # --------------------------------------------------------
+      - name: Set Image Tag
+        id: tag
+        run: echo "IMAGE_TAG=${{ steps.env.outputs.ENV_NAME }}-$(date +'%Y%m%d%H%M%S')" >> $GITHUB_OUTPUT
+
+      # --------------------------------------------------------
+      # 6. Docker 이미지 빌드
+      #
+      # FULL_IMAGE_URI 예:
+      #   123456789012.dkr.ecr.ap-northeast-2.amazonaws.com/caffeine-backend-dev:dev-20251124091530
+      #
+      # docker build -t FULL_IMAGE_URI .
+      # --------------------------------------------------------
+      - name: Build Docker image
+        run: |
+          ACCOUNT_ID="${{ secrets.AWS_ACCOUNT_ID }}"
+          REGION="${{ secrets.AWS_REGION }}"
+          REPO_NAME="${{ steps.env.outputs.ECR_REPO_NAME }}"
+          IMAGE_TAG="${{ steps.tag.outputs.IMAGE_TAG }}"
+
+          FULL_IMAGE_URI="$ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com/$REPO_NAME:$IMAGE_TAG"
+
+          echo "Building image: $FULL_IMAGE_URI"
+
+          docker build -t "$FULL_IMAGE_URI" .
+
+      # --------------------------------------------------------
+      # 7. Docker 이미지 ECR로 Push
+      #
+      # docker push <ECR주소>/<레포>:<태그>
+      # --------------------------------------------------------
+      - name: Push Docker image
+        run: |
+          ACCOUNT_ID="${{ secrets.AWS_ACCOUNT_ID }}"
+          REGION="${{ secrets.AWS_REGION }}"
+          REPO_NAME="${{ steps.env.outputs.ECR_REPO_NAME }}"
+          IMAGE_TAG="${{ steps.tag.outputs.IMAGE_TAG }}"
+
+          FULL_IMAGE_URI="$ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com/$REPO_NAME:$IMAGE_TAG"
+
+          echo "Pushing image: $FULL_IMAGE_URI"
+          docker push "$FULL_IMAGE_URI"
+
+      # --------------------------------------------------------
+      # 8. 마지막으로 어떤 이미지가 푸시되었는지 콘솔에 출력
+      # --------------------------------------------------------
+      - name: Show Pushed Image
+        run: |
+          echo "Environment: ${{ steps.env.outputs.ENV_NAME }}"
+          echo "Repository:  ${{ steps.env.outputs.ECR_REPO_NAME }}"
+          echo "Image tag:   ${{ steps.tag.outputs.IMAGE_TAG }}"
