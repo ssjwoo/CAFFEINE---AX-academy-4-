@@ -1,10 +1,11 @@
-name: Deploy User Frontend to CloudFront
+name: Deploy User Frontend (front-sjw)
 
 on:
   push:
-    branches: ["main"]
+    branches: ["front-sjw"]        # ✅ 이 브랜치에서만 배포
     paths:
       - "20_frontend_user/**"
+  workflow_dispatch:
 
 jobs:
   build-and-deploy:
@@ -21,13 +22,12 @@ jobs:
 
       - name: Install dependencies
         working-directory: 20_frontend_user
-        run: npm ci
+        run: npm ci         # 또는 npm install
 
       - name: Build project
         working-directory: 20_frontend_user
         run: npm run build
 
-      # 빌드 결과물이 예를 들어 dist 또는 .next/out 이라고 가정
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -35,10 +35,12 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
 
-      - name: Sync build to S3
+      - name: Sync build output to S3
         run: |
-          aws s3 sync 20_frontend_user/dist s3://caffeine-user-frontend-prod \
+          aws s3 sync 20_frontend_user/build s3://20-frontend-user \
             --delete
+        # 🔁 빌드 폴더가 dist라면 위 줄을 이렇게:
+        # aws s3 sync 20_frontend_user/dist s3://20-frontend-user --delete
 
       - name: Invalidate CloudFront cache
         run: |

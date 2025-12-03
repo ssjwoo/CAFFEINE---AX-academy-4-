@@ -2,7 +2,7 @@ name: Deploy Admin Frontend to CloudFront
 
 on:
   push:
-    branches: ["main"]
+    branches: ["front-sjw"]
     paths:
       - "21_frontend_admin/**"
 
