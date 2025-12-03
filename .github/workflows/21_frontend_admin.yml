@@ -1,10 +1,12 @@
-name: Deploy Admin Frontend to CloudFront
+name: Deploy Admin Frontend (Next.js Export)
 
 on:
   push:
-    branches: ["front-sjw"]
+    branches: ["front-sjw"]                  # 필요하면 main으로 변경
     paths:
       - "21_frontend_admin/**"
+      - ".github/workflows/21-frontend-admin.yml"
+  workflow_dispatch:
 
 jobs:
   build-and-deploy:
@@ -18,12 +20,14 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: "20"
+          cache: "npm"
 
       - name: Install dependencies
         working-directory: 21_frontend_admin
         run: npm ci
 
-      - name: Build project
+      # next.config.ts 에 output: "export" 이미 들어있다는 전제
+      - name: Build Next.js (static export)
         working-directory: 21_frontend_admin
         run: npm run build
 
@@ -34,12 +38,11 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
 
-      - name: Sync build to S3
+      - name: Sync exported site to S3 (admin)
         run: |
-          aws s3 sync 25_frontend_admin/dist s3://caffeine-admin-frontend-prod \
-            --delete
+          aws s3 sync 21_frontend_admin/out s3://21-frontend-admin --delete
 
-      - name: Invalidate CloudFront cache
+      - name: Invalidate CloudFront cache (admin)
         run: |
           aws cloudfront create-invalidation \
             --distribution-id ${{ secrets.CF_ADMIN_DISTRIBUTION_ID }} \
