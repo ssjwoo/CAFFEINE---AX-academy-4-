@@ -24,7 +24,7 @@ const TabBarIcon = ({ name, focused }) => {
     '쿠폰함': '',
     '프로필': ''
   };
-  return <Text style={{ fontSize: 24, opacity: focused ? 1 : 0.5 }}>{icons[name] || '📱'}</Text>;
+  return <Text style={{ fontSize: 24, opacity: focused ? 1 : 0.5 }}>{icons[name] || ''}</Text>;
 };
 
 function MainTabs() {
