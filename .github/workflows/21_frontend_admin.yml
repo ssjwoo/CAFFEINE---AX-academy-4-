@@ -5,7 +5,7 @@ on:
     branches: ["front-sjw"]                      # 필요하면 main 으로 바꾸면 됨
     paths:
       - "21_frontend_admin/**"
-      - ".github/workflows/21-frontend-admin.yml"
+      - ".github/workflows/21_frontend_admin.yml"
   workflow_dispatch:
 
 jobs:
