@@ -1,0 +1,340 @@
+{
+  "model_info": {
+    "model_name": "LightGBM (CUDA) Production",
+    "model_file": "lightgbm_cuda_production_20251205_162340.joblib",
+    "model_version": "v1.0",
+    "model_type": "LightGBM Classifier",
+    "framework": "lightgbm",
+    "device": "GPU (CUDA)",
+    "created_at": "2025-12-05T16:23:45.331106",
+    "model_size_mb": 24.46
+  },
+  "performance": {
+    "accuracy": 0.4913,
+    "macro_f1": 0.4344,
+    "weighted_f1": 0.4727,
+    "category_f1": {
+      "교통": 0.6496,
+      "생활": 0.0802,
+      "쇼핑": 0.3478,
+      "식료품": 0.5414,
+      "외식": 0.4434,
+      "주유": 0.5441
+    },
+    "train_time_seconds": 453.37,
+    "train_time_minutes": 7.56
+  },
+  "training_data": {
+    "description": "SMOTE 증강 데이터",
+    "filter_condition": "월 10건 이상 x 5개월 이상",
+    "original_samples": 6443429,
+    "filtered_samples": 6424957,
+    "active_users": 1603,
+    "train_samples": 9254112,
+    "test_samples": 1284992,
+    "smote_ratio": 1.8
+  },
+  "model_parameters": {
+    "device": "gpu",
+    "gpu_platform_id": 0,
+    "gpu_device_id": 0,
+    "n_estimators": 300,
+    "max_depth": 10,
+    "learning_rate": 0.1,
+    "num_leaves": 128,
+    "subsample": 0.8,
+    "colsample_bytree": 0.8,
+    "reg_alpha": 0.1,
+    "reg_lambda": 0.1,
+    "random_state": 42
+  },
+  "input_spec": {
+    "description": "모델 입력 데이터 스펙",
+    "input_shape": [
+      null,
+      27
+    ],
+    "input_dtype": "float32",
+    "n_features": 27,
+    "feature_names": [
+      "Amount_scaled",
+      "Amount_log_scaled",
+      "AmountBin_encoded_scaled",
+      "Hour_scaled",
+      "DayOfWeek_scaled",
+      "DayOfMonth_scaled",
+      "IsWeekend_scaled",
+      "IsLunchTime_scaled",
+      "IsEvening_scaled",
+      "IsMorningRush_scaled",
+      "IsNight_scaled",
+      "IsBusinessHour_scaled",
+      "User_AvgAmount_scaled",
+      "User_StdAmount_scaled",
+      "User_TxCount_scaled",
+      "Time_Since_Last_scaled",
+      "Transaction_Sequence_scaled",
+      "User_Category_Count_scaled",
+      "Current_Category_encoded_scaled",
+      "Previous_Category_encoded_scaled",
+      "User_FavCategory_encoded_scaled",
+      "User_교통_Ratio_scaled",
+      "User_생활_Ratio_scaled",
+      "User_쇼핑_Ratio_scaled",
+      "User_식료품_Ratio_scaled",
+      "User_외식_Ratio_scaled",
+      "User_주유_Ratio_scaled"
+    ],
+    "feature_statistics": {
+      "Amount_scaled": {
+        "index": 0,
+        "mean": 0.04442846402525902,
+        "std": 1.0679566860198975,
+        "min": -0.895783543586731,
+        "max": 86.24951171875,
+        "dtype": "float32"
+      },
+      "Amount_log_scaled": {
+        "index": 1,
+        "mean": 0.04170259088277817,
+        "std": 0.9905557632446289,
+        "min": -2.1119565963745117,
+        "max": 3.8391432762145996,
+        "dtype": "float32"
+      },
+      "AmountBin_encoded_scaled": {
+        "index": 2,
+        "mean": 0.03449597582221031,
+        "std": 1.0201863050460815,
+        "min": -0.9012306332588196,
+        "max": 2.2985105514526367,
+        "dtype": "float32"
+      },
+      "Hour_scaled": {
+        "index": 3,
+        "mean": 0.013887136243283749,
+        "std": 0.9848780035972595,
+        "min": -2.45597243309021,
+        "max": 2.1376073360443115,
+        "dtype": "float32"
+      },
+      "DayOfWeek_scaled": {
+        "index": 4,
+        "mean": -0.0005267976666800678,
+        "std": 0.991355836391449,
+        "min": -1.503867745399475,
+        "max": 1.4971389770507812,
+        "dtype": "float32"
+      },
+      "DayOfMonth_scaled": {
+        "index": 5,
+        "mean": 0.00012285745469853282,
+        "std": 0.984346330165863,
+        "min": -1.6732277870178223,
+        "max": 1.7372615337371826,
+        "dtype": "float32"
+      },
+      "IsWeekend_scaled": {
+        "index": 6,
+        "mean": -0.000490776845254004,
+        "std": 0.9997078776359558,
+        "min": -0.6344175338745117,
+        "max": 1.5762490034103394,
+        "dtype": "float32"
+      },
+      "IsLunchTime_scaled": {
+        "index": 7,
+        "mean": 0.0007790950476191938,
+        "std": 1.0003461837768555,
+        "min": -0.6131599545478821,
+        "max": 1.630895733833313,
+        "dtype": "float32"
+      },
+      "IsEvening_scaled": {
+        "index": 8,
+        "mean": 0.016561096534132957,
+        "std": 1.0179535150527954,
+        "min": -0.3859044015407562,
+        "max": 2.591315269470215,
+        "dtype": "float32"
+      },
+      "IsMorningRush_scaled": {
+        "index": 9,
+        "mean": 0.007887649349868298,
+        "std": 1.0054092407226562,
+        "min": -0.5232003331184387,
+        "max": 1.9113138914108276,
+        "dtype": "float32"
+      },
+      "IsNight_scaled": {
+        "index": 10,
+        "mean": -0.019025487825274467,
+        "std": 0.9809985160827637,
+        "min": -0.42032817006111145,
+        "max": 2.3790934085845947,
+        "dtype": "float32"
+      },
+      "IsBusinessHour_scaled": {
+        "index": 11,
+        "mean": 0.009776593185961246,
+        "std": 0.9976786375045776,
+        "min": -1.2467528581619263,
+        "max": 0.8020835518836975,
+        "dtype": "float32"
+      },
+      "User_AvgAmount_scaled": {
+        "index": 12,
+        "mean": 0.12217582017183304,
+        "std": 1.118547797203064,
+        "min": -2.3277204036712646,
+        "max": 13.541337013244629,
+        "dtype": "float32"
+      },
+      "User_StdAmount_scaled": {
+        "index": 13,
+        "mean": 0.1238904669880867,
+        "std": 1.138583779335022,
+        "min": -2.720060110092163,
+        "max": 25.758790969848633,
+        "dtype": "float32"
+      },
+      "User_TxCount_scaled": {
+        "index": 14,
+        "mean": -0.002294316655024886,
+        "std": 0.9989778995513916,
+        "min": -1.0113760232925415,
+        "max": 7.490924835205078,
+        "dtype": "float32"
+      },
+      "Time_Since_Last_scaled": {
+        "index": 15,
+        "mean": -0.0009352975757792592,
+        "std": 0.9021809697151184,
+        "min": -0.11960199475288391,
+        "max": 1097.82666015625,
+        "dtype": "float32"
+      },
+      "Transaction_Sequence_scaled": {
+        "index": 16,
+        "mean": -0.002294316655024886,
+        "std": 0.9989778995513916,
+        "min": -1.0113760232925415,
+        "max": 7.490924835205078,
+        "dtype": "float32"
+      },
+      "User_Category_Count_scaled": {
+        "index": 17,
+        "mean": -0.02264295518398285,
+        "std": 0.9093127250671387,
+        "min": -0.7282240986824036,
+        "max": 7.611770153045654,
+        "dtype": "float32"
+      },
+      "Current_Category_encoded_scaled": {
+        "index": 18,
+        "mean": -0.031488727778196335,
+        "std": 1.0382976531982422,
+        "min": -1.8198590278625488,
+        "max": 1.4638988971710205,
+        "dtype": "float32"
+      },
+      "Previous_Category_encoded_scaled": {
+        "index": 19,
+        "mean": -0.03164728730916977,
+        "std": 1.0232954025268555,
+        "min": -2.4756276607513428,
+        "max": 1.4637478590011597,
+        "dtype": "float32"
+      },
+      "User_FavCategory_encoded_scaled": {
+        "index": 20,
+        "mean": -0.07839910686016083,
+        "std": 1.0483837127685547,
+        "min": -1.9158862829208374,
+        "max": 1.171138882637024,
+        "dtype": "float32"
+      },
+      "User_교통_Ratio_scaled": {
+        "index": 21,
+        "mean": 0.09707553684711456,
+        "std": 1.037381887435913,
+        "min": -0.6284253597259521,
+        "max": 3.2667548656463623,
+        "dtype": "float32"
+      },
+      "User_생활_Ratio_scaled": {
+        "index": 22,
+        "mean": 0.0024574988055974245,
+        "std": 1.0027554035186768,
+        "min": -1.3178364038467407,
+        "max": 3.8467977046966553,
+        "dtype": "float32"
+      },
+      "User_쇼핑_Ratio_scaled": {
+        "index": 23,
+        "mean": -0.015480761416256428,
+        "std": 0.9926485419273376,
+        "min": -1.5689101219177246,
+        "max": 4.1809468269348145,
+        "dtype": "float32"
+      },
+      "User_식료품_Ratio_scaled": {
+        "index": 24,
+        "mean": -0.10997392237186432,
+        "std": 0.950518786907196,
+        "min": -2.1949148178100586,
+        "max": 4.100992679595947,
+        "dtype": "float32"
+      },
+      "User_외식_Ratio_scaled": {
+        "index": 25,
+        "mean": -0.008469573222100735,
+        "std": 0.9832027554512024,
+        "min": -1.330147385597229,
+        "max": 3.9401586055755615,
+        "dtype": "float32"
+      },
+      "User_주유_Ratio_scaled": {
+        "index": 26,
+        "mean": -0.04069272056221962,
+        "std": 0.9891632795333862,
+        "min": -1.6330811977386475,
+        "max": 3.7551684379577637,
+        "dtype": "float32"
+      }
+    },
+    "expected_format": "numpy.ndarray or pandas.DataFrame",
+    "scaling_method": "StandardScaler applied during preprocessing",
+    "missing_values": "Not allowed - please impute before prediction"
+  },
+  "output_spec": {
+    "description": "모델 출력 데이터 스펙",
+    "output_type": "class_label",
+    "n_classes": 6,
+    "class_mapping": {
+      "0": "교통",
+      "1": "생활",
+      "2": "쇼핑",
+      "3": "식료품",
+      "4": "외식",
+      "5": "주유"
+    },
+    "output_dtype": "int32",
+    "prediction_methods": {
+      "predict": "Returns class labels (0-5)",
+      "predict_proba": "Returns probability distribution over classes"
+    }
+  },
+  "usage_example": {
+    "python_code": "\n# 모델 로드\nimport joblib\nimport numpy as np\n\nmodel = joblib.load('lightgbm_cuda_production_TIMESTAMP.joblib')\n\n# 입력 데이터 준비 (예시)\n# 반드시 27개 피처가 올바른 순서로 정렬되어야 함\nX_input = np.array([[\n    # Amount_scaled, Amount_log_scaled, AmountBin_encoded_scaled,\n    # Hour_scaled, DayOfWeek_scaled, DayOfMonth_scaled,\n    # IsWeekend_scaled, IsLunchTime_scaled, IsEvening_scaled,\n    # IsMorningRush_scaled, IsNight_scaled, IsBusinessHour_scaled,\n    # User_AvgAmount_scaled, User_StdAmount_scaled, User_TxCount_scaled,\n    # Time_Since_Last_scaled, Transaction_Sequence_scaled,\n    # User_Category_Count_scaled, Current_Category_encoded_scaled,\n    # Previous_Category_encoded_scaled, User_FavCategory_encoded_scaled,\n    # User_교통_Ratio_scaled, User_생활_Ratio_scaled,\n    # User_쇼핑_Ratio_scaled, User_식료품_Ratio_scaled,\n    # User_외식_Ratio_scaled, User_주유_Ratio_scaled\n    0.5, 0.3, 0.2, 0.6, 0.4, 0.5, 0.0, 0.0, 1.0,\n    0.0, 0.0, 1.0, 0.4, 0.3, 0.5, 0.2, 0.7,\n    0.8, 2.0, 1.0, 3.0, 0.1, 0.2, 0.3, 0.15, 0.2, 0.05\n]], dtype=np.float32)\n\n# 예측 (클래스 레이블)\ny_pred = model.predict(X_input)\nprint(f\"예측 카테고리: {y_pred[0]}\")  # 0-5\n\n# 예측 (확률 분포)\ny_proba = model.predict_proba(X_input)\nprint(f\"예측 확률: {y_proba[0]}\")  # [교통, 생활, 쇼핑, 식료품, 외식, 주유]\n",
+    "curl_example": "\n# FastAPI 서버에 REST API 요청 (예시)\ncurl -X POST \"http://localhost:8000/predict\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"features\": [0.5, 0.3, 0.2, 0.6, 0.4, 0.5, 0.0, 0.0, 1.0,\n                 0.0, 0.0, 1.0, 0.4, 0.3, 0.5, 0.2, 0.7, 0.8,\n                 2.0, 1.0, 3.0, 0.1, 0.2, 0.3, 0.15, 0.2, 0.05]\n  }'\n"
+  },
+  "important_notes": [
+    "⚠️ 입력 데이터는 반드시 27개 피처를 정확한 순서로 포함해야 합니다",
+    "⚠️ 모든 피처는 StandardScaler로 정규화되어야 합니다 (feature_statistics 참고)",
+    "⚠️ GPU(CUDA) 환경에서 학습되었지만, CPU 환경에서도 예측 가능합니다",
+    "⚠️ 결측값은 허용되지 않습니다. 예측 전에 반드시 처리하세요",
+    "✅ SMOTE 증강 데이터로 학습되어 클래스 불균형이 해소되었습니다",
+    "✅ 실시간 예측에 최적화되어 있습니다"
+  ]
+}

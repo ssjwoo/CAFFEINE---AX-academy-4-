@@ -2,56 +2,89 @@ import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, ScrollView, StyleSheet, Dimensions, RefreshControl, TouchableOpacity } from 'react-native';
 import { LineChart, PieChart } from 'react-native-chart-kit';
 import { useTheme } from '../contexts/ThemeContext';
+import { useTransactions } from '../contexts/TransactionContext';
 import CountUpNumber from '../components/CountUpNumber';
 import FadeInView from '../components/FadeInView';
 import AnimatedButton from '../components/AnimatedButton';
+import EmptyState from '../components/EmptyState';
 import { SkeletonStats, SkeletonChart } from '../components/SkeletonCard';
 import { formatCurrency } from '../utils/currency';
 import { CHART_COLORS, ANIMATION_DELAY } from '../constants';
 
-// ============================================================
-// TODO: 백엔드 연결 시 삭제 필요
-// ============================================================
-// 현재는 MOCK 데이터를 사용하고 있습니다.
-// 백엔드 API 연결 시 이 MOCK_DATA 전체를 삭제하고
-// loadData() 함수에서 실제 API를 호출하도록 변경하세요.
-//
-// 백엔드 API 엔드포인트 예시:
-// - GET /api/dashboard/summary - 대시보드 요약 데이터
-// - GET /api/dashboard/monthly - 월별 지출 데이터
-// - GET /api/dashboard/category - 카테고리별 소비 데이터
-// - GET /api/predictions/next - AI 예측 거래 데이터
-// ============================================================
-const MOCK_DATA = {
-    summary: { total_spending: 1250000, total_transactions: 81, average_transaction: 15432, most_used_category: '쇼핑', monthly_trend: '증가', anomaly_count: 3 },
-    monthlyData: [
-        { month: '2024-06', total_amount: 577000 },
-        { month: '2024-07', total_amount: 638000 },
-        { month: '2024-08', total_amount: 705200 },
-        { month: '2024-09', total_amount: 633800 },
-        { month: '2024-10', total_amount: 761200 },
-        { month: '2024-11', total_amount: 185000 },
-    ],
-    categoryData: [
-        { category: '쇼핑', total_amount: 1140000, percentage: 37 },
-        { category: '식비', total_amount: 890000, percentage: 29 },
-        { category: '공과금', total_amount: 590000, percentage: 19 },
-        { category: '여가', total_amount: 280000, percentage: 9 },
-        { category: '교통', total_amount: 125000, percentage: 4 },
-        { category: '기타', total_amount: 75000, percentage: 2 },
-    ],
-    predictedTransaction: {
-        category: '식비',
-        merchant: '이디야',
-        predictedAmount: 15000,
-        couponDiscount: 2000,
-        confidence: 85,
-        predictedDate: '내일 오전'
+// 통계 계산 함수들
+const calculateSummary = (transactions) => {
+    if (!transactions || transactions.length === 0) {
+        return {
+            total_spending: 0,
+            total_transactions: 0,
+            average_transaction: 0,
+            most_used_category: '-',
+            monthly_trend: '변화없음',
+            anomaly_count: 0
+        };
     }
+
+    const total_spending = transactions.reduce((sum, t) => sum + t.amount, 0);
+    const total_transactions = transactions.length;
+    const average_transaction = Math.round(total_spending / total_transactions);
+
+    // 가장 많이 쓴 카테고리
+    const categoryCount = {};
+    transactions.forEach(t => {
+        categoryCount[t.category] = (categoryCount[t.category] || 0) + 1;
+    });
+    const most_used_category = Object.entries(categoryCount)
+        .sort((a, b) => b[1] - a[1])[0]?.[0] || '-';
+
+    return {
+        total_spending,
+        total_transactions,
+        average_transaction,
+        most_used_category,
+        monthly_trend: '증가',
+        anomaly_count: 0
+    };
+};
+
+const calculateMonthlyData = (transactions) => {
+    if (!transactions || transactions.length === 0) return [];
+
+    const monthlyMap = {};
+
+    transactions.forEach(t => {
+        const month = t.date.substring(0, 7);  // '2024-11-29 10:00' → '2024-11'
+        monthlyMap[month] = (monthlyMap[month] || 0) + t.amount;
+    });
+
+    // 최근 6개월만
+    return Object.entries(monthlyMap)
+        .sort((a, b) => a[0].localeCompare(b[0]))
+        .slice(-6)
+        .map(([month, total_amount]) => ({ month, total_amount }));
+};
+
+const calculateCategoryData = (transactions) => {
+    if (!transactions || transactions.length === 0) return [];
+
+    const categoryMap = {};
+    const total = transactions.reduce((sum, t) => sum + t.amount, 0);
+
+    transactions.forEach(t => {
+        categoryMap[t.category] = (categoryMap[t.category] || 0) + t.amount;
+    });
+
+    return Object.entries(categoryMap)
+        .map(([category, total_amount]) => ({
+            category,
+            total_amount,
+            percentage: Math.round((total_amount / total) * 100)
+        }))
+        .sort((a, b) => b.total_amount - a.total_amount);
 };
 
 export default function DashboardScreen({ navigation }) {
     const { colors } = useTheme();
+    const { transactions, loading: transactionsLoading, predictNextPurchase } = useTransactions();
     const [loading, setLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
     const [summary, setSummary] = useState(null);
@@ -59,76 +92,49 @@ export default function DashboardScreen({ navigation }) {
     const [categoryData, setCategoryData] = useState([]);
     const [tooltip, setTooltip] = useState(null);
     const [predictedTransaction, setPredictedTransaction] = useState(null);
+    const [nextPrediction, setNextPrediction] = useState(null);
     const [couponReceived, setCouponReceived] = useState(false);
 
     const scrollViewRef = useRef(null);
     const categoryRef = useRef(null);
     const insightRef = useRef(null);
 
-    // ============================================================
-    // TODO: 백엔드 API 연결
-    // ============================================================
-    // 백엔드 서버와 연결 시 아래 loadData() 함수를 수정하세요.
-    //
-    // 변경 방법:
-    // 1. API Base URL 설정 (예: const API_BASE_URL = 'http://localhost:5000/api')
-    // 2. MOCK_DATA 대신 실제 fetch/axios 호출로 변경
-    // 3. 에러 처리 추가
-    //
-    // 예시 코드:
-    // const loadData = async () => {
-    //     try {
-    //         const token = await AsyncStorage.getItem('authToken');
-    //         const headers = { 'Authorization': `Bearer ${token}` };
-    //
-    //         // 대시보드 요약 데이터
-    //         const summaryRes = await fetch(`${API_BASE_URL}/dashboard/summary`, { headers });
-    //         const summaryData = await summaryRes.json();
-    //         setSummary(summaryData);
-    //
-    //         // 월별 지출 데이터
-    //         const monthlyRes = await fetch(`${API_BASE_URL}/dashboard/monthly`, { headers });
-    //         const monthlyDataRaw = await monthlyRes.json();
-    //         // ⚠️ 날짜 형식 변환: '2024-06-01' → '2024-06'
-    //         const monthlyData = monthlyDataRaw.map(item => ({
-    //             month: item.month.substring(0, 7),
-    //             total_amount: item.total_amount
-    //         }));
-    //         setMonthlyData(monthlyData);
-    //
-    //         // 카테고리별 소비 데이터
-    //         const categoryRes = await fetch(`${API_BASE_URL}/dashboard/category`, { headers });
-    //         const categoryData = await categoryRes.json();
-    //         setCategoryData(categoryData);
-    //
-    //         // AI 예측 거래 데이터 (ML 모델 결과)
-    //         const predictionRes = await fetch(`${API_BASE_URL}/predictions/next`, { headers });
-    //         const predictionData = await predictionRes.json();
-    //         setPredictedTransaction(predictionData);
-    //
-    //     } catch (error) {
-    //         console.error('데이터 로드 실패:', error);
-    //         alert('데이터를 불러오는데 실패했습니다.');
-    //     } finally {
-    //         setLoading(false);
-    //         setRefreshing(false);
-    //     }
-    // };
-    // ============================================================
     const loadData = async () => {
         try {
-            // 현재는 MOCK 데이터 사용 (백엔드 연결 시 위의 예시 코드로 교체)
-            setSummary(MOCK_DATA.summary);
-            setMonthlyData(MOCK_DATA.monthlyData);
-            setCategoryData(MOCK_DATA.categoryData);
-            setPredictedTransaction(MOCK_DATA.predictedTransaction);
+            if (transactions && transactions.length > 0) {
+                setSummary(calculateSummary(transactions));
+                setMonthlyData(calculateMonthlyData(transactions));
+                setCategoryData(calculateCategoryData(transactions));
+
+                // 다음 소비 예측 자동 실행
+                loadNextPrediction();
+            } else {
+                setSummary(null);
+                setMonthlyData([]);
+                setCategoryData([]);
+                setNextPrediction(null);
+            }
         } finally {
             setLoading(false);
             setRefreshing(false);
         }
     };
 
-    useEffect(() => { loadData(); }, []);
+    const loadNextPrediction = async () => {
+        const result = await predictNextPurchase();
+        if (result.success && result.data) {
+            setNextPrediction(result.data);
+            console.log('다음 소비 예측:', result.data);
+        } else {
+            console.log('예측 실패:', result.error);
+        }
+    };
+
+
+    // transactions가 변경될 때마다 데이터 재계산
+    useEffect(() => {
+        loadData();
+    }, [transactions]);
 
     const onRefresh = () => {
         setRefreshing(true);
@@ -180,6 +186,24 @@ export default function DashboardScreen({ navigation }) {
                     <SkeletonChart />
                 </View>
             </ScrollView>
+        );
+    }
+
+    // 거래 데이터가 없으면 EmptyState 표시
+    if (transactions.length === 0) {
+        return (
+            <View style={styles(colors).container}>
+                <View style={styles(colors).header}>
+                    <Text style={styles(colors).headerTitle}>대시보드</Text>
+                </View>
+                <EmptyState
+                    icon="📊"
+                    title="연동된 거래내역이 없습니다"
+                    message="프로필 → 데이터 동기화로 CSV 파일을 업로드하세요"
+                    actionText="동기화 하러 가기"
+                    onAction={() => navigation.navigate('프로필')}
+                />
+            </View>
         );
     }
 
@@ -393,7 +417,7 @@ export default function DashboardScreen({ navigation }) {
             </FadeInView>
 
             <FadeInView ref={insightRef} style={styles(colors).insightSection} delay={ANIMATION_DELAY.VERY_LONG}>
-                <Text style={styles(colors).sectionTitle}> AI 인사이트</Text>
+                <Text style={styles(colors).sectionTitle}>AI 인사이트</Text>
 
                 <View style={styles(colors).insightCard}>
                     <Text style={styles(colors).insightIcon}></Text>
@@ -409,6 +433,76 @@ export default function DashboardScreen({ navigation }) {
                         지난 6개월 평균 대비 <Text style={styles(colors).insightHighlight}>12%</Text> 증가했어요
                     </Text>
                 </View>
+
+                {nextPrediction && (
+                    <View style={styles(colors).predictionCard}>
+                        <View style={styles(colors).predictionHeader}>
+                            <Text style={styles(colors).predictionIcon}></Text>
+                            <Text style={styles(colors).predictionTitle}>다음 소비 예측</Text>
+                            <View style={styles(colors).predictionBadge}>
+                                <Text style={styles(colors).predictionBadgeText}>
+                                    {nextPrediction.confidence_metrics?.confidence_level === 'high' ? '높음' :
+                                        nextPrediction.confidence_metrics?.confidence_level === 'medium' ? '중간' : '낮음'}
+                                </Text>
+                            </View>
+                        </View>
+
+                        <View style={styles(colors).predictionContent}>
+                            <View style={styles(colors).predictionRow}>
+                                <Text style={styles(colors).predictionLabel}>예측 카테고리</Text>
+                                <Text style={styles(colors).predictionValueAmount}>
+                                    {nextPrediction.predicted_category}
+                                </Text>
+                            </View>
+
+                            <View style={styles(colors).predictionRow}>
+                                <Text style={styles(colors).predictionLabel}>신뢰도</Text>
+                                <Text style={styles(colors).predictionValue}>
+                                    {(nextPrediction.confidence * 100).toFixed(0)}%
+                                </Text>
+                            </View>
+
+                            {nextPrediction.context?.last_category && (
+                                <View style={styles(colors).predictionRow}>
+                                    <Text style={styles(colors).predictionLabel}>마지막 소비</Text>
+                                    <Text style={styles(colors).predictionValue}>
+                                        {nextPrediction.context.last_category}
+                                    </Text>
+                                </View>
+                            )}
+
+                            {nextPrediction.context?.most_frequent_category && (
+                                <View style={styles(colors).predictionRow}>
+                                    <Text style={styles(colors).predictionLabel}>가장 많이 소비</Text>
+                                    <Text style={styles(colors).predictionValue}>
+                                        {nextPrediction.context.most_frequent_category}
+                                    </Text>
+                                </View>
+                            )}
+
+                            {nextPrediction.context?.user_avg_amount && (
+                                <View style={styles(colors).predictionRow}>
+                                    <Text style={styles(colors).predictionLabel}>평균 거래액</Text>
+                                    <Text style={styles(colors).predictionValue}>
+                                        {formatCurrency(Math.round(nextPrediction.context.user_avg_amount))}
+                                    </Text>
+                                </View>
+                            )}
+                        </View>
+
+                        {nextPrediction.probabilities && (
+                            <View style={styles(colors).predictionFooter}>
+                                <Text style={styles(colors).predictionCouponText}>
+                                    확률 분포: {Object.entries(nextPrediction.probabilities)
+                                        .sort((a, b) => b[1] - a[1])
+                                        .slice(0, 3)
+                                        .map(([cat, prob]) => `${cat} ${(prob * 100).toFixed(0)}%`)
+                                        .join(', ')}
+                                </Text>
+                            </View>
+                        )}
+                    </View>
+                )}
             </FadeInView>
 
             <View style={{ height: 40 }} />

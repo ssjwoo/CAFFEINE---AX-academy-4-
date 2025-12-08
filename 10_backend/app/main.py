@@ -81,8 +81,8 @@ app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 # ============================================================
 # 프론트엔드 도메인에서 API에 접근할 수 있도록 허용합니다.
 # .env 파일의 ALLOWED_ORIGINS에서 쉼표로 구분된 도메인 목록을 읽습니다.
-# 예: ALLOWED_ORIGINS=http://localhost:3000,http://localhost:19006
-allowed_origins = os.getenv("ALLOWED_ORIGINS", "http://localhost:3000").split(",")
+# 예: ALLOWED_ORIGINS=http://localhost:3000,http://localhost:19006,http://localhost:8081
+allowed_origins = os.getenv("ALLOWED_ORIGINS", "http://localhost:3000,http://localhost:8081,http://localhost:8080,http://localhost:19000,http://localhost:19006").split(",")
 
 app.add_middleware(
     CORSMiddleware,
@@ -193,38 +193,10 @@ async def health(request: Request):
     }
 
 # ============================================================
-# 라우터 등록 (추후 추가 예정)
+# 라우터 등록
 # ============================================================
-# 각 기능별로 라우터를 분리하여 관리합니다.
-# 아래는 추후 구현할 라우터들의 예시입니다.
-#
-# from app.routes import auth, users, transactions, anomalies, coupons
-# 
-# app.include_router(auth.router, prefix="/api/auth", tags=["인증"])
-#   - POST /api/auth/signup   : 회원가입
-#   - POST /api/auth/login    : 로그인 (JWT 발급)
-#   - POST /api/auth/logout   : 로그아웃
-#
-# app.include_router(users.router, prefix="/api/users", tags=["사용자"])
-#   - GET  /api/users/me      : 현재 사용자 정보 조회
-#   - PUT  /api/users/me      : 프로필 수정
-#
-# app.include_router(transactions.router, prefix="/api/transactions", tags=["거래"])
-#   - GET  /api/transactions          : 거래 목록
-#   - GET  /api/transactions/{id}     : 거래 상세
-#   - PATCH /api/transactions/{id}/note : 메모 수정
-#
-# app.include_router(anomalies.router, prefix="/api/anomalies", tags=["이상거래"])
-#   - GET  /api/anomalies           : 이상 거래 목록 (관리자)
-#   - GET  /api/anomalies/pending   : 대기 중인 이상 거래 (실시간 폴링용)
-#   - POST /api/anomalies/{id}/approve : 이상거래 승인
-#   - POST /api/anomalies/{id}/reject  : 이상거래 거부
-#
-# app.include_router(coupons.router, prefix="/api/coupons", tags=["쿠폰"])
-#   - GET  /api/coupons         : 사용자 쿠폰 목록
-#   - GET  /api/coupons/available : 사용 가능한 쿠폰만
-#   - POST /api/coupons/{id}/use  : 쿠폰 사용
-#   - POST /api/coupons/issue     : AI 예측 기반 쿠폰 자동 발급
+from app.routers import ml
+app.include_router(ml.router)
 
 # ============================================================
 # 시작 / 종료 이벤트
@@ -234,17 +206,15 @@ async def health(request: Request):
 async def startup_event():
     """
     애플리케이션 시작 시 실행되는 이벤트 핸들러
-    
-    주요 작업:
-    - 시작 로그 기록
-    - 환경 설정 확인
-    - 데이터베이스 연결 (추후 추가)
-    - 캐시 초기화 (추후 추가)
     """
     logger.info("=" * 60)
     logger.info("🚀 Caffeine API 시작됨")
     logger.info(f"환경: {os.getenv('ENVIRONMENT', 'development')}")
     logger.info(f"CORS 허용 도메인: {allowed_origins}")
+    
+    # ML 모델 로드
+    ml.load_model()
+    
     logger.info("=" * 60)
 
 @app.on_event("shutdown")

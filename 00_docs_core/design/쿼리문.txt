@@ -1,0 +1,225 @@
+
+-- 1. User Groups
+
+CREATE TABLE user_groups (
+    id          BIGSERIAL PRIMARY KEY,          -- 그룹 ID
+    key         VARCHAR(50) UNIQUE NOT NULL,    -- 그룹 키(USER/ADMIN 등)
+    name        VARCHAR(50) NOT NULL,           -- 그룹 이름
+    description VARCHAR(255),                   -- 그룹 설명
+    is_admin    BOOLEAN NOT NULL DEFAULT FALSE, -- 관리자 그룹 여부
+    is_default  BOOLEAN NOT NULL DEFAULT FALSE, -- 기본 그룹 여부
+    created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+
+-- 2. Users
+
+CREATE TABLE users (
+    id              BIGSERIAL PRIMARY KEY,                  -- 사용자 고유 ID
+    email           VARCHAR(255) UNIQUE NOT NULL,           -- 로그인 이메일
+    password_hash   VARCHAR(255) NOT NULL,                  -- bcrypt 해시 비밀번호
+    name            VARCHAR(100) NOT NULL,                  -- 이름
+    nickname        VARCHAR(50),                            -- 닉네임
+    phone           VARCHAR(20),                            -- 전화번호
+    role            VARCHAR(20) NOT NULL DEFAULT 'USER',    -- 권한(USER/ADMIN 등)
+    group_id        BIGINT REFERENCES user_groups(id),      -- 사용자 그룹, NULL 허용
+    is_active       BOOLEAN NOT NULL DEFAULT TRUE,          -- 계정 활성 여부
+    social_provider VARCHAR(20),                            -- LOCAL/GOOGLE/KAKAO/NAVER
+    social_id       VARCHAR(255),                           -- 소셜 로그인 ID
+    created_at      TIMESTAMPTZ NOT NULL DEFAULT NOW(),     -- 가입일
+    updated_at      TIMESTAMPTZ NOT NULL DEFAULT NOW(),     -- 수정일 (트리거나 앱에서 갱신)
+    last_login_at   TIMESTAMPTZ                             -- 최근 로그인 시각
+);
+
+CREATE INDEX idx_users_email ON users(email);
+
+
+-- 3. Login History
+
+CREATE TABLE login_history (
+    id          BIGSERIAL PRIMARY KEY,                      -- 로그인 이력 ID
+    user_id     BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    login_at    TIMESTAMPTZ NOT NULL DEFAULT NOW(),         -- 로그인 시도 시각
+    is_success  BOOLEAN NOT NULL,                           -- 성공 여부
+    ip_address  VARCHAR(45),                                -- IPv4/IPv6
+    user_agent  TEXT,                                       -- 브라우저/클라이언트
+    device_info VARCHAR(255)                                -- 디바이스 정보
+);
+
+CREATE INDEX idx_login_history_user_time
+    ON login_history(user_id, login_at DESC);
+
+
+-- 4. user 프로필
+
+CREATE TABLE user_profiles (
+    id              BIGSERIAL PRIMARY KEY,
+    user_id         BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    monthly_income  BIGINT DEFAULT 0,
+    created_at      TIMESTAMPTZ DEFAULT NOW(),
+    updated_at      TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX idx_user_profiles_user
+    ON user_profiles(user_id);
+
+
+-- 5. categories
+
+CREATE TABLE categories (
+    id          BIGSERIAL PRIMARY KEY,
+    code        VARCHAR(50)  NOT NULL UNIQUE,    -- 내부 코드: FOOD, MART 등
+    name     VARCHAR(100) NOT NULL,           -- 카테고리 이름
+    created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+
+-- 6. transactions
+
+CREATE TABLE transactions ( 
+    id                BIGSERIAL PRIMARY KEY,
+    user_id           BIGINT       NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    category_id       BIGINT       REFERENCES categories(id) ON DELETE SET NULL,
+    amount            NUMERIC(12,2) NOT NULL,              -- 금액
+    currency          VARCHAR(10)  NOT NULL DEFAULT 'KRW', -- 통화
+    merchant_name     VARCHAR(255),                        -- 가맹점명
+    description       TEXT,                                -- 메모
+    status            VARCHAR(50)  NOT NULL DEFAULT 'completed', -- 상태
+    transaction_time  TIMESTAMPTZ  NOT NULL DEFAULT NOW(), -- 실제 거래 시각
+    created_at        TIMESTAMPTZ  NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX idx_transactions_user_time
+    ON transactions(user_id, transaction_time DESC);
+
+CREATE INDEX idx_transactions_category
+    ON transactions(category_id);
+
+
+-- 7. LLM 분석 결과
+
+CREATE TABLE ai_reports (
+    id              BIGSERIAL PRIMARY KEY,
+    user_id         BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    report_type     VARCHAR(50),        -- daily/weekly/monthly
+    period_start    DATE,
+    period_end      DATE,
+    summary_text    TEXT,
+    advice_text     TEXT,
+    score           INTEGER,            -- 0~100
+    created_at      TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX idx_ai_reports_user_time
+    ON ai_reports(user_id, created_at DESC);
+
+
+-- 8. 소비 예측
+
+CREATE TABLE predictions (
+    id                  BIGSERIAL PRIMARY KEY,
+    user_id             BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    category_id         BIGINT REFERENCES categories(id),
+    predicted_date      DATE NOT NULL,
+    predicted_amount    BIGINT NOT NULL,
+    model_name          VARCHAR(100),
+    created_at          TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX idx_predictions_user_date
+    ON predictions(user_id, predicted_date);
+
+
+-- 9. 이상 탐지
+
+CREATE TABLE anomalies (
+    id              BIGSERIAL PRIMARY KEY,
+    transaction_id  BIGINT NOT NULL REFERENCES transactions(id) ON DELETE CASCADE,
+    user_id         BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    severity        VARCHAR(20),         -- low/medium/high
+    reason          TEXT,
+    is_resolved     BOOLEAN DEFAULT FALSE,
+    created_at      TIMESTAMPTZ DEFAULT NOW(),
+    resolved_at     TIMESTAMPTZ
+);
+
+CREATE INDEX idx_anomalies_user_resolved
+    ON anomalies(user_id, is_resolved);
+
+
+-- 10. 쿠폰
+
+CREATE TABLE coupons (
+    id              BIGSERIAL PRIMARY KEY,
+    user_id         BIGINT REFERENCES users(id) ON DELETE CASCADE,
+    category_id     BIGINT REFERENCES categories(id),
+    merchant_name   VARCHAR(255),
+    code            VARCHAR(50) UNIQUE NOT NULL,
+    title           VARCHAR(100) NOT NULL,
+    description     TEXT,
+    discount_type   VARCHAR(20) NOT NULL DEFAULT 'rate',   -- rate/amount
+    discount_value  BIGINT NOT NULL DEFAULT 0,             -- % 또는 금액
+    min_amount      BIGINT,
+    valid_from      TIMESTAMPTZ,
+    valid_until     TIMESTAMPTZ,
+    is_active       BOOLEAN NOT NULL DEFAULT TRUE,
+    created_at      TIMESTAMPTZ DEFAULT NOW(),
+    used_at         TIMESTAMPTZ
+);
+
+CREATE INDEX idx_coupons_user_active
+    ON coupons(user_id, is_active);
+
+
+-- 11. 광고
+
+CREATE TABLE ad_campaigns (
+    id                  BIGSERIAL PRIMARY KEY,
+    name                VARCHAR(100) NOT NULL,
+    description         TEXT,
+    target_category_id  BIGINT REFERENCES categories(id),
+    target_segment      VARCHAR(100),          -- 광고 타겟 분야
+    banner_text         VARCHAR(255),
+    link_url            VARCHAR(255),
+    starts_at           TIMESTAMPTZ,
+    ends_at             TIMESTAMPTZ,
+    is_active           BOOLEAN NOT NULL DEFAULT TRUE,
+    created_at          TIMESTAMPTZ DEFAULT NOW()
+);
+
+
+-- 12. 광고 노출
+
+CREATE TABLE ad_impressions (
+    id              BIGSERIAL PRIMARY KEY,
+    user_id         BIGINT REFERENCES users(id) ON DELETE CASCADE,
+    campaign_id     BIGINT REFERENCES ad_campaigns(id) ON DELETE CASCADE,
+    impression_at   TIMESTAMPTZ DEFAULT NOW(),
+    clicked         BOOLEAN DEFAULT FALSE,
+    clicked_at      TIMESTAMPTZ
+);
+
+CREATE INDEX idx_ad_impressions_user
+    ON ad_impressions(user_id);
+
+
+-- 13. 알림 
+
+CREATE TABLE notifications (
+    id                  BIGSERIAL PRIMARY KEY,
+    user_id             BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    title               VARCHAR(100) NOT NULL,
+    message             TEXT NOT NULL,
+    is_read             BOOLEAN DEFAULT FALSE,
+    type                VARCHAR(50),  -- report/alert/coupon/ad
+    related_tx_id       BIGINT REFERENCES transactions(id),
+    related_anomaly_id  BIGINT REFERENCES anomalies(id),
+    related_coupon_id   BIGINT REFERENCES coupons(id),
+    created_at          TIMESTAMPTZ DEFAULT NOW(),
+    read_at             TIMESTAMPTZ
+);
+
+CREATE INDEX idx_notifications_user_read
+    ON notifications(user_id, is_read);
+
+COMMIT;

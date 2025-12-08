@@ -3,10 +3,14 @@ import { View, Text, StyleSheet, Switch, TouchableOpacity, ScrollView, Modal, Sh
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useTheme } from '../contexts/ThemeContext';
 import { useAuth } from '../contexts/AuthContext';
+import { useTransactions } from '../contexts/TransactionContext';
+import * as DocumentPicker from 'expo-document-picker';
+import axios from 'axios';
 
 export default function ProfileScreen() {
     const { colors, isDarkMode, toggleTheme } = useTheme();
     const { user, logout } = useAuth();
+    const { saveTransactions, clearTransactions, setLoading } = useTransactions();
     const [infoModalVisible, setInfoModalVisible] = useState(false);
     const [infoContent, setInfoContent] = useState({ title: '', content: '' });
 
@@ -30,23 +34,138 @@ export default function ProfileScreen() {
         }
     };
 
-    const handleSyncData = () => {
-        // 동기화 시뮬레이션
-        setTimeout(() => {
-            alert('데이터 동기화 완료!\n\n최신 거래 내역이 업데이트되었습니다.');
-        }, 1000);
-        alert('데이터 동기화 중...');
+    // ... (중략)
+
+    const handleSyncData = async () => {
+        try {
+            // 1. CSV 파일 선택
+            const result = await DocumentPicker.getDocumentAsync({
+                type: ['text/csv', 'text/comma-separated-values', 'application/csv'],
+                copyToCacheDirectory: true
+            });
+
+            if (result.canceled) {
+                return;
+            }
+
+            const file = result.assets ? result.assets[0] : result;
+
+            // 2. FormData 생성
+            const formData = new FormData();
+            if (file.file) {
+                // 웹 환경
+                formData.append('file', file.file);
+            } else {
+                // 앱 환경
+                formData.append('file', {
+                    uri: file.uri,
+                    name: file.name,
+                    type: file.mimeType || 'text/csv'
+                });
+            }
+
+            // 로딩 시작
+            setLoading(true);
+            alert('파일을 분석하고 거래 내역을 가져오는 중...');
+
+            // 3. 백엔드로 전송
+            const response = await axios.post(
+                'http://localhost:8000/ml/upload',
+                formData,
+                {
+                    headers: { 'Content-Type': 'multipart/form-data' },
+                    timeout: 60000  // 60초 타임아웃
+                }
+            );
+
+            const { transactions, summary } = response.data;
+
+            // 4. Context에 저장 (AsyncStorage 포함)
+            const saveResult = await saveTransactions(transactions);
+
+            if (saveResult.success) {
+                const categorySummary = Object.entries(summary.by_category)
+                    .map(([cat, cnt]) => `${cat}: ${cnt}건`)
+                    .join('\n');
+
+                alert(
+                    `✅ 동기화 완료!\n\n` +
+                    `총 거래: ${transactions.length}건\n\n` +
+                    `카테고리별 요약:\n${categorySummary}\n\n` +
+                    `거래 내역 탭에서 확인하세요!`
+                );
+
+                // 5. 다음 소비 예측 자동 실행
+                try {
+                    alert('🔮 다음 소비를 예측하는 중...');
+
+                    const predictResponse = await axios.post(
+                        'http://localhost:8000/ml/predict-next',
+                        formData,
+                        {
+                            headers: { 'Content-Type': 'multipart/form-data' },
+                            timeout: 30000
+                        }
+                    );
+
+                    const { predicted_category, confidence, probabilities, context } = predictResponse.data;
+
+                    // 확률 정렬 (높은 순)
+                    const sortedProbs = Object.entries(probabilities)
+                        .sort(([, a], [, b]) => b - a)
+                        .slice(0, 3)  // 상위 3개만
+                        .map(([cat, prob]) => `${cat}: ${(prob * 100).toFixed(1)}%`)
+                        .join('\n');
+
+                    // 결과 표시
+                    alert(`🔮 다음 소비 예측 결과\n\n` +
+                        `예측 카테고리: ${predicted_category}\n` +
+                        `신뢰도: ${(confidence * 100).toFixed(1)}%\n\n` +
+                        `📊 상위 3개 카테고리 확률:\n${sortedProbs}\n\n` +
+                        `📈 분석 정보:\n` +
+                        `• 총 거래: ${context.total_transactions}건\n` +
+                        `• 마지막 거래: ${context.last_category}\n` +
+                        `• 평균 금액: ${Math.round(context.user_avg_amount).toLocaleString()}원\n` +
+                        `• 주요 카테고리: ${context.most_frequent_category}`);
+
+                } catch (predictError) {
+                    console.error('예측 실패:', predictError);
+                    // 예측 실패해도 동기화는 성공이므로 에러 표시만
+                    alert('⚠️ 다음 소비 예측은 실패했지만 데이터 동기화는 성공했습니다.');
+                }
+            } else {
+                throw new Error('저장 실패');
+            }
+
+        } catch (error) {
+            console.error('동기화 실패:', error);
+            alert('동기화 실패: ' + (error.response?.data?.detail || error.message));
+        } finally {
+            setLoading(false);
+        }
     };
 
     const handleClearCache = async () => {
+        if (!confirm('⚠️ 모든 거래 데이터를 삭제하시겠습니까?\n\n이 작업은 되돌릴 수 없습니다.')) {
+            return;
+        }
+
         try {
-            // AsyncStorage에서 테마 외의 캐시 삭제 시뮬레이션
-            alert('캐시 삭제 중...');
-            setTimeout(() => {
-                alert('캐시가 삭제되었습니다!\n\n앱 성능이 개선될 수 있습니다.');
-            }, 800);
+            setLoading(true);
+
+            // TransactionContext의 clearTransactions 호출
+            const result = await clearTransactions();
+
+            if (result.success) {
+                alert('✅ 모든 거래 데이터가 삭제되었습니다!\n\n다시 CSV를 업로드하려면 "데이터 동기화" 버튼을 사용하세요.');
+            } else {
+                throw new Error('삭제 실패');
+            }
         } catch (error) {
-            alert('캐시 삭제 실패');
+            console.error('데이터 삭제 실패:', error);
+            alert('❌ 데이터 삭제 실패: ' + error.message);
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -158,8 +277,8 @@ export default function ProfileScreen() {
                 </View>
 
                 <MenuItem icon="" title="데이터 내보내기" onPress={handleExportData} />
-                <MenuItem icon="" title="데이터 동기화" onPress={handleSyncData} />
-                <MenuItem icon="" title="캐시 삭제" onPress={handleClearCache} />
+                <MenuItem icon="🔄" title="데이터 동기화 (예측 포함)" onPress={handleSyncData} />
+                <MenuItem icon="🗑️" title="거래 데이터 초기화" onPress={handleClearCache} />
             </View>
 
             <View style={styles(colors).section}>
