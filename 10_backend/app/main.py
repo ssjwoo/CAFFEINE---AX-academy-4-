@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 # 01_backend/app/main.py
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -74,22 +75,15 @@ Caffeine Backend API (v1.0)
 """
 
 from fastapi import FastAPI, Request
+=======
+# 01_backend/app/main.py
+from fastapi import FastAPI
+>>>>>>> origin/front-sjw
 from fastapi.middleware.cors import CORSMiddleware
-from slowapi import Limiter, _rate_limit_exceeded_handler
-from slowapi.util import get_remote_address
-from slowapi.errors import RateLimitExceeded
-import logging
-from datetime import datetime
-import os
-from dotenv import load_dotenv
 
-# ============================================================
-# 환경 변수 로드
-# ============================================================
-# .env 파일에서 환경 변수를 읽어옵니다.
-# DATABASE_URL, SECRET_KEY, ENCRYPTION_KEY 등이 포함되어야 합니다.
-load_dotenv()
+app = FastAPI()
 
+<<<<<<< HEAD
 # ============================================================
 # 로거 설정 (라이트 Audit 로그)
 # ============================================================
@@ -136,125 +130,57 @@ app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 # .env 파일의 ALLOWED_ORIGINS에서 쉼표로 구분된 도메인 목록을 읽습니다.
 # 예: ALLOWED_ORIGINS=http://localhost:3000,http://localhost:19006,http://localhost:8081
 allowed_origins = os.getenv("ALLOWED_ORIGINS", "http://localhost:3000,http://localhost:8081,http://localhost:8080,http://localhost:19000,http://localhost:19006").split(",")
+=======
+# CORS 설정 ----------------------------------------------------
+# 개발 단계에서는 * 로 열어두고, 배포 후에는 도메인만 허용하는 게 좋음.
+origins = [
+    "http://localhost:5173",  # 04_app_front Vite dev 서버
+    "http://localhost:5174",  # 05_admin_front Vite dev 서버 (포트는 팀에서 통일하기)
+    "http://localhost",       # nginx 경유 접근 (로컬)
+]
+>>>>>>> origin/front-sjw
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=allowed_origins,           # 허용할 도메인 목록
-    allow_credentials=True,                  # 쿠키 포함 요청 허용
-    allow_methods=["GET", "POST", "PUT", "DELETE", "PATCH"],  # 허용할 HTTP 메서드
-    allow_headers=["*"],                     # 모든 헤더 허용
+    allow_origins=["*"],      # 필요하다면 ["*"] 로 개발 중 전체 허용해도 됨
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
+# -------------------------------------------------------------
 
-# ============================================================
-# 보안 헤더 미들웨어
-# ============================================================
-# 주로 Nginx에서 처리하지만, FastAPI 레벨에서도 백업으로 추가합니다.
-# 이 헤더들은 XSS, Clickjacking 등의 공격을 방어하는 데 도움이 됩니다.
-@app.middleware("http")
-async def security_headers_middleware(request: Request, call_next):
-    """
-    모든 응답에 보안 헤더를 추가하는 미들웨어
-    
-    추가되는 헤더:
-    - X-Content-Type-Options: MIME 타입 스니핑 방지
-    - X-Frame-Options: 클릭재킹 공격 방지 (iframe 차단)
-    - X-XSS-Protection: XSS 공격 방지 (구형 브라우저용)
-    """
-    response = await call_next(request)
-    response.headers["X-Content-Type-Options"] = "nosniff"
-    response.headers["X-Frame-Options"] = "DENY"
-    response.headers["X-XSS-Protection"] = "1; mode=block"
-    return response
+# ---------------- DUMMY DATA!! 나중에 삭제 --------------------
+dummy_users = [
+    {"id": 1, "name": "홍길동", "email": "test1@example.com"},
+    {"id": 2, "name": "김철수", "email": "test2@example.com"},
+]
 
-# ============================================================
-# 라이트 Audit 로그 미들웨어
-# ============================================================
-# 모든 HTTP 요청과 응답을 로깅하여 감사 추적을 가능하게 합니다.
-# v1.0에서는 파일/콘솔에만 기록하고, v2.0+에서는 DB에 저장할 예정입니다.
-@app.middleware("http")
-async def audit_log_middleware(request: Request, call_next):
-    """
-    모든 HTTP 요청/응답을 로깅하는 미들웨어
-    
-    로깅 내용:
-    - 요청: HTTP 메서드, URL 경로, 클라이언트 IP
-    - 응답: HTTP 상태 코드, 처리 시간
-    
-    로그 파일: audit.log (프로젝트 루트에 생성됨)
-    """
-    start_time = datetime.utcnow()
-    
-    # 요청 로깅 (요청이 들어올 때)
-    audit_logger.info(
-        f"Request: {request.method} {request.url.path} | "
-        f"Client: {request.client.host if request.client else 'unknown'}"
-    )
-    
-    # 실제 요청 처리
-    response = await call_next(request)
-    
-    # 응답 로깅 (응답을 보낼 때)
-    duration = (datetime.utcnow() - start_time).total_seconds()
-    audit_logger.info(
-        f"Response: {response.status_code} | Duration: {duration:.3f}s"
-    )
-    
-    return response
+dummy_transactions = [
+    {"id": 1, "user_id": 1, "category": "식비", "amount": 12000},
+    {"id": 2, "user_id": 2, "category": "쇼핑", "amount": 50000},
+]
+# -------------------------------------------------------------
 
-# ============================================================
-# 기본 엔드포인트
-# ============================================================
-
-@app.get("/")
-async def root():
-    """
-    API 루트 엔드포인트
-    
-    API가 정상 작동 중인지 확인하고 문서 링크를 제공합니다.
-    
-    Returns:
-        dict: API 상태 및 문서 링크
-    """
-    return {
-        "message": "Caffeine API v1.0",
-        "status": "running",
-        "docs": "/docs",      # Swagger UI 문서
-        "redoc": "/redoc"     # ReDoc 문서
-    }
 
 @app.get("/health")
-@limiter.limit("10/minute")  # 분당 10회로 제한
-async def health(request: Request):
-    """
-    헬스체크 엔드포인트 (Rate Limiting 적용 예시)
-    
-    이 엔드포인트는 slowapi Rate Limiting이 적용되어 있어
-    동일 IP에서 분당 10회까지만 호출할 수 있습니다.
-    
-    모니터링 도구(Kubernetes, Docker 등)에서 주기적으로 호출하여
-    API 서버의 정상 작동 여부를 확인하는 데 사용됩니다.
-    
-    Args:
-        request: FastAPI Request 객체 (Rate Limiting에 필요)
-    
-    Returns:
-        dict: 상태 및 현재 타임스탬프
-    """
-    return {
-        "status": "ok",
-        "timestamp": datetime.utcnow().isoformat()
-    }
+def health():
+    return {"status": "ok"}
 
+<<<<<<< HEAD
 # ============================================================
 # 라우터 등록
 # ============================================================
 from app.routers import ml
 app.include_router(ml.router)
+=======
+>>>>>>> origin/front-sjw
 
-# ============================================================
-# 시작 / 종료 이벤트
-# ============================================================
+@app.get("/users")
+def get_users():
+    # 🚨 DUMMY DATA!! 나중에 DB 연동되면 교체
+    return dummy_users
 
+<<<<<<< HEAD
 @app.on_event("startup")
 async def startup_event():
     """
@@ -304,3 +230,10 @@ async def shutdown_event():
 #    - 접근 제어 매트릭스 (Role별 권한 상세 정의)
 #    - 사고 대응 절차 (Incident Response Plan)
 >>>>>>> origin/develop-psh
+=======
+
+@app.get("/transactions")
+def get_transactions():
+    # 🚨 DUMMY DATA!! 나중에 DB 연동되면 교체
+    return dummy_transactions
+>>>>>>> origin/front-sjw
