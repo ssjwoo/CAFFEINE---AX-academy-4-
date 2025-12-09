@@ -9,7 +9,7 @@
   "containerDefinitions": [
     {
       "name": "backend",
-      "image": "<IMAGE_PLACEHOLDER>",
+      "image": "REPLACE_ME",
       "essential": true,
       "portMappings": [
         {
