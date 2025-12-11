@@ -1,15 +1,18 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, Switch, TouchableOpacity, ScrollView, Modal, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, Switch, TouchableOpacity, ScrollView, Modal, Dimensions, ActivityIndicator } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import * as DocumentPicker from 'expo-document-picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useTheme } from '../contexts/ThemeContext';
 import { useAuth } from '../contexts/AuthContext';
+import { useTransactions } from '../contexts/TransactionContext';
 
 const { width: screenWidth } = Dimensions.get('window');
 
-export default function ProfileScreen() {
+export default function ProfileScreen({ navigation }) {
     const { colors, isDarkMode, toggleTheme } = useTheme();
     const { user, logout } = useAuth();
+    const { saveTransactions, clearTransactions, loading: syncLoading } = useTransactions();
     const [infoModalVisible, setInfoModalVisible] = useState(false);
     const [infoContent, setInfoContent] = useState({ title: '', content: '' });
 
@@ -22,21 +25,105 @@ export default function ProfileScreen() {
         }
     };
 
-    const handleSyncData = () => {
-        setTimeout(() => {
-            alert('데이터 동기화 완료!\n\n최신 거래 내역이 업데이트되었습니다.');
-        }, 1000);
-        alert('데이터 동기화 중...');
+    // CSV 파일 파싱 함수
+    const parseCSV = (csvText) => {
+        const lines = csvText.trim().split('\n');
+        if (lines.length < 2) return [];
+
+        const headers = lines[0].split(',').map(h => h.trim());
+        const transactions = [];
+
+        for (let i = 1; i < lines.length; i++) {
+            const values = lines[i].split(',');
+            if (values.length < 6) continue;
+
+            // CSV 컬럼 매핑: 날짜,시간,타입,대분류,소분류,내용,금액,화폐,결제수단,메모
+            const transaction = {
+                id: String(i),
+                date: values[0]?.trim() + ' ' + (values[1]?.trim() || '00:00'),
+                category: values[3]?.trim() || '기타',
+                merchant: values[5]?.trim() || '알 수 없음',
+                amount: Math.abs(parseFloat(values[6]?.trim()) || 0),
+                cardType: values[8]?.includes('체크') ? '체크' : '신용',
+                notes: values[9]?.trim() || '',
+            };
+
+            if (transaction.amount > 0) {
+                transactions.push(transaction);
+            }
+        }
+
+        return transactions;
+    };
+
+    // 데이터 동기화 (CSV 파일 선택)
+    const handleSyncData = async () => {
+        try {
+            // 파일 선택 다이얼로그 열기
+            const result = await DocumentPicker.getDocumentAsync({
+                type: ['text/csv', 'text/comma-separated-values', 'application/csv', '*/*'],
+                copyToCacheDirectory: true,
+            });
+
+            if (result.canceled) {
+                return;
+            }
+
+            const file = result.assets[0];
+            console.log('선택된 파일:', file.name);
+
+            // 파일 읽기
+            const response = await fetch(file.uri);
+            const csvText = await response.text();
+
+            // CSV 파싱
+            const transactions = parseCSV(csvText);
+
+            if (transactions.length === 0) {
+                alert('CSV 파일에서 거래 데이터를 찾을 수 없습니다.\n\n올바른 형식의 CSV 파일인지 확인해주세요.');
+                return;
+            }
+
+            // TransactionContext에 저장
+            const saveResult = await saveTransactions(transactions);
+
+            if (saveResult.success) {
+                alert(`✅ 데이터 동기화 완료!\n\n${transactions.length}건의 거래 내역이 업데이트되었습니다.`);
+                // 대시보드로 자동 이동
+                navigation?.navigate('대시보드');
+            } else {
+                alert('데이터 저장 중 오류가 발생했습니다.');
+            }
+
+        } catch (error) {
+            console.error('동기화 실패:', error);
+            alert('파일을 읽는 중 오류가 발생했습니다.\n\n' + error.message);
+        }
     };
 
     const handleClearCache = async () => {
+        // 확인 다이얼로그
+        const confirmed = confirm('정말 모든 거래 데이터를 삭제하시겠습니까?\n\n이 작업은 되돌릴 수 없습니다.');
+        
+        if (!confirmed) return;
+
         try {
-            alert('캐시 삭제 중...');
-            setTimeout(() => {
-                alert('캐시가 삭제되었습니다!\n\n앱 성능이 개선될 수 있습니다.');
-            }, 800);
+            // TransactionContext의 clearTransactions 호출
+            await clearTransactions();
+            
+            // AsyncStorage에서도 삭제 (이중 보장)
+            await AsyncStorage.removeItem('transactions_cache');
+            await AsyncStorage.removeItem('last_sync_time');
+            
+            alert('✅ 캐시가 삭제되었습니다!\n\n모든 거래 데이터가 초기화되었습니다.\n다시 동기화해주세요.');
+            
+            // 페이지 새로고침 효과
+            if (typeof window !== 'undefined') {
+                window.location.reload();
+            }
         } catch (error) {
-            alert('캐시 삭제 실패');
+            console.error('캐시 삭제 실패:', error);
+            alert('캐시 삭제 중 오류가 발생했습니다.');
         }
     };
 

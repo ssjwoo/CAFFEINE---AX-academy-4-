@@ -101,18 +101,49 @@ export default function DashboardScreen({ navigation }) {
 
         const monthlyMap = {};
         txns.forEach(t => {
-            const date = t.date?.split(' ')[0] || t.date;
-            const month = date?.substring(0, 7); // YYYY-MM
-            if (month) {
+            let date = t.date?.split(' ')[0] || t.date || '';
+            
+            // 다양한 날짜 형식 처리
+            let month = null;
+            
+            // YYYY-MM-DD 형식
+            if (date.match(/^\d{4}-\d{2}/)) {
+                month = date.substring(0, 7);
+            }
+            // YYYY.MM.DD 형식
+            else if (date.match(/^\d{4}\.\d{2}/)) {
+                month = date.substring(0, 7).replace('.', '-');
+            }
+            // DD/MM/YYYY 또는 MM/DD/YYYY 형식
+            else if (date.includes('/')) {
+                const parts = date.split('/');
+                if (parts.length >= 3) {
+                    // 마지막이 4자리면 년도로 가정
+                    if (parts[2]?.length === 4) {
+                        month = `${parts[2]}-${parts[1].padStart(2, '0')}`;
+                    }
+                }
+            }
+            
+            if (month && month.length >= 7) {
                 if (!monthlyMap[month]) monthlyMap[month] = 0;
                 monthlyMap[month] += Math.abs(t.amount);
             }
         });
 
-        return Object.entries(monthlyMap)
+        const sortedData = Object.entries(monthlyMap)
             .sort((a, b) => a[0].localeCompare(b[0]))
             .slice(-6)
             .map(([month, amount]) => ({ month, total_amount: amount }));
+
+        // 데이터가 없으면 현재 월 기본값 반환
+        if (sortedData.length === 0) {
+            const now = new Date();
+            const currentMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+            return [{ month: currentMonth, total_amount: 0 }];
+        }
+
+        return sortedData;
     };
 
     useEffect(() => {
@@ -169,11 +200,21 @@ export default function DashboardScreen({ navigation }) {
     const screenWidth = Dimensions.get('window').width;
     const chartWidth = screenWidth - 48;
 
+    // 월별 라벨 안전하게 생성
+    const getMonthLabel = (monthStr) => {
+        if (!monthStr || typeof monthStr !== 'string') return '?월';
+        const parts = monthStr.split('-');
+        if (parts.length >= 2 && parts[1]) {
+            return parseInt(parts[1], 10) + '월';
+        }
+        return '?월';
+    };
+
     // 월별 데이터가 있을 때만 차트 데이터 생성
-    const lineChartData = monthlyData.length > 0 ? {
-        labels: monthlyData.map(item => item.month.split('-')[1] + '월'),
+    const lineChartData = (monthlyData && monthlyData.length > 0) ? {
+        labels: monthlyData.map(item => getMonthLabel(item.month)),
         datasets: [{
-            data: monthlyData.map(item => item.total_amount / 10000),
+            data: monthlyData.map(item => (item.total_amount || 0) / 10000),
             color: (opacity = 1) => `rgba(37, 99, 235, ${opacity})`,
             strokeWidth: 3
         }]
@@ -322,45 +363,54 @@ export default function DashboardScreen({ navigation }) {
                         </TouchableOpacity>
                     </View>
                     <View style={styles.chartCard}>
-                        <LineChart
-                            data={lineChartData}
-                            width={chartWidth}
-                            height={200}
-                            chartConfig={{
-                                backgroundColor: '#FFFFFF',
-                                backgroundGradientFrom: '#FFFFFF',
-                                backgroundGradientTo: '#FFFFFF',
-                                decimalPlaces: 0,
-                                color: (opacity = 1) => `rgba(37, 99, 235, ${opacity})`,
-                                labelColor: (opacity = 1) => `rgba(107, 114, 128, ${opacity})`,
-                                style: { borderRadius: 16 },
-                                propsForDots: { r: '5', strokeWidth: '2', stroke: '#2563EB' },
-                                propsForBackgroundLines: {
-                                    strokeDasharray: '',
-                                    stroke: '#E5E7EB',
-                                    strokeWidth: 1,
-                                }
-                            }}
-                            bezier
-                            style={styles.chart}
-                            withInnerLines={true}
-                            withOuterLines={false}
-                            withVerticalLines={false}
-                            onDataPointClick={(data) => {
-                                const amount = (data.value * 10000).toFixed(0);
-                                setTooltip({
-                                    x: data.x,
-                                    y: data.y,
-                                    value: formatCurrency(parseInt(amount)),
-                                    month: monthlyData[data.index]?.month.split('-')[1] + '월'
-                                });
-                                setTimeout(() => setTooltip(null), 3000);
-                            }}
-                        />
-                        {tooltip && (
-                            <View style={[styles.tooltip, { left: tooltip.x - 40, top: tooltip.y - 50 }]}>
-                                <Text style={styles.tooltipMonth}>{tooltip.month}</Text>
-                                <Text style={styles.tooltipValue}>{tooltip.value}</Text>
+                        {lineChartData ? (
+                            <>
+                                <LineChart
+                                    data={lineChartData}
+                                    width={chartWidth}
+                                    height={200}
+                                    chartConfig={{
+                                        backgroundColor: '#FFFFFF',
+                                        backgroundGradientFrom: '#FFFFFF',
+                                        backgroundGradientTo: '#FFFFFF',
+                                        decimalPlaces: 0,
+                                        color: (opacity = 1) => `rgba(37, 99, 235, ${opacity})`,
+                                        labelColor: (opacity = 1) => `rgba(107, 114, 128, ${opacity})`,
+                                        style: { borderRadius: 16 },
+                                        propsForDots: { r: '5', strokeWidth: '2', stroke: '#2563EB' },
+                                        propsForBackgroundLines: {
+                                            strokeDasharray: '',
+                                            stroke: '#E5E7EB',
+                                            strokeWidth: 1,
+                                        }
+                                    }}
+                                    bezier
+                                    style={styles.chart}
+                                    withInnerLines={true}
+                                    withOuterLines={false}
+                                    withVerticalLines={false}
+                                    onDataPointClick={(data) => {
+                                        const amount = (data.value * 10000).toFixed(0);
+                                        const monthLabel = getMonthLabel(monthlyData[data.index]?.month);
+                                        setTooltip({
+                                            x: data.x,
+                                            y: data.y,
+                                            value: formatCurrency(parseInt(amount)),
+                                            month: monthLabel
+                                        });
+                                        setTimeout(() => setTooltip(null), 3000);
+                                    }}
+                                />
+                                {tooltip && (
+                                    <View style={[styles.tooltip, { left: tooltip.x - 40, top: tooltip.y - 50 }]}>
+                                        <Text style={styles.tooltipMonth}>{tooltip.month}</Text>
+                                        <Text style={styles.tooltipValue}>{tooltip.value}</Text>
+                                    </View>
+                                )}
+                            </>
+                        ) : (
+                            <View style={{ height: 200, justifyContent: 'center', alignItems: 'center' }}>
+                                <Text style={{ color: '#6B7280', fontSize: 14 }}>차트 데이터 준비 중...</Text>
                             </View>
                         )}
                         <Text style={styles.chartCaption}>단위: 만원</Text>
