@@ -104,23 +104,23 @@ services:
       # S3_BUCKET: caffeine-ml-models
       # MODEL_KEY: models/model.joblib
 
-  ml_fraud:
-    build: ./41_ml_fraud
-    container_name: caf_ml_fraud
-    ports:
-      - "9002:9002"
+      # ml_fraud:
+      #   build: ./41_ml_fraud
+      #   container_name: caf_ml_fraud
+      #   ports:
+      #     - "9002:9002"
 
-  # ============================================================
-  # LLM 서비스
-  # ============================================================
-  llm_category:
-    build: ./50_llm_category
-    container_name: caf_llm_category
-    ports:
-      - "9100:9100"
+      # ============================================================
+      # LLM 서비스
+      # # ============================================================
+      # llm_category:
+      #   build: ./50_llm_category
+      #   container_name: caf_llm_category
+      #   ports:
+      #     - "9100:9100"
 
-  llm_analysis:
-    build: ./51_llm_analysis
-    container_name: caf_llm_analysis
-    ports:
-      - "9101:9101"
+      # llm_analysis:
+      #   build: ./51_llm_analysis
+      #   container_name: caf_llm_analysis
+      #   ports:
+      #     - "9102:9101"
