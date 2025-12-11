@@ -1,0 +1,786 @@
+2025-12-05 12:09:59,793 - numexpr.utils - INFO - Note: NumExpr detected 20 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 16.
+2025-12-05 12:09:59,793 - numexpr.utils - INFO - NumExpr defaulting to 16 threads.
+2025-12-05 12:09:59,866 - app.main - INFO - ============================================================
+2025-12-05 12:09:59,866 - app.main - INFO - 🚀 Caffeine API 시작됨
+2025-12-05 12:09:59,866 - app.main - INFO - 환경: development
+2025-12-05 12:09:59,866 - app.main - INFO - CORS 허용 도메인: ['http://localhost:3000']
+2025-12-05 12:10:00,937 - app.main - INFO - ============================================================
+2025-12-05 12:12:48,884 - app.main - INFO - ============================================================
+2025-12-05 12:12:48,884 - app.main - INFO - 🛑 Caffeine API 종료됨
+2025-12-05 12:12:48,884 - app.main - INFO - ============================================================
+2025-12-05 12:12:49,169 - numexpr.utils - INFO - Note: NumExpr detected 20 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 16.
+2025-12-05 12:12:49,169 - numexpr.utils - INFO - NumExpr defaulting to 16 threads.
+2025-12-05 12:12:49,239 - app.main - INFO - ============================================================
+2025-12-05 12:12:49,239 - app.main - INFO - 🚀 Caffeine API 시작됨
+2025-12-05 12:12:49,239 - app.main - INFO - 환경: development
+2025-12-05 12:12:49,239 - app.main - INFO - CORS 허용 도메인: ['http://localhost:3000']
+2025-12-05 12:12:49,430 - numexpr.utils - INFO - Note: NumExpr detected 20 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 16.
+2025-12-05 12:12:49,430 - numexpr.utils - INFO - NumExpr defaulting to 16 threads.
+2025-12-05 12:12:49,499 - app.main - INFO - ============================================================
+2025-12-05 12:12:49,499 - app.main - INFO - 🚀 Caffeine API 시작됨
+2025-12-05 12:12:49,499 - app.main - INFO - 환경: development
+2025-12-05 12:12:49,499 - app.main - INFO - CORS 허용 도메인: ['http://localhost:3000']
+2025-12-05 12:12:50,248 - app.main - INFO - ============================================================
+2025-12-05 12:12:50,248 - app.main - INFO - ============================================================
+2025-12-05 12:12:50,248 - app.main - INFO - 🛑 Caffeine API 종료됨
+2025-12-05 12:12:50,249 - app.main - INFO - ============================================================
+2025-12-05 12:12:50,443 - app.main - INFO - ============================================================
+2025-12-05 12:14:08,672 - audit - INFO - Request: POST /ml/predict | Client: 127.0.0.1
+2025-12-05 12:14:08,675 - audit - INFO - Response: 400 | Duration: 0.003s
+2025-12-05 12:14:26,959 - app.main - INFO - ============================================================
+2025-12-05 12:14:26,959 - app.main - INFO - 🛑 Caffeine API 종료됨
+2025-12-05 12:14:26,959 - app.main - INFO - ============================================================
+2025-12-05 12:14:27,368 - numexpr.utils - INFO - Note: NumExpr detected 20 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 16.
+2025-12-05 12:14:27,368 - numexpr.utils - INFO - NumExpr defaulting to 16 threads.
+2025-12-05 12:14:27,469 - app.main - INFO - ============================================================
+2025-12-05 12:14:27,469 - app.main - INFO - 🚀 Caffeine API 시작됨
+2025-12-05 12:14:27,469 - app.main - INFO - 환경: development
+2025-12-05 12:14:27,469 - app.main - INFO - CORS 허용 도메인: ['http://localhost:3000']
+2025-12-05 12:14:27,470 - numexpr.utils - INFO - Note: NumExpr detected 20 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 16.
+2025-12-05 12:14:27,470 - numexpr.utils - INFO - NumExpr defaulting to 16 threads.
+2025-12-05 12:14:27,558 - app.main - INFO - ============================================================
+2025-12-05 12:14:27,558 - app.main - INFO - 🚀 Caffeine API 시작됨
+2025-12-05 12:14:27,558 - app.main - INFO - 환경: development
+2025-12-05 12:14:27,558 - app.main - INFO - CORS 허용 도메인: ['http://localhost:3000']
+2025-12-05 12:14:28,578 - app.main - INFO - ============================================================
+2025-12-05 12:14:28,578 - app.main - INFO - ============================================================
+2025-12-05 12:14:28,578 - app.main - INFO - 🛑 Caffeine API 종료됨
+2025-12-05 12:14:28,578 - app.main - INFO - ============================================================
+2025-12-05 12:14:28,661 - app.main - INFO - ============================================================
+2025-12-05 12:14:51,121 - audit - INFO - Request: POST /ml/predict | Client: 127.0.0.1
+2025-12-05 12:14:51,123 - audit - INFO - Response: 200 | Duration: 0.002s
+2025-12-05 12:19:52,351 - audit - INFO - Request: OPTIONS /ml/predict | Client: 127.0.0.1
+2025-12-05 12:19:52,352 - audit - INFO - Response: 400 | Duration: 0.000s
+2025-12-05 12:19:54,452 - audit - INFO - Request: OPTIONS /ml/predict | Client: 127.0.0.1
+2025-12-05 12:19:54,453 - audit - INFO - Response: 400 | Duration: 0.000s
+2025-12-05 12:20:52,477 - app.main - INFO - ============================================================
+2025-12-05 12:20:52,477 - app.main - INFO - 🛑 Caffeine API 종료됨
+2025-12-05 12:20:52,477 - app.main - INFO - ============================================================
+2025-12-05 12:20:52,947 - numexpr.utils - INFO - Note: NumExpr detected 20 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 16.
+2025-12-05 12:20:52,947 - numexpr.utils - INFO - NumExpr defaulting to 16 threads.
+2025-12-05 12:20:52,967 - numexpr.utils - INFO - Note: NumExpr detected 20 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 16.
+2025-12-05 12:20:52,968 - numexpr.utils - INFO - NumExpr defaulting to 16 threads.
+2025-12-05 12:20:53,016 - app.main - INFO - ============================================================
+2025-12-05 12:20:53,016 - app.main - INFO - 🚀 Caffeine API 시작됨
+2025-12-05 12:20:53,016 - app.main - INFO - 환경: development
+2025-12-05 12:20:53,016 - app.main - INFO - CORS 허용 도메인: ['http://localhost:3000', 'http://localhost:8081', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006']
+2025-12-05 12:20:53,037 - app.main - INFO - ============================================================
+2025-12-05 12:20:53,037 - app.main - INFO - 🚀 Caffeine API 시작됨
+2025-12-05 12:20:53,037 - app.main - INFO - 환경: development
+2025-12-05 12:20:53,038 - app.main - INFO - CORS 허용 도메인: ['http://localhost:3000', 'http://localhost:8081', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006']
+2025-12-05 12:20:53,932 - app.main - INFO - ============================================================
+2025-12-05 12:20:53,933 - app.main - INFO - ============================================================
+2025-12-05 12:20:53,933 - app.main - INFO - ============================================================
+2025-12-05 12:20:53,933 - app.main - INFO - 🛑 Caffeine API 종료됨
+2025-12-05 12:20:53,933 - app.main - INFO - ============================================================
+2025-12-05 12:24:17,322 - audit - INFO - Request: OPTIONS /ml/predict | Client: 127.0.0.1
+2025-12-05 12:24:17,322 - audit - INFO - Response: 200 | Duration: 0.000s
+2025-12-05 12:24:17,324 - audit - INFO - Request: POST /ml/predict | Client: 127.0.0.1
+2025-12-05 12:24:17,325 - audit - INFO - Response: 200 | Duration: 0.002s
+2025-12-05 12:24:17,495 - audit - INFO - Request: POST /ml/predict | Client: 127.0.0.1
+2025-12-05 12:24:17,497 - audit - INFO - Response: 200 | Duration: 0.002s
+2025-12-05 12:38:36,454 - audit - INFO - Request: OPTIONS /ml/predict | Client: 127.0.0.1
+2025-12-05 12:38:36,454 - audit - INFO - Response: 200 | Duration: 0.000s
+2025-12-05 12:38:36,457 - audit - INFO - Request: POST /ml/predict | Client: 127.0.0.1
+2025-12-05 12:38:36,459 - audit - INFO - Response: 200 | Duration: 0.002s
+2025-12-05 14:19:34,258 - audit - INFO - Request: OPTIONS /ml/predict | Client: 127.0.0.1
+2025-12-05 14:19:34,259 - audit - INFO - Response: 200 | Duration: 0.000s
+2025-12-05 14:19:34,260 - audit - INFO - Request: POST /ml/predict | Client: 127.0.0.1
+2025-12-05 14:19:34,261 - audit - INFO - Response: 200 | Duration: 0.001s
+2025-12-05 14:19:48,920 - audit - INFO - Request: POST /ml/predict | Client: 127.0.0.1
+2025-12-05 14:19:48,922 - audit - INFO - Response: 200 | Duration: 0.001s
+2025-12-05 14:19:49,184 - audit - INFO - Request: POST /ml/predict | Client: 127.0.0.1
+2025-12-05 14:19:49,185 - audit - INFO - Response: 200 | Duration: 0.001s
+2025-12-05 14:19:49,551 - audit - INFO - Request: POST /ml/predict | Client: 127.0.0.1
+2025-12-05 14:19:49,552 - audit - INFO - Response: 200 | Duration: 0.001s
+2025-12-05 14:20:45,925 - app.main - INFO - ============================================================
+2025-12-05 14:20:45,925 - app.main - INFO - 🛑 Caffeine API 종료됨
+2025-12-05 14:20:45,925 - app.main - INFO - ============================================================
+2025-12-05 14:21:10,718 - numexpr.utils - INFO - Note: NumExpr detected 20 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 16.
+2025-12-05 14:21:10,718 - numexpr.utils - INFO - NumExpr defaulting to 16 threads.
+2025-12-05 14:21:10,791 - app.main - INFO - ============================================================
+2025-12-05 14:21:10,791 - app.main - INFO - 🚀 Caffeine API 시작됨
+2025-12-05 14:21:10,791 - app.main - INFO - 환경: development
+2025-12-05 14:21:10,791 - app.main - INFO - CORS 허용 도메인: ['http://localhost:3000', 'http://localhost:8081', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006']
+2025-12-05 14:21:10,951 - numexpr.utils - INFO - Note: NumExpr detected 20 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 16.
+2025-12-05 14:21:10,951 - numexpr.utils - INFO - NumExpr defaulting to 16 threads.
+2025-12-05 14:21:11,023 - app.main - INFO - ============================================================
+2025-12-05 14:21:11,023 - app.main - INFO - 🚀 Caffeine API 시작됨
+2025-12-05 14:21:11,023 - app.main - INFO - 환경: development
+2025-12-05 14:21:11,023 - app.main - INFO - CORS 허용 도메인: ['http://localhost:3000', 'http://localhost:8081', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006']
+2025-12-05 14:21:11,833 - app.main - INFO - ============================================================
+2025-12-05 14:21:11,833 - app.main - INFO - ============================================================
+2025-12-05 14:21:11,833 - app.main - INFO - ============================================================
+2025-12-05 14:21:11,834 - app.main - INFO - 🛑 Caffeine API 종료됨
+2025-12-05 14:21:11,834 - app.main - INFO - ============================================================
+2025-12-05 14:25:56,965 - audit - INFO - Request: POST /ml/predict | Client: 127.0.0.1
+2025-12-05 14:25:56,967 - audit - INFO - Response: 200 | Duration: 0.002s
+2025-12-05 14:25:57,265 - audit - INFO - Request: POST /ml/predict | Client: 127.0.0.1
+2025-12-05 14:25:57,267 - audit - INFO - Response: 200 | Duration: 0.001s
+2025-12-05 14:25:57,891 - audit - INFO - Request: POST /ml/predict | Client: 127.0.0.1
+2025-12-05 14:25:57,892 - audit - INFO - Response: 200 | Duration: 0.002s
+2025-12-05 14:25:58,332 - audit - INFO - Request: POST /ml/predict | Client: 127.0.0.1
+2025-12-05 14:25:58,333 - audit - INFO - Response: 200 | Duration: 0.001s
+2025-12-05 14:25:58,747 - audit - INFO - Request: POST /ml/predict | Client: 127.0.0.1
+2025-12-05 14:25:58,749 - audit - INFO - Response: 200 | Duration: 0.001s
+2025-12-05 14:25:58,956 - audit - INFO - Request: POST /ml/predict | Client: 127.0.0.1
+2025-12-05 14:25:58,957 - audit - INFO - Response: 200 | Duration: 0.001s
+2025-12-05 14:25:59,186 - audit - INFO - Request: POST /ml/predict | Client: 127.0.0.1
+2025-12-05 14:25:59,187 - audit - INFO - Response: 200 | Duration: 0.001s
+2025-12-05 14:25:59,643 - audit - INFO - Request: POST /ml/predict | Client: 127.0.0.1
+2025-12-05 14:25:59,644 - audit - INFO - Response: 200 | Duration: 0.001s
+2025-12-05 14:26:00,058 - audit - INFO - Request: POST /ml/predict | Client: 127.0.0.1
+2025-12-05 14:26:00,060 - audit - INFO - Response: 200 | Duration: 0.001s
+2025-12-05 14:26:00,275 - audit - INFO - Request: POST /ml/predict | Client: 127.0.0.1
+2025-12-05 14:26:00,276 - audit - INFO - Response: 200 | Duration: 0.001s
+2025-12-05 14:26:00,498 - audit - INFO - Request: POST /ml/predict | Client: 127.0.0.1
+2025-12-05 14:26:00,499 - audit - INFO - Response: 200 | Duration: 0.001s
+2025-12-05 14:26:00,708 - audit - INFO - Request: POST /ml/predict | Client: 127.0.0.1
+2025-12-05 14:26:00,709 - audit - INFO - Response: 200 | Duration: 0.001s
+2025-12-05 14:26:00,914 - audit - INFO - Request: POST /ml/predict | Client: 127.0.0.1
+2025-12-05 14:26:00,915 - audit - INFO - Response: 200 | Duration: 0.001s
+2025-12-05 14:26:01,125 - audit - INFO - Request: POST /ml/predict | Client: 127.0.0.1
+2025-12-05 14:26:01,126 - audit - INFO - Response: 200 | Duration: 0.001s
+2025-12-05 14:26:01,330 - audit - INFO - Request: POST /ml/predict | Client: 127.0.0.1
+2025-12-05 14:26:01,331 - audit - INFO - Response: 200 | Duration: 0.001s
+2025-12-05 14:26:01,538 - audit - INFO - Request: POST /ml/predict | Client: 127.0.0.1
+2025-12-05 14:26:01,539 - audit - INFO - Response: 200 | Duration: 0.001s
+2025-12-05 14:26:01,741 - audit - INFO - Request: POST /ml/predict | Client: 127.0.0.1
+2025-12-05 14:26:01,743 - audit - INFO - Response: 200 | Duration: 0.001s
+2025-12-05 14:26:01,924 - audit - INFO - Request: POST /ml/predict | Client: 127.0.0.1
+2025-12-05 14:26:01,925 - audit - INFO - Response: 200 | Duration: 0.002s
+2025-12-05 14:26:02,123 - audit - INFO - Request: POST /ml/predict | Client: 127.0.0.1
+2025-12-05 14:26:02,124 - audit - INFO - Response: 200 | Duration: 0.001s
+2025-12-05 14:26:02,313 - audit - INFO - Request: POST /ml/predict | Client: 127.0.0.1
+2025-12-05 14:26:02,315 - audit - INFO - Response: 200 | Duration: 0.001s
+2025-12-05 14:26:02,507 - audit - INFO - Request: POST /ml/predict | Client: 127.0.0.1
+2025-12-05 14:26:02,509 - audit - INFO - Response: 200 | Duration: 0.001s
+2025-12-05 14:26:02,684 - audit - INFO - Request: POST /ml/predict | Client: 127.0.0.1
+2025-12-05 14:26:02,685 - audit - INFO - Response: 200 | Duration: 0.001s
+2025-12-05 14:26:10,090 - audit - INFO - Request: POST /ml/predict | Client: 127.0.0.1
+2025-12-05 14:26:10,091 - audit - INFO - Response: 200 | Duration: 0.001s
+2025-12-05 14:26:10,602 - audit - INFO - Request: POST /ml/predict | Client: 127.0.0.1
+2025-12-05 14:26:10,603 - audit - INFO - Response: 200 | Duration: 0.001s
+2025-12-05 14:26:11,026 - audit - INFO - Request: POST /ml/predict | Client: 127.0.0.1
+2025-12-05 14:26:11,028 - audit - INFO - Response: 200 | Duration: 0.001s
+2025-12-05 14:26:11,186 - audit - INFO - Request: POST /ml/predict | Client: 127.0.0.1
+2025-12-05 14:26:11,188 - audit - INFO - Response: 200 | Duration: 0.001s
+2025-12-05 14:26:41,360 - app.main - INFO - ============================================================
+2025-12-05 14:26:41,360 - app.main - INFO - 🛑 Caffeine API 종료됨
+2025-12-05 14:26:41,360 - app.main - INFO - ============================================================
+2025-12-05 14:26:41,768 - numexpr.utils - INFO - Note: NumExpr detected 20 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 16.
+2025-12-05 14:26:41,768 - numexpr.utils - INFO - NumExpr defaulting to 16 threads.
+2025-12-05 14:26:41,850 - app.main - INFO - ============================================================
+2025-12-05 14:26:41,850 - app.main - INFO - 🚀 Caffeine API 시작됨
+2025-12-05 14:26:41,850 - app.main - INFO - 환경: development
+2025-12-05 14:26:41,850 - app.main - INFO - CORS 허용 도메인: ['http://localhost:3000', 'http://localhost:8081', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006']
+2025-12-05 14:26:41,851 - numexpr.utils - INFO - Note: NumExpr detected 20 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 16.
+2025-12-05 14:26:41,851 - numexpr.utils - INFO - NumExpr defaulting to 16 threads.
+2025-12-05 14:26:41,934 - app.main - INFO - ============================================================
+2025-12-05 14:26:41,934 - app.main - INFO - 🚀 Caffeine API 시작됨
+2025-12-05 14:26:41,934 - app.main - INFO - 환경: development
+2025-12-05 14:26:41,934 - app.main - INFO - CORS 허용 도메인: ['http://localhost:3000', 'http://localhost:8081', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006']
+2025-12-05 14:26:42,799 - app.main - INFO - ============================================================
+2025-12-05 14:26:42,806 - app.main - INFO - ============================================================
+2025-12-05 14:26:42,806 - app.main - INFO - ============================================================
+2025-12-05 14:26:42,806 - app.main - INFO - 🛑 Caffeine API 종료됨
+2025-12-05 14:26:42,806 - app.main - INFO - ============================================================
+2025-12-05 14:28:15,202 - app.main - INFO - ============================================================
+2025-12-05 14:28:15,202 - app.main - INFO - 🛑 Caffeine API 종료됨
+2025-12-05 14:28:15,202 - app.main - INFO - ============================================================
+2025-12-05 14:28:15,365 - numexpr.utils - INFO - Note: NumExpr detected 20 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 16.
+2025-12-05 14:28:15,365 - numexpr.utils - INFO - NumExpr defaulting to 16 threads.
+2025-12-05 14:28:15,430 - app.main - INFO - ============================================================
+2025-12-05 14:28:15,431 - app.main - INFO - 🚀 Caffeine API 시작됨
+2025-12-05 14:28:15,431 - app.main - INFO - 환경: development
+2025-12-05 14:28:15,431 - app.main - INFO - CORS 허용 도메인: ['http://localhost:3000', 'http://localhost:8081', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006']
+2025-12-05 14:28:15,687 - numexpr.utils - INFO - Note: NumExpr detected 20 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 16.
+2025-12-05 14:28:15,687 - numexpr.utils - INFO - NumExpr defaulting to 16 threads.
+2025-12-05 14:28:15,755 - app.main - INFO - ============================================================
+2025-12-05 14:28:15,755 - app.main - INFO - 🚀 Caffeine API 시작됨
+2025-12-05 14:28:15,755 - app.main - INFO - 환경: development
+2025-12-05 14:28:15,755 - app.main - INFO - CORS 허용 도메인: ['http://localhost:3000', 'http://localhost:8081', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006']
+2025-12-05 14:28:16,460 - app.main - INFO - ============================================================
+2025-12-05 14:28:16,461 - app.main - INFO - ============================================================
+2025-12-05 14:28:16,461 - app.main - INFO - 🛑 Caffeine API 종료됨
+2025-12-05 14:28:16,461 - app.main - INFO - ============================================================
+2025-12-05 14:28:16,536 - app.main - INFO - ============================================================
+2025-12-05 14:35:39,306 - app.main - INFO - ============================================================
+2025-12-05 14:35:39,306 - app.main - INFO - 🛑 Caffeine API 종료됨
+2025-12-05 14:35:39,306 - app.main - INFO - ============================================================
+2025-12-05 14:35:39,562 - numexpr.utils - INFO - Note: NumExpr detected 20 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 16.
+2025-12-05 14:35:39,562 - numexpr.utils - INFO - NumExpr defaulting to 16 threads.
+2025-12-05 14:35:39,635 - app.main - INFO - ============================================================
+2025-12-05 14:35:39,635 - app.main - INFO - 🚀 Caffeine API 시작됨
+2025-12-05 14:35:39,635 - app.main - INFO - 환경: development
+2025-12-05 14:35:39,635 - app.main - INFO - CORS 허용 도메인: ['http://localhost:3000', 'http://localhost:8081', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006']
+2025-12-05 14:35:39,831 - numexpr.utils - INFO - Note: NumExpr detected 20 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 16.
+2025-12-05 14:35:39,832 - numexpr.utils - INFO - NumExpr defaulting to 16 threads.
+2025-12-05 14:35:39,908 - app.main - INFO - ============================================================
+2025-12-05 14:35:39,908 - app.main - INFO - 🚀 Caffeine API 시작됨
+2025-12-05 14:35:39,908 - app.main - INFO - 환경: development
+2025-12-05 14:35:39,908 - app.main - INFO - CORS 허용 도메인: ['http://localhost:3000', 'http://localhost:8081', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006']
+2025-12-05 14:35:40,543 - app.main - INFO - ============================================================
+2025-12-05 14:35:40,544 - app.main - INFO - ============================================================
+2025-12-05 14:35:40,544 - app.main - INFO - 🛑 Caffeine API 종료됨
+2025-12-05 14:35:40,544 - app.main - INFO - ============================================================
+2025-12-05 14:35:40,822 - app.main - INFO - ============================================================
+2025-12-05 14:38:24,286 - app.main - INFO - ============================================================
+2025-12-05 14:38:24,286 - app.main - INFO - 🛑 Caffeine API 종료됨
+2025-12-05 14:38:24,286 - app.main - INFO - ============================================================
+2025-12-05 14:38:24,589 - numexpr.utils - INFO - Note: NumExpr detected 20 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 16.
+2025-12-05 14:38:24,590 - numexpr.utils - INFO - NumExpr defaulting to 16 threads.
+2025-12-05 14:38:24,676 - app.main - INFO - ============================================================
+2025-12-05 14:38:24,676 - app.main - INFO - 🚀 Caffeine API 시작됨
+2025-12-05 14:38:24,677 - app.main - INFO - 환경: development
+2025-12-05 14:38:24,677 - app.main - INFO - CORS 허용 도메인: ['http://localhost:3000', 'http://localhost:8081', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006']
+2025-12-05 14:38:24,796 - numexpr.utils - INFO - Note: NumExpr detected 20 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 16.
+2025-12-05 14:38:24,797 - numexpr.utils - INFO - NumExpr defaulting to 16 threads.
+2025-12-05 14:38:24,879 - app.main - INFO - ============================================================
+2025-12-05 14:38:24,879 - app.main - INFO - 🚀 Caffeine API 시작됨
+2025-12-05 14:38:24,879 - app.main - INFO - 환경: development
+2025-12-05 14:38:24,879 - app.main - INFO - CORS 허용 도메인: ['http://localhost:3000', 'http://localhost:8081', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006']
+2025-12-05 14:38:25,613 - app.main - INFO - ============================================================
+2025-12-05 14:38:25,614 - app.main - INFO - ============================================================
+2025-12-05 14:38:25,614 - app.main - INFO - 🛑 Caffeine API 종료됨
+2025-12-05 14:38:25,614 - app.main - INFO - ============================================================
+2025-12-05 14:38:25,737 - app.main - INFO - ============================================================
+2025-12-05 14:44:58,212 - audit - INFO - Request: OPTIONS /ml/predict | Client: 127.0.0.1
+2025-12-05 14:44:58,212 - audit - INFO - Response: 200 | Duration: 0.000s
+2025-12-05 14:44:58,214 - audit - INFO - Request: POST /ml/predict | Client: 127.0.0.1
+2025-12-05 14:44:58,238 - audit - INFO - Response: 400 | Duration: 0.024s
+2025-12-05 14:44:58,586 - audit - INFO - Request: POST /ml/predict | Client: 127.0.0.1
+2025-12-05 14:44:58,588 - audit - INFO - Response: 400 | Duration: 0.003s
+2025-12-05 14:44:58,787 - audit - INFO - Request: POST /ml/predict | Client: 127.0.0.1
+2025-12-05 14:44:58,790 - audit - INFO - Response: 400 | Duration: 0.003s
+2025-12-05 14:44:58,969 - audit - INFO - Request: POST /ml/predict | Client: 127.0.0.1
+2025-12-05 14:44:58,971 - audit - INFO - Response: 400 | Duration: 0.003s
+2025-12-05 14:45:10,977 - audit - INFO - Request: POST /ml/predict | Client: 127.0.0.1
+2025-12-05 14:45:10,979 - audit - INFO - Response: 400 | Duration: 0.003s
+2025-12-05 14:45:11,488 - audit - INFO - Request: POST /ml/predict | Client: 127.0.0.1
+2025-12-05 14:45:11,490 - audit - INFO - Response: 400 | Duration: 0.003s
+2025-12-05 14:45:11,657 - audit - INFO - Request: POST /ml/predict | Client: 127.0.0.1
+2025-12-05 14:45:11,659 - audit - INFO - Response: 400 | Duration: 0.003s
+2025-12-05 14:45:32,212 - audit - INFO - Request: POST /ml/predict | Client: 127.0.0.1
+2025-12-05 14:45:32,214 - audit - INFO - Response: 400 | Duration: 0.002s
+2025-12-05 14:46:18,040 - app.main - INFO - ============================================================
+2025-12-05 14:46:18,040 - app.main - INFO - 🛑 Caffeine API 종료됨
+2025-12-05 14:46:18,040 - app.main - INFO - ============================================================
+2025-12-05 14:46:18,139 - numexpr.utils - INFO - Note: NumExpr detected 20 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 16.
+2025-12-05 14:46:18,139 - numexpr.utils - INFO - NumExpr defaulting to 16 threads.
+2025-12-05 14:46:18,227 - app.main - INFO - ============================================================
+2025-12-05 14:46:18,227 - app.main - INFO - 🚀 Caffeine API 시작됨
+2025-12-05 14:46:18,227 - app.main - INFO - 환경: development
+2025-12-05 14:46:18,227 - app.main - INFO - CORS 허용 도메인: ['http://localhost:3000', 'http://localhost:8081', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006']
+2025-12-05 14:46:18,557 - numexpr.utils - INFO - Note: NumExpr detected 20 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 16.
+2025-12-05 14:46:18,557 - numexpr.utils - INFO - NumExpr defaulting to 16 threads.
+2025-12-05 14:46:18,636 - app.main - INFO - ============================================================
+2025-12-05 14:46:18,636 - app.main - INFO - 🚀 Caffeine API 시작됨
+2025-12-05 14:46:18,636 - app.main - INFO - 환경: development
+2025-12-05 14:46:18,636 - app.main - INFO - CORS 허용 도메인: ['http://localhost:3000', 'http://localhost:8081', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006']
+2025-12-05 14:46:19,095 - app.main - INFO - ============================================================
+2025-12-05 14:46:19,095 - app.main - INFO - ============================================================
+2025-12-05 14:46:19,095 - app.main - INFO - 🛑 Caffeine API 종료됨
+2025-12-05 14:46:19,095 - app.main - INFO - ============================================================
+2025-12-05 14:46:19,464 - app.main - INFO - ============================================================
+2025-12-05 14:52:08,322 - audit - INFO - Request: POST /ml/predict | Client: 127.0.0.1
+2025-12-05 14:52:08,352 - audit - INFO - Response: 400 | Duration: 0.030s
+2025-12-05 14:52:08,520 - audit - INFO - Request: POST /ml/predict | Client: 127.0.0.1
+2025-12-05 14:52:08,523 - audit - INFO - Response: 400 | Duration: 0.003s
+2025-12-05 14:52:08,720 - audit - INFO - Request: POST /ml/predict | Client: 127.0.0.1
+2025-12-05 14:52:08,723 - audit - INFO - Response: 400 | Duration: 0.003s
+2025-12-05 14:52:09,330 - audit - INFO - Request: POST /ml/predict | Client: 127.0.0.1
+2025-12-05 14:52:09,333 - audit - INFO - Response: 400 | Duration: 0.002s
+2025-12-05 14:52:16,588 - audit - INFO - Request: POST /ml/upload | Client: 127.0.0.1
+2025-12-05 14:52:21,338 - audit - INFO - Request: POST /ml/upload | Client: 127.0.0.1
+2025-12-05 14:52:56,368 - app.main - INFO - ============================================================
+2025-12-05 14:52:56,368 - app.main - INFO - 🛑 Caffeine API 종료됨
+2025-12-05 14:52:56,368 - app.main - INFO - ============================================================
+2025-12-05 14:52:56,510 - numexpr.utils - INFO - Note: NumExpr detected 20 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 16.
+2025-12-05 14:52:56,510 - numexpr.utils - INFO - NumExpr defaulting to 16 threads.
+2025-12-05 14:52:56,578 - app.main - INFO - ============================================================
+2025-12-05 14:52:56,578 - app.main - INFO - 🚀 Caffeine API 시작됨
+2025-12-05 14:52:56,578 - app.main - INFO - 환경: development
+2025-12-05 14:52:56,578 - app.main - INFO - CORS 허용 도메인: ['http://localhost:3000', 'http://localhost:8081', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006']
+2025-12-05 14:52:56,886 - numexpr.utils - INFO - Note: NumExpr detected 20 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 16.
+2025-12-05 14:52:56,886 - numexpr.utils - INFO - NumExpr defaulting to 16 threads.
+2025-12-05 14:52:56,957 - app.main - INFO - ============================================================
+2025-12-05 14:52:56,957 - app.main - INFO - 🚀 Caffeine API 시작됨
+2025-12-05 14:52:56,957 - app.main - INFO - 환경: development
+2025-12-05 14:52:56,957 - app.main - INFO - CORS 허용 도메인: ['http://localhost:3000', 'http://localhost:8081', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006']
+2025-12-05 14:52:57,533 - app.main - INFO - ============================================================
+2025-12-05 14:52:57,533 - app.main - INFO - ============================================================
+2025-12-05 14:52:57,533 - app.main - INFO - 🛑 Caffeine API 종료됨
+2025-12-05 14:52:57,533 - app.main - INFO - ============================================================
+2025-12-05 14:52:57,697 - app.main - INFO - ============================================================
+2025-12-05 15:31:08,590 - audit - INFO - Request: POST /ml/upload | Client: 127.0.0.1
+2025-12-05 15:31:08,634 - audit - INFO - Response: 200 | Duration: 0.044s
+2025-12-05 15:31:19,548 - audit - INFO - Request: OPTIONS /ml/predict | Client: 127.0.0.1
+2025-12-05 15:31:19,548 - audit - INFO - Response: 200 | Duration: 0.000s
+2025-12-05 15:31:19,550 - audit - INFO - Request: POST /ml/predict | Client: 127.0.0.1
+2025-12-05 15:31:19,576 - audit - INFO - Response: 400 | Duration: 0.026s
+2025-12-05 15:31:21,802 - audit - INFO - Request: POST /ml/predict | Client: 127.0.0.1
+2025-12-05 15:31:21,804 - audit - INFO - Response: 400 | Duration: 0.003s
+2025-12-05 15:31:22,545 - audit - INFO - Request: POST /ml/predict | Client: 127.0.0.1
+2025-12-05 15:31:22,547 - audit - INFO - Response: 400 | Duration: 0.003s
+2025-12-05 15:32:35,991 - app.main - INFO - ============================================================
+2025-12-05 15:32:35,991 - app.main - INFO - 🛑 Caffeine API 종료됨
+2025-12-05 15:32:35,991 - app.main - INFO - ============================================================
+2025-12-05 15:32:36,170 - numexpr.utils - INFO - Note: NumExpr detected 20 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 16.
+2025-12-05 15:32:36,170 - numexpr.utils - INFO - NumExpr defaulting to 16 threads.
+2025-12-05 15:32:36,243 - app.main - INFO - ============================================================
+2025-12-05 15:32:36,243 - app.main - INFO - 🚀 Caffeine API 시작됨
+2025-12-05 15:32:36,243 - app.main - INFO - 환경: development
+2025-12-05 15:32:36,243 - app.main - INFO - CORS 허용 도메인: ['http://localhost:3000', 'http://localhost:8081', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006']
+2025-12-05 15:32:36,478 - numexpr.utils - INFO - Note: NumExpr detected 20 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 16.
+2025-12-05 15:32:36,479 - numexpr.utils - INFO - NumExpr defaulting to 16 threads.
+2025-12-05 15:32:36,548 - app.main - INFO - ============================================================
+2025-12-05 15:32:36,548 - app.main - INFO - 🚀 Caffeine API 시작됨
+2025-12-05 15:32:36,548 - app.main - INFO - 환경: development
+2025-12-05 15:32:36,548 - app.main - INFO - CORS 허용 도메인: ['http://localhost:3000', 'http://localhost:8081', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006']
+2025-12-05 15:32:37,154 - app.main - INFO - ============================================================
+2025-12-05 15:32:37,154 - app.main - INFO - ============================================================
+2025-12-05 15:32:37,155 - app.main - INFO - 🛑 Caffeine API 종료됨
+2025-12-05 15:32:37,155 - app.main - INFO - ============================================================
+2025-12-05 15:32:37,448 - app.main - INFO - ============================================================
+2025-12-05 15:33:00,145 - audit - INFO - Request: POST /ml/predict | Client: 127.0.0.1
+2025-12-05 15:33:00,172 - audit - INFO - Response: 400 | Duration: 0.027s
+2025-12-05 15:33:32,774 - app.main - INFO - ============================================================
+2025-12-05 15:33:32,774 - app.main - INFO - 🛑 Caffeine API 종료됨
+2025-12-05 15:33:32,774 - app.main - INFO - ============================================================
+2025-12-05 15:33:33,004 - numexpr.utils - INFO - Note: NumExpr detected 20 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 16.
+2025-12-05 15:33:33,004 - numexpr.utils - INFO - NumExpr defaulting to 16 threads.
+2025-12-05 15:33:33,076 - app.main - INFO - ============================================================
+2025-12-05 15:33:33,076 - app.main - INFO - 🚀 Caffeine API 시작됨
+2025-12-05 15:33:33,076 - app.main - INFO - 환경: development
+2025-12-05 15:33:33,076 - app.main - INFO - CORS 허용 도메인: ['http://localhost:3000', 'http://localhost:8081', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006']
+2025-12-05 15:33:33,275 - numexpr.utils - INFO - Note: NumExpr detected 20 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 16.
+2025-12-05 15:33:33,275 - numexpr.utils - INFO - NumExpr defaulting to 16 threads.
+2025-12-05 15:33:33,348 - app.main - INFO - ============================================================
+2025-12-05 15:33:33,348 - app.main - INFO - 🚀 Caffeine API 시작됨
+2025-12-05 15:33:33,348 - app.main - INFO - 환경: development
+2025-12-05 15:33:33,348 - app.main - INFO - CORS 허용 도메인: ['http://localhost:3000', 'http://localhost:8081', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006']
+2025-12-05 15:33:33,935 - app.main - INFO - ============================================================
+2025-12-05 15:33:33,935 - app.main - INFO - ============================================================
+2025-12-05 15:33:33,935 - app.main - INFO - 🛑 Caffeine API 종료됨
+2025-12-05 15:33:33,935 - app.main - INFO - ============================================================
+2025-12-05 15:33:34,181 - app.main - INFO - ============================================================
+2025-12-05 15:54:12,550 - numexpr.utils - INFO - Note: NumExpr detected 20 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 16.
+2025-12-05 15:54:12,551 - numexpr.utils - INFO - NumExpr defaulting to 16 threads.
+2025-12-05 15:54:12,615 - app.main - INFO - ============================================================
+2025-12-05 15:54:12,615 - app.main - INFO - 🚀 Caffeine API 시작됨
+2025-12-05 15:54:12,615 - app.main - INFO - 환경: development
+2025-12-05 15:54:12,615 - app.main - INFO - CORS 허용 도메인: ['http://localhost:3000', 'http://localhost:8081', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006']
+2025-12-05 15:54:13,456 - app.main - INFO - ============================================================
+2025-12-05 15:56:25,450 - audit - INFO - Request: POST /ml/upload | Client: 127.0.0.1
+2025-12-05 15:56:25,514 - audit - INFO - Response: 200 | Duration: 0.064s
+2025-12-05 15:56:30,028 - audit - INFO - Request: OPTIONS /ml/predict | Client: 127.0.0.1
+2025-12-05 15:56:30,028 - audit - INFO - Response: 200 | Duration: 0.001s
+2025-12-05 15:56:30,031 - audit - INFO - Request: POST /ml/predict | Client: 127.0.0.1
+2025-12-05 15:56:30,300 - audit - INFO - Response: 200 | Duration: 0.270s
+2025-12-05 15:56:32,883 - audit - INFO - Request: POST /ml/predict | Client: 127.0.0.1
+2025-12-05 15:56:33,151 - audit - INFO - Response: 200 | Duration: 0.268s
+2025-12-05 15:56:33,483 - audit - INFO - Request: POST /ml/predict | Client: 127.0.0.1
+2025-12-05 15:56:33,698 - audit - INFO - Response: 200 | Duration: 0.215s
+2025-12-05 16:04:02,474 - app.main - INFO - ============================================================
+2025-12-05 16:04:02,474 - app.main - INFO - 🛑 Caffeine API 종료됨
+2025-12-05 16:04:02,474 - app.main - INFO - ============================================================
+2025-12-05 16:04:02,897 - numexpr.utils - INFO - Note: NumExpr detected 20 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 16.
+2025-12-05 16:04:02,897 - numexpr.utils - INFO - NumExpr defaulting to 16 threads.
+2025-12-05 16:04:03,289 - app.main - INFO - ============================================================
+2025-12-05 16:04:03,289 - app.main - INFO - 🚀 Caffeine API 시작됨
+2025-12-05 16:04:03,290 - app.main - INFO - 환경: development
+2025-12-05 16:04:03,290 - app.main - INFO - CORS 허용 도메인: ['http://localhost:3000', 'http://localhost:8081', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006']
+2025-12-05 16:04:03,812 - app.main - INFO - ============================================================
+2025-12-05 16:04:11,531 - app.main - INFO - ============================================================
+2025-12-05 16:04:11,531 - app.main - INFO - 🛑 Caffeine API 종료됨
+2025-12-05 16:04:11,531 - app.main - INFO - ============================================================
+2025-12-05 16:43:59,128 - numexpr.utils - INFO - Note: NumExpr detected 20 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 16.
+2025-12-05 16:43:59,128 - numexpr.utils - INFO - NumExpr defaulting to 16 threads.
+2025-12-05 16:43:59,194 - app.main - INFO - ============================================================
+2025-12-05 16:43:59,194 - app.main - INFO - 🚀 Caffeine API 시작됨
+2025-12-05 16:43:59,194 - app.main - INFO - 환경: development
+2025-12-05 16:43:59,194 - app.main - INFO - CORS 허용 도메인: ['http://localhost:3000', 'http://localhost:8081', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006']
+2025-12-05 16:43:59,194 - app.main - INFO - ============================================================
+2025-12-05 16:44:21,441 - app.main - INFO - ============================================================
+2025-12-05 16:44:21,441 - app.main - INFO - 🛑 Caffeine API 종료됨
+2025-12-05 16:44:21,441 - app.main - INFO - ============================================================
+2025-12-05 16:44:21,830 - numexpr.utils - INFO - Note: NumExpr detected 20 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 16.
+2025-12-05 16:44:21,830 - numexpr.utils - INFO - NumExpr defaulting to 16 threads.
+2025-12-05 16:44:21,896 - app.main - INFO - ============================================================
+2025-12-05 16:44:21,896 - app.main - INFO - 🚀 Caffeine API 시작됨
+2025-12-05 16:44:21,896 - app.main - INFO - 환경: development
+2025-12-05 16:44:21,896 - app.main - INFO - CORS 허용 도메인: ['http://localhost:3000', 'http://localhost:8081', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006']
+2025-12-05 16:44:23,380 - app.main - INFO - ============================================================
+2025-12-05 16:44:32,100 - app.main - INFO - ============================================================
+2025-12-05 16:44:32,100 - app.main - INFO - 🛑 Caffeine API 종료됨
+2025-12-05 16:44:32,100 - app.main - INFO - ============================================================
+2025-12-05 16:44:32,464 - numexpr.utils - INFO - Note: NumExpr detected 20 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 16.
+2025-12-05 16:44:32,465 - numexpr.utils - INFO - NumExpr defaulting to 16 threads.
+2025-12-05 16:44:32,530 - app.main - INFO - ============================================================
+2025-12-05 16:44:32,530 - app.main - INFO - 🚀 Caffeine API 시작됨
+2025-12-05 16:44:32,530 - app.main - INFO - 환경: development
+2025-12-05 16:44:32,530 - app.main - INFO - CORS 허용 도메인: ['http://localhost:3000', 'http://localhost:8081', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006']
+2025-12-05 16:44:33,719 - app.main - INFO - ============================================================
+2025-12-05 16:45:26,872 - numexpr.utils - INFO - Note: NumExpr detected 20 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 16.
+2025-12-05 16:45:26,873 - numexpr.utils - INFO - NumExpr defaulting to 16 threads.
+2025-12-05 16:45:26,947 - app.main - INFO - ============================================================
+2025-12-05 16:45:26,947 - app.main - INFO - 🚀 Caffeine API 시작됨
+2025-12-05 16:45:26,947 - app.main - INFO - 환경: development
+2025-12-05 16:45:26,947 - app.main - INFO - CORS 허용 도메인: ['http://localhost:3000', 'http://localhost:8081', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006']
+2025-12-05 16:45:28,126 - app.main - INFO - ============================================================
+2025-12-05 17:17:46,537 - numexpr.utils - INFO - Note: NumExpr detected 20 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 16.
+2025-12-05 17:17:46,537 - numexpr.utils - INFO - NumExpr defaulting to 16 threads.
+2025-12-05 17:17:46,603 - app.main - INFO - ============================================================
+2025-12-05 17:17:46,603 - app.main - INFO - 🚀 Caffeine API 시작됨
+2025-12-05 17:17:46,603 - app.main - INFO - 환경: development
+2025-12-05 17:17:46,603 - app.main - INFO - CORS 허용 도메인: ['http://localhost:3000', 'http://localhost:8081', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006']
+2025-12-05 17:17:47,756 - app.main - INFO - ============================================================
+2025-12-05 17:18:14,010 - audit - INFO - Request: POST /ml/predict-next | Client: 127.0.0.1
+2025-12-05 17:18:14,052 - audit - INFO - Response: 200 | Duration: 0.042s
+2025-12-05 17:19:39,072 - audit - INFO - Request: POST /ml/predict-next | Client: 127.0.0.1
+2025-12-05 17:19:39,106 - audit - INFO - Response: 200 | Duration: 0.033s
+2025-12-05 17:41:01,414 - numexpr.utils - INFO - Note: NumExpr detected 20 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 16.
+2025-12-05 17:41:01,414 - numexpr.utils - INFO - NumExpr defaulting to 16 threads.
+2025-12-05 17:41:01,482 - app.main - INFO - ============================================================
+2025-12-05 17:41:01,482 - app.main - INFO - 🚀 Caffeine API 시작됨
+2025-12-05 17:41:01,482 - app.main - INFO - 환경: development
+2025-12-05 17:41:01,482 - app.main - INFO - CORS 허용 도메인: ['http://localhost:3000', 'http://localhost:8081', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006']
+2025-12-05 17:41:02,828 - app.main - INFO - ============================================================
+2025-12-05 17:41:37,916 - audit - INFO - Request: POST /ml/upload | Client: 127.0.0.1
+2025-12-05 17:41:37,962 - audit - INFO - Response: 400 | Duration: 0.046s
+2025-12-05 17:42:29,011 - audit - INFO - Request: POST /ml/predict-next | Client: 127.0.0.1
+2025-12-05 17:42:29,104 - audit - INFO - Response: 200 | Duration: 0.093s
+2025-12-05 17:42:38,493 - audit - INFO - Request: POST /ml/predict-next | Client: 127.0.0.1
+2025-12-05 17:42:38,533 - audit - INFO - Response: 200 | Duration: 0.040s
+2025-12-05 17:46:45,053 - audit - INFO - Request: OPTIONS /ml/predict | Client: 127.0.0.1
+2025-12-05 17:46:45,053 - audit - INFO - Response: 200 | Duration: 0.000s
+2025-12-05 17:46:45,055 - audit - INFO - Request: POST /ml/predict | Client: 127.0.0.1
+2025-12-05 17:46:45,076 - audit - INFO - Response: 200 | Duration: 0.021s
+2025-12-05 18:03:38,757 - app.main - INFO - ============================================================
+2025-12-05 18:03:38,757 - app.main - INFO - 🛑 Caffeine API 종료됨
+2025-12-05 18:03:38,757 - app.main - INFO - ============================================================
+2025-12-05 18:03:39,149 - numexpr.utils - INFO - Note: NumExpr detected 20 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 16.
+2025-12-05 18:03:39,150 - numexpr.utils - INFO - NumExpr defaulting to 16 threads.
+2025-12-05 18:03:39,215 - app.main - INFO - ============================================================
+2025-12-05 18:03:39,215 - app.main - INFO - 🚀 Caffeine API 시작됨
+2025-12-05 18:03:39,215 - app.main - INFO - 환경: development
+2025-12-05 18:03:39,215 - app.main - INFO - CORS 허용 도메인: ['http://localhost:3000', 'http://localhost:8081', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006']
+2025-12-05 18:03:40,415 - app.main - INFO - ============================================================
+2025-12-05 18:03:56,647 - app.main - INFO - ============================================================
+2025-12-05 18:03:56,647 - app.main - INFO - 🛑 Caffeine API 종료됨
+2025-12-05 18:03:56,647 - app.main - INFO - ============================================================
+2025-12-05 18:03:57,052 - numexpr.utils - INFO - Note: NumExpr detected 20 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 16.
+2025-12-05 18:03:57,052 - numexpr.utils - INFO - NumExpr defaulting to 16 threads.
+2025-12-05 18:03:57,132 - app.main - INFO - ============================================================
+2025-12-05 18:03:57,132 - app.main - INFO - 🚀 Caffeine API 시작됨
+2025-12-05 18:03:57,132 - app.main - INFO - 환경: development
+2025-12-05 18:03:57,132 - app.main - INFO - CORS 허용 도메인: ['http://localhost:3000', 'http://localhost:8081', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006']
+2025-12-05 18:03:58,387 - app.main - INFO - ============================================================
+2025-12-05 18:04:46,226 - audit - INFO - Request: POST /ml/upload | Client: 127.0.0.1
+2025-12-05 18:04:46,231 - audit - INFO - Response: 400 | Duration: 0.005s
+2025-12-05 18:05:45,733 - app.main - INFO - ============================================================
+2025-12-05 18:05:45,733 - app.main - INFO - 🛑 Caffeine API 종료됨
+2025-12-05 18:05:45,733 - app.main - INFO - ============================================================
+2025-12-05 18:07:27,390 - numexpr.utils - INFO - Note: NumExpr detected 20 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 16.
+2025-12-05 18:07:27,391 - numexpr.utils - INFO - NumExpr defaulting to 16 threads.
+2025-12-05 18:07:27,462 - app.main - INFO - ============================================================
+2025-12-05 18:07:27,462 - app.main - INFO - 🚀 Caffeine API 시작됨
+2025-12-05 18:07:27,462 - app.main - INFO - 환경: development
+2025-12-05 18:07:27,462 - app.main - INFO - CORS 허용 도메인: ['http://localhost:3000', 'http://localhost:8081', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006']
+2025-12-05 18:07:28,785 - app.main - INFO - ============================================================
+2025-12-05 18:07:43,634 - audit - INFO - Request: POST /ml/upload | Client: 127.0.0.1
+2025-12-05 18:07:43,639 - audit - INFO - Response: 400 | Duration: 0.004s
+2025-12-05 18:08:07,179 - app.main - INFO - ============================================================
+2025-12-05 18:08:07,179 - app.main - INFO - 🛑 Caffeine API 종료됨
+2025-12-05 18:08:07,179 - app.main - INFO - ============================================================
+2025-12-05 18:08:07,552 - numexpr.utils - INFO - Note: NumExpr detected 20 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 16.
+2025-12-05 18:08:07,552 - numexpr.utils - INFO - NumExpr defaulting to 16 threads.
+2025-12-05 18:08:07,619 - app.main - INFO - ============================================================
+2025-12-05 18:08:07,619 - app.main - INFO - 🚀 Caffeine API 시작됨
+2025-12-05 18:08:07,619 - app.main - INFO - 환경: development
+2025-12-05 18:08:07,619 - app.main - INFO - CORS 허용 도메인: ['http://localhost:3000', 'http://localhost:8081', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006']
+2025-12-05 18:08:08,807 - app.main - INFO - ============================================================
+2025-12-05 18:08:27,131 - audit - INFO - Request: POST /ml/upload | Client: 127.0.0.1
+2025-12-05 18:08:27,222 - audit - INFO - Response: 200 | Duration: 0.091s
+2025-12-05 18:15:28,071 - audit - INFO - Request: POST /ml/upload | Client: 127.0.0.1
+2025-12-05 18:15:28,177 - audit - INFO - Response: 200 | Duration: 0.106s
+2025-12-08 10:30:50,492 - numexpr.utils - INFO - Note: NumExpr detected 20 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 16.
+2025-12-08 10:30:50,493 - numexpr.utils - INFO - NumExpr defaulting to 16 threads.
+2025-12-08 10:30:50,557 - app.main - INFO - ============================================================
+2025-12-08 10:30:50,557 - app.main - INFO - 🚀 Caffeine API 시작됨
+2025-12-08 10:30:50,557 - app.main - INFO - 환경: development
+2025-12-08 10:30:50,558 - app.main - INFO - CORS 허용 도메인: ['http://localhost:3000', 'http://localhost:8081', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006']
+2025-12-08 10:30:51,702 - app.main - INFO - ============================================================
+2025-12-08 10:32:06,443 - audit - INFO - Request: GET /health | Client: 127.0.0.1
+2025-12-08 10:32:06,444 - audit - INFO - Response: 200 | Duration: 0.001s
+2025-12-08 10:44:20,795 - audit - INFO - Request: GET /health | Client: 127.0.0.1
+2025-12-08 10:44:20,795 - audit - INFO - Response: 200 | Duration: 0.001s
+2025-12-08 12:36:50,322 - audit - INFO - Request: POST /ml/upload | Client: 127.0.0.1
+2025-12-08 12:36:50,335 - audit - INFO - Response: 400 | Duration: 0.013s
+2025-12-08 12:36:57,714 - audit - INFO - Request: POST /ml/upload | Client: 127.0.0.1
+2025-12-08 12:36:57,863 - audit - INFO - Response: 200 | Duration: 0.149s
+2025-12-08 12:37:02,687 - audit - INFO - Request: POST /ml/predict-next | Client: 127.0.0.1
+2025-12-08 12:37:02,746 - audit - INFO - Response: 200 | Duration: 0.058s
+2025-12-08 12:37:04,030 - audit - INFO - Request: POST /ml/predict-next | Client: 127.0.0.1
+2025-12-08 12:37:04,067 - audit - INFO - Response: 200 | Duration: 0.037s
+2025-12-08 12:37:16,290 - audit - INFO - Request: OPTIONS /ml/predict | Client: 127.0.0.1
+2025-12-08 12:37:16,290 - audit - INFO - Response: 200 | Duration: 0.000s
+2025-12-08 12:37:16,292 - audit - INFO - Request: POST /ml/predict | Client: 127.0.0.1
+2025-12-08 12:37:16,327 - audit - INFO - Response: 200 | Duration: 0.035s
+2025-12-08 12:38:52,073 - app.main - INFO - ============================================================
+2025-12-08 12:38:52,073 - app.main - INFO - 🛑 Caffeine API 종료됨
+2025-12-08 12:38:52,073 - app.main - INFO - ============================================================
+2025-12-08 12:38:52,449 - numexpr.utils - INFO - Note: NumExpr detected 20 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 16.
+2025-12-08 12:38:52,449 - numexpr.utils - INFO - NumExpr defaulting to 16 threads.
+2025-12-08 12:38:52,509 - app.main - INFO - ============================================================
+2025-12-08 12:38:52,509 - app.main - INFO - 🚀 Caffeine API 시작됨
+2025-12-08 12:38:52,509 - app.main - INFO - 환경: development
+2025-12-08 12:38:52,509 - app.main - INFO - CORS 허용 도메인: ['http://localhost:3000', 'http://localhost:8081', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006']
+2025-12-08 12:38:53,608 - app.routers.ml - INFO - Model loaded: lightgbm_cuda_production_20251205_162340.joblib
+2025-12-08 12:38:53,608 - app.main - INFO - ============================================================
+2025-12-08 12:42:51,533 - audit - INFO - Request: POST /ml/predict-next | Client: 127.0.0.1
+2025-12-08 12:42:51,574 - audit - INFO - Response: 200 | Duration: 0.041s
+2025-12-08 12:43:03,633 - audit - INFO - Request: POST /ml/predict-next | Client: 127.0.0.1
+2025-12-08 12:43:03,671 - audit - INFO - Response: 200 | Duration: 0.038s
+2025-12-08 12:43:14,543 - audit - INFO - Request: POST /ml/predict-next | Client: 127.0.0.1
+2025-12-08 12:43:14,622 - audit - INFO - Response: 200 | Duration: 0.079s
+2025-12-08 12:43:18,752 - audit - INFO - Request: POST /ml/predict-next | Client: 127.0.0.1
+2025-12-08 12:43:18,786 - audit - INFO - Response: 200 | Duration: 0.035s
+2025-12-08 12:43:19,613 - audit - INFO - Request: POST /ml/predict-next | Client: 127.0.0.1
+2025-12-08 12:43:19,639 - audit - INFO - Response: 200 | Duration: 0.026s
+2025-12-08 12:43:48,715 - audit - INFO - Request: POST /ml/predict-next | Client: 127.0.0.1
+2025-12-08 12:43:48,807 - audit - INFO - Response: 200 | Duration: 0.092s
+2025-12-08 12:47:53,005 - audit - INFO - Request: POST /ml/predict-next | Client: 127.0.0.1
+2025-12-08 12:47:53,044 - audit - INFO - Response: 200 | Duration: 0.039s
+2025-12-08 12:48:41,234 - audit - INFO - Request: POST /ml/upload | Client: 127.0.0.1
+2025-12-08 12:48:41,236 - app.routers.ml - ERROR - File upload failed: '날짜'
+2025-12-08 12:48:41,236 - audit - INFO - Response: 400 | Duration: 0.002s
+2025-12-08 12:48:54,575 - audit - INFO - Request: POST /ml/upload | Client: 127.0.0.1
+2025-12-08 12:48:54,675 - audit - INFO - Response: 200 | Duration: 0.100s
+2025-12-08 12:48:58,088 - audit - INFO - Request: POST /ml/predict-next | Client: 127.0.0.1
+2025-12-08 12:48:58,143 - audit - INFO - Response: 200 | Duration: 0.055s
+2025-12-08 12:49:02,996 - audit - INFO - Request: POST /ml/predict-next | Client: 127.0.0.1
+2025-12-08 12:49:03,082 - audit - INFO - Response: 200 | Duration: 0.085s
+2025-12-08 12:49:08,928 - audit - INFO - Request: OPTIONS /ml/predict | Client: 127.0.0.1
+2025-12-08 12:49:08,928 - audit - INFO - Response: 200 | Duration: 0.001s
+2025-12-08 12:49:08,930 - audit - INFO - Request: POST /ml/predict | Client: 127.0.0.1
+2025-12-08 12:49:08,964 - audit - INFO - Response: 200 | Duration: 0.034s
+2025-12-08 12:49:09,366 - audit - INFO - Request: POST /ml/predict | Client: 127.0.0.1
+2025-12-08 12:49:09,388 - audit - INFO - Response: 200 | Duration: 0.022s
+2025-12-09 15:13:16,887 - numexpr.utils - INFO - Note: NumExpr detected 20 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 16.
+2025-12-09 15:13:16,887 - numexpr.utils - INFO - NumExpr defaulting to 16 threads.
+2025-12-09 15:13:16,952 - app.main - INFO - ============================================================
+2025-12-09 15:13:16,952 - app.main - INFO - 🚀 Caffeine API 시작됨
+2025-12-09 15:13:16,952 - app.main - INFO - 환경: development
+2025-12-09 15:13:16,952 - app.main - INFO - CORS 허용 도메인: ['http://localhost:3000', 'http://localhost:8081', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006']
+2025-12-09 15:13:18,054 - app.routers.ml - INFO - Model loaded: lightgbm_cuda_production_20251205_162340.joblib
+2025-12-09 15:13:18,054 - app.main - INFO - ============================================================
+2025-12-09 15:13:33,944 - audit - INFO - Request: GET / | Client: 127.0.0.1
+2025-12-09 15:13:33,945 - audit - INFO - Response: 200 | Duration: 0.000s
+2025-12-09 15:13:34,066 - audit - INFO - Request: GET /favicon.ico | Client: 127.0.0.1
+2025-12-09 15:13:34,067 - audit - INFO - Response: 404 | Duration: 0.000s
+2025-12-09 15:22:47,730 - audit - INFO - Request: POST /ml/predict-next | Client: 127.0.0.1
+2025-12-09 15:22:47,777 - audit - INFO - Response: 200 | Duration: 0.047s
+2025-12-09 15:23:11,597 - audit - INFO - Request: POST /ml/upload | Client: 127.0.0.1
+2025-12-09 15:23:11,732 - audit - INFO - Response: 200 | Duration: 0.134s
+2025-12-09 15:23:15,223 - audit - INFO - Request: POST /ml/predict-next | Client: 127.0.0.1
+2025-12-09 15:23:15,267 - audit - INFO - Response: 200 | Duration: 0.044s
+2025-12-09 15:23:16,419 - audit - INFO - Request: POST /ml/predict-next | Client: 127.0.0.1
+2025-12-09 15:23:16,460 - audit - INFO - Response: 200 | Duration: 0.041s
+2025-12-09 15:23:19,846 - audit - INFO - Request: OPTIONS /ml/predict | Client: 127.0.0.1
+2025-12-09 15:23:19,846 - audit - INFO - Response: 200 | Duration: 0.000s
+2025-12-09 15:23:19,847 - audit - INFO - Request: POST /ml/predict | Client: 127.0.0.1
+2025-12-09 15:23:19,883 - audit - INFO - Response: 200 | Duration: 0.035s
+2025-12-09 16:27:06,419 - audit - INFO - Request: POST /ml/predict-next | Client: 127.0.0.1
+2025-12-09 16:27:06,450 - audit - INFO - Response: 200 | Duration: 0.031s
+2025-12-09 16:27:35,778 - audit - INFO - Request: POST /ml/upload | Client: 127.0.0.1
+2025-12-09 16:27:35,779 - app.routers.ml - ERROR - File upload failed: '날짜'
+2025-12-09 16:27:35,779 - audit - INFO - Response: 400 | Duration: 0.001s
+2025-12-09 16:28:02,535 - audit - INFO - Request: POST /ml/upload | Client: 127.0.0.1
+2025-12-09 16:28:02,664 - audit - INFO - Response: 200 | Duration: 0.129s
+2025-12-09 16:28:24,328 - audit - INFO - Request: POST /ml/predict-next | Client: 127.0.0.1
+2025-12-09 16:28:24,373 - audit - INFO - Response: 200 | Duration: 0.046s
+2025-12-09 16:28:42,160 - audit - INFO - Request: POST /ml/predict-next | Client: 127.0.0.1
+2025-12-09 16:28:42,236 - audit - INFO - Response: 200 | Duration: 0.076s
+2025-12-09 16:29:06,135 - audit - INFO - Request: OPTIONS /ml/predict | Client: 127.0.0.1
+2025-12-09 16:29:06,135 - audit - INFO - Response: 200 | Duration: 0.000s
+2025-12-09 16:29:06,137 - audit - INFO - Request: POST /ml/predict | Client: 127.0.0.1
+2025-12-09 16:29:06,159 - audit - INFO - Response: 200 | Duration: 0.022s
+2025-12-10 16:17:12,422 - numexpr.utils - INFO - Note: NumExpr detected 20 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 16.
+2025-12-10 16:17:12,422 - numexpr.utils - INFO - NumExpr defaulting to 16 threads.
+2025-12-10 16:17:12,595 - app.main - INFO - ============================================================
+2025-12-10 16:17:12,595 - app.main - INFO - 🚀 Caffeine API 시작됨
+2025-12-10 16:17:12,595 - app.main - INFO - 환경: development
+2025-12-10 16:17:12,595 - app.main - INFO - CORS 허용 도메인: ['http://localhost:3000', 'http://localhost:8081', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006']
+2025-12-10 16:17:13,354 - app.routers.ml - INFO - ✅ XGBoost 모델 로드 완료: model_xgboost_acc_73.47.joblib
+2025-12-10 16:17:13,355 - app.main - INFO - ============================================================
+2025-12-10 16:17:28,489 - app.main - INFO - ============================================================
+2025-12-10 16:17:28,489 - app.main - INFO - 🛑 Caffeine API 종료됨
+2025-12-10 16:17:28,489 - app.main - INFO - ============================================================
+2025-12-10 16:18:01,517 - numexpr.utils - INFO - Note: NumExpr detected 20 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 16.
+2025-12-10 16:18:01,517 - numexpr.utils - INFO - NumExpr defaulting to 16 threads.
+2025-12-10 16:18:01,691 - app.main - INFO - ============================================================
+2025-12-10 16:18:01,691 - app.main - INFO - 🚀 Caffeine API 시작됨
+2025-12-10 16:18:01,691 - app.main - INFO - 환경: development
+2025-12-10 16:18:01,691 - app.main - INFO - CORS 허용 도메인: ['http://localhost:3000', 'http://localhost:8081', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006']
+2025-12-10 16:18:02,464 - app.routers.ml - INFO - ✅ XGBoost 모델 로드 완료: model_xgboost_acc_73.47.joblib
+2025-12-10 16:18:02,464 - app.main - INFO - ============================================================
+2025-12-10 16:18:04,200 - audit - INFO - Request: GET /health | Client: 127.0.0.1
+2025-12-10 16:18:04,201 - audit - INFO - Response: 200 | Duration: 0.001s
+2025-12-10 16:18:16,366 - audit - INFO - Request: GET /health | Client: 127.0.0.1
+2025-12-10 16:18:16,367 - audit - INFO - Response: 200 | Duration: 0.001s
+2025-12-10 16:18:23,206 - audit - INFO - Request: GET /api/transactions | Client: 127.0.0.1
+2025-12-10 16:18:23,463 - audit - INFO - Response: 200 | Duration: 0.258s
+2025-12-10 16:18:37,809 - audit - INFO - Request: GET /api/analysis/full | Client: 127.0.0.1
+2025-12-10 16:18:37,867 - audit - INFO - Response: 200 | Duration: 0.058s
+2025-12-10 16:18:47,102 - audit - INFO - Request: GET /ml/status | Client: 127.0.0.1
+2025-12-10 16:18:47,102 - audit - INFO - Response: 404 | Duration: 0.000s
+2025-12-10 16:18:54,461 - audit - INFO - Request: GET /docs | Client: 127.0.0.1
+2025-12-10 16:18:54,462 - audit - INFO - Response: 200 | Duration: 0.000s
+2025-12-10 16:25:03,251 - audit - INFO - Request: POST /ml/predict-next | Client: 127.0.0.1
+2025-12-10 16:25:03,878 - audit - INFO - Response: 200 | Duration: 0.627s
+2025-12-10 16:35:01,822 - audit - INFO - Request: OPTIONS /ml/predict | Client: 127.0.0.1
+2025-12-10 16:35:01,822 - audit - INFO - Response: 200 | Duration: 0.000s
+2025-12-10 16:35:01,823 - audit - INFO - Request: POST /ml/predict | Client: 127.0.0.1
+2025-12-10 16:35:02,043 - audit - INFO - Response: 200 | Duration: 0.220s
+2025-12-10 16:38:17,068 - audit - INFO - Request: GET /users | Client: 127.0.0.1
+2025-12-10 16:38:17,068 - audit - INFO - Response: 404 | Duration: 0.000s
+2025-12-10 16:38:17,070 - audit - INFO - Request: GET /users | Client: 127.0.0.1
+2025-12-10 16:38:17,070 - audit - INFO - Response: 404 | Duration: 0.000s
+2025-12-10 16:38:17,071 - audit - INFO - Request: GET /users | Client: 127.0.0.1
+2025-12-10 16:38:17,071 - audit - INFO - Response: 404 | Duration: 0.000s
+2025-12-10 16:38:19,172 - audit - INFO - Request: GET /users | Client: 127.0.0.1
+2025-12-10 16:38:19,173 - audit - INFO - Response: 404 | Duration: 0.000s
+2025-12-10 16:38:19,174 - audit - INFO - Request: GET /users | Client: 127.0.0.1
+2025-12-10 16:38:19,174 - audit - INFO - Response: 404 | Duration: 0.000s
+2025-12-10 16:38:19,175 - audit - INFO - Request: GET /users | Client: 127.0.0.1
+2025-12-10 16:38:19,175 - audit - INFO - Response: 404 | Duration: 0.000s
+2025-12-10 16:38:20,462 - audit - INFO - Request: GET /users | Client: 127.0.0.1
+2025-12-10 16:38:20,463 - audit - INFO - Response: 404 | Duration: 0.000s
+2025-12-10 16:38:20,463 - audit - INFO - Request: GET /users | Client: 127.0.0.1
+2025-12-10 16:38:20,464 - audit - INFO - Response: 404 | Duration: 0.000s
+2025-12-10 16:38:20,464 - audit - INFO - Request: GET /users | Client: 127.0.0.1
+2025-12-10 16:38:20,465 - audit - INFO - Response: 404 | Duration: 0.000s
+2025-12-10 16:39:16,234 - audit - INFO - Request: GET /users | Client: 127.0.0.1
+2025-12-10 16:39:16,234 - audit - INFO - Response: 404 | Duration: 0.000s
+2025-12-10 16:39:16,235 - audit - INFO - Request: GET /users | Client: 127.0.0.1
+2025-12-10 16:39:16,235 - audit - INFO - Response: 404 | Duration: 0.000s
+2025-12-10 16:39:16,236 - audit - INFO - Request: GET /users | Client: 127.0.0.1
+2025-12-10 16:39:16,236 - audit - INFO - Response: 404 | Duration: 0.000s
+2025-12-10 17:02:33,562 - audit - INFO - Request: GET /api/analysis/monthly-trend | Client: 127.0.0.1
+2025-12-10 17:02:33,575 - audit - INFO - Response: 200 | Duration: 0.013s
+2025-12-10 17:04:23,638 - audit - INFO - Request: GET /api/transactions | Client: 127.0.0.1
+2025-12-10 17:04:23,665 - audit - INFO - Response: 200 | Duration: 0.027s
+2025-12-10 17:04:23,666 - audit - INFO - Request: GET /api/transactions | Client: 127.0.0.1
+2025-12-10 17:04:23,854 - audit - INFO - Response: 200 | Duration: 0.187s
+2025-12-10 17:04:23,856 - audit - INFO - Request: POST /ml/predict-next | Client: 127.0.0.1
+2025-12-10 17:04:24,446 - audit - INFO - Response: 200 | Duration: 0.590s
+2025-12-10 17:04:24,446 - audit - INFO - Request: POST /ml/predict-next | Client: 127.0.0.1
+2025-12-10 17:04:24,810 - audit - INFO - Response: 200 | Duration: 0.364s
+2025-12-10 18:14:21,382 - audit - INFO - Request: GET /users | Client: 127.0.0.1
+2025-12-10 18:14:21,383 - audit - INFO - Response: 404 | Duration: 0.000s
+2025-12-10 18:14:21,384 - audit - INFO - Request: GET /users | Client: 127.0.0.1
+2025-12-10 18:14:21,384 - audit - INFO - Response: 404 | Duration: 0.000s
+2025-12-10 18:14:21,385 - audit - INFO - Request: GET /users | Client: 127.0.0.1
+2025-12-10 18:14:21,385 - audit - INFO - Response: 404 | Duration: 0.000s
+2025-12-10 18:14:22,299 - audit - INFO - Request: GET /users | Client: 127.0.0.1
+2025-12-10 18:14:22,299 - audit - INFO - Response: 404 | Duration: 0.000s
+2025-12-10 18:14:22,300 - audit - INFO - Request: GET /users | Client: 127.0.0.1
+2025-12-10 18:14:22,300 - audit - INFO - Response: 404 | Duration: 0.000s
+2025-12-10 18:14:22,301 - audit - INFO - Request: GET /users | Client: 127.0.0.1
+2025-12-10 18:14:22,301 - audit - INFO - Response: 404 | Duration: 0.000s
+2025-12-10 18:14:22,817 - audit - INFO - Request: GET /users | Client: 127.0.0.1
+2025-12-10 18:14:22,817 - audit - INFO - Response: 404 | Duration: 0.000s
+2025-12-10 18:14:22,818 - audit - INFO - Request: GET /users | Client: 127.0.0.1
+2025-12-10 18:14:22,818 - audit - INFO - Response: 404 | Duration: 0.000s
+2025-12-10 18:14:22,819 - audit - INFO - Request: GET /users | Client: 127.0.0.1
+2025-12-10 18:14:22,819 - audit - INFO - Response: 404 | Duration: 0.000s
+2025-12-10 18:14:23,036 - audit - INFO - Request: GET /users | Client: 127.0.0.1
+2025-12-10 18:14:23,037 - audit - INFO - Response: 404 | Duration: 0.000s
+2025-12-10 18:14:23,037 - audit - INFO - Request: GET /users | Client: 127.0.0.1
+2025-12-10 18:14:23,038 - audit - INFO - Response: 404 | Duration: 0.000s
+2025-12-10 18:14:23,038 - audit - INFO - Request: GET /users | Client: 127.0.0.1
+2025-12-10 18:14:23,038 - audit - INFO - Response: 404 | Duration: 0.000s
+2025-12-10 18:14:35,600 - audit - INFO - Request: GET /users | Client: 127.0.0.1
+2025-12-10 18:14:35,600 - audit - INFO - Response: 404 | Duration: 0.000s
+2025-12-10 18:14:35,602 - audit - INFO - Request: GET /users | Client: 127.0.0.1
+2025-12-10 18:14:35,602 - audit - INFO - Response: 404 | Duration: 0.000s
+2025-12-10 18:14:35,602 - audit - INFO - Request: GET /users | Client: 127.0.0.1
+2025-12-10 18:14:35,603 - audit - INFO - Response: 404 | Duration: 0.000s
+2025-12-10 18:14:35,622 - audit - INFO - Request: GET /users | Client: 127.0.0.1
+2025-12-10 18:14:35,622 - audit - INFO - Response: 404 | Duration: 0.000s
+2025-12-10 18:14:35,623 - audit - INFO - Request: GET /users | Client: 127.0.0.1
+2025-12-10 18:14:35,624 - audit - INFO - Response: 404 | Duration: 0.000s
+2025-12-10 18:14:35,624 - audit - INFO - Request: GET /users | Client: 127.0.0.1
+2025-12-10 18:14:35,625 - audit - INFO - Response: 404 | Duration: 0.000s
+2025-12-10 18:14:37,572 - audit - INFO - Request: GET /api/transactions | Client: 127.0.0.1
+2025-12-10 18:14:37,601 - audit - INFO - Response: 200 | Duration: 0.030s
+2025-12-10 18:14:37,623 - audit - INFO - Request: GET /api/transactions | Client: 127.0.0.1
+2025-12-10 18:14:37,655 - audit - INFO - Response: 200 | Duration: 0.033s
+2025-12-10 18:14:37,701 - audit - INFO - Request: POST /ml/predict-next | Client: 127.0.0.1
+2025-12-10 18:14:37,729 - audit - INFO - Request: POST /ml/predict-next | Client: 127.0.0.1
+2025-12-10 18:14:38,349 - audit - INFO - Request: POST /ml/predict-next | Client: 127.0.0.1
+2025-12-10 18:14:38,349 - audit - INFO - Response: 200 | Duration: 0.620s
+2025-12-10 18:14:38,350 - audit - INFO - Request: POST /ml/predict-next | Client: 127.0.0.1
+2025-12-10 18:14:38,691 - audit - INFO - Response: 200 | Duration: 0.990s
+2025-12-10 18:14:39,342 - audit - INFO - Response: 200 | Duration: 0.993s
+2025-12-10 18:14:39,342 - audit - INFO - Response: 200 | Duration: 0.992s
+2025-12-10 18:14:44,824 - audit - INFO - Request: GET /api/transactions | Client: 127.0.0.1
+2025-12-10 18:14:44,869 - audit - INFO - Request: POST /ml/predict-next | Client: 127.0.0.1
+2025-12-10 18:14:45,515 - audit - INFO - Response: 200 | Duration: 0.646s
+2025-12-10 18:14:45,523 - audit - INFO - Response: 200 | Duration: 0.698s
+2025-12-10 18:14:45,718 - audit - INFO - Request: POST /ml/predict-next | Client: 127.0.0.1
+2025-12-10 18:14:46,019 - audit - INFO - Request: GET /users | Client: 127.0.0.1
+2025-12-10 18:14:46,019 - audit - INFO - Response: 200 | Duration: 0.301s
+2025-12-10 18:14:46,019 - audit - INFO - Response: 404 | Duration: 0.001s
+2025-12-10 18:14:46,020 - audit - INFO - Request: GET /users | Client: 127.0.0.1
+2025-12-10 18:14:46,020 - audit - INFO - Response: 404 | Duration: 0.000s
+2025-12-10 18:14:46,021 - audit - INFO - Request: GET /users | Client: 127.0.0.1
+2025-12-10 18:14:46,021 - audit - INFO - Response: 404 | Duration: 0.000s
+2025-12-10 18:15:32,817 - audit - INFO - Request: GET /api/analysis/full | Client: 127.0.0.1
+2025-12-10 18:15:32,885 - audit - INFO - Response: 200 | Duration: 0.068s
+2025-12-10 18:16:05,343 - audit - INFO - Request: GET /api/analysis/summary | Client: 127.0.0.1
+2025-12-10 18:16:05,360 - audit - INFO - Response: 200 | Duration: 0.017s
+2025-12-10 18:17:31,877 - audit - INFO - Request: GET /users | Client: 127.0.0.1
+2025-12-10 18:17:31,877 - audit - INFO - Response: 404 | Duration: 0.000s
+2025-12-10 18:17:31,879 - audit - INFO - Request: GET /users | Client: 127.0.0.1
+2025-12-10 18:17:31,879 - audit - INFO - Response: 404 | Duration: 0.000s
+2025-12-10 18:17:31,879 - audit - INFO - Request: GET /users | Client: 127.0.0.1
+2025-12-10 18:17:31,880 - audit - INFO - Response: 404 | Duration: 0.000s
+2025-12-10 18:18:07,973 - audit - INFO - Request: GET /users | Client: 127.0.0.1
+2025-12-10 18:18:07,974 - audit - INFO - Response: 404 | Duration: 0.000s
+2025-12-10 18:18:07,974 - audit - INFO - Request: GET /users | Client: 127.0.0.1
+2025-12-10 18:18:07,975 - audit - INFO - Response: 404 | Duration: 0.000s
+2025-12-10 18:18:07,976 - audit - INFO - Request: GET /users | Client: 127.0.0.1
+2025-12-10 18:18:07,976 - audit - INFO - Response: 404 | Duration: 0.000s
+2025-12-10 18:18:24,906 - audit - INFO - Request: GET /users | Client: 127.0.0.1
+2025-12-10 18:18:24,907 - audit - INFO - Response: 404 | Duration: 0.000s
+2025-12-10 18:18:24,908 - audit - INFO - Request: GET /users | Client: 127.0.0.1
+2025-12-10 18:18:24,908 - audit - INFO - Response: 404 | Duration: 0.000s
+2025-12-10 18:18:24,909 - audit - INFO - Request: GET /users | Client: 127.0.0.1
+2025-12-10 18:18:24,909 - audit - INFO - Response: 404 | Duration: 0.000s
+2025-12-10 18:20:20,296 - audit - INFO - Request: GET /api/analysis/full | Client: 127.0.0.1
+2025-12-10 18:20:20,333 - audit - INFO - Response: 200 | Duration: 0.037s
+2025-12-10 18:20:20,334 - audit - INFO - Request: GET /api/analysis/full | Client: 127.0.0.1
+2025-12-10 18:20:20,366 - audit - INFO - Response: 200 | Duration: 0.032s
+2025-12-10 18:20:20,367 - audit - INFO - Request: GET /api/analysis/full | Client: 127.0.0.1
+2025-12-10 18:20:20,402 - audit - INFO - Response: 200 | Duration: 0.035s
+2025-12-10 18:20:20,596 - audit - INFO - Request: GET /api/analysis/full | Client: 127.0.0.1
+2025-12-10 18:20:20,628 - audit - INFO - Response: 200 | Duration: 0.031s
+2025-12-10 18:20:20,629 - audit - INFO - Request: GET /api/analysis/full | Client: 127.0.0.1
+2025-12-10 18:20:20,667 - audit - INFO - Response: 200 | Duration: 0.038s
+2025-12-10 18:20:20,669 - audit - INFO - Request: GET /api/analysis/full | Client: 127.0.0.1
+2025-12-10 18:20:20,704 - audit - INFO - Response: 200 | Duration: 0.036s
+2025-12-10 18:25:14,578 - audit - INFO - Request: GET /api/analysis/full | Client: 127.0.0.1
+2025-12-10 18:25:14,607 - audit - INFO - Response: 200 | Duration: 0.029s
+2025-12-10 18:25:14,608 - audit - INFO - Request: GET /api/analysis/full | Client: 127.0.0.1
+2025-12-10 18:25:14,638 - audit - INFO - Response: 200 | Duration: 0.030s
+2025-12-10 18:25:14,639 - audit - INFO - Request: GET /api/analysis/full | Client: 127.0.0.1
+2025-12-10 18:25:14,673 - audit - INFO - Response: 200 | Duration: 0.034s
+2025-12-10 18:25:14,848 - audit - INFO - Request: GET /api/analysis/full | Client: 127.0.0.1
+2025-12-10 18:25:14,879 - audit - INFO - Response: 200 | Duration: 0.031s
+2025-12-10 18:25:14,880 - audit - INFO - Request: GET /api/analysis/full | Client: 127.0.0.1
+2025-12-10 18:25:14,916 - audit - INFO - Response: 200 | Duration: 0.036s
+2025-12-10 18:25:14,917 - audit - INFO - Request: GET /api/analysis/full | Client: 127.0.0.1
+2025-12-10 18:25:14,955 - audit - INFO - Response: 200 | Duration: 0.038s

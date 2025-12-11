@@ -8,17 +8,24 @@ ENV_PATH = BASE_DIR / ".env"
 
 
 class Settings(BaseSettings):
-    # Database 설정 (PostgreSQL)
-    # 2025-12-05: MySQL → PostgreSQL 전환
-    # - db_user: root → user (docker-compose.yml의 POSTGRES_USER와 일치)
-    # - db_password: 1234 → password (docker-compose.yml의 POSTGRES_PASSWORD와 일치)
-    # - db_port: 3306 → 5432 (PostgreSQL 기본 포트)
-    # - db_name: caffeine → caffeine_db (docker-compose.yml의 POSTGRES_DB와 일치)
-    db_user: str = Field("user", alias="DB_USER")
-    db_password: str = Field("password", alias="DB_PASSWORD")
-    db_host: str = Field("localhost", alias="DB_HOST")
+    # ==========================================================
+    # Database 설정 (Primary: AWS RDS, Fallback: Local PostgreSQL)
+    # ==========================================================
+    # 2025-12-11: AWS RDS 우선, 연결 실패 시 로컬 DB 폴백
+    
+    # AWS RDS 설정 (Primary)
+    db_user: str = Field("postgres", alias="DB_USER")
+    db_password: str = Field("caffeineapprds", alias="DB_PASSWORD")
+    db_host: str = Field("caffeine-database.c58og6ke6t36.ap-northeast-2.rds.amazonaws.com", alias="DB_HOST")
     db_port: str = Field("5432", alias="DB_PORT")
-    db_name: str = Field("caffeine_db", alias="DB_NAME")
+    db_name: str = Field("postgres", alias="DB_NAME")
+    
+    # 로컬 DB 설정 (Fallback) - Docker 또는 로컬 PostgreSQL
+    local_db_host: str = Field("localhost", alias="LOCAL_DB_HOST")
+    local_db_port: str = Field("5432", alias="LOCAL_DB_PORT")
+    local_db_name: str = Field("caffeine_db", alias="LOCAL_DB_NAME")
+    local_db_user: str = Field("postgres", alias="LOCAL_DB_USER")
+    local_db_password: str = Field("caffeineapprds", alias="LOCAL_DB_PASSWORD")
 
     # App 설정
     app_port: int = Field(8081, alias="APP_PORT")
@@ -38,8 +45,13 @@ class Settings(BaseSettings):
 
     @property
     def database_url(self) -> str:
-        # 2025-12-05: mysql+aiomysql → postgresql+asyncpg로 변경
+        """Primary DB URL (AWS RDS)"""
         return f"postgresql+asyncpg://{self.db_user}:{self.db_password}@{self.db_host}:{self.db_port}/{self.db_name}"
+
+    @property
+    def local_database_url(self) -> str:
+        """Fallback DB URL (Local PostgreSQL)"""
+        return f"postgresql+asyncpg://{self.local_db_user}:{self.local_db_password}@{self.local_db_host}:{self.local_db_port}/{self.local_db_name}"
 
     @property
     def backend_url(self) -> str:

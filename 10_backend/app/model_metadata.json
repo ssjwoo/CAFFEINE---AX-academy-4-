@@ -1,0 +1,75 @@
+{
+  "models": {
+    "XGBoost": {
+      "accuracy": 0.734670455903753,
+      "macro_f1": 0.7713845880381531,
+      "weighted_f1": 0.7300875707636819,
+      "category_f1": [
+        0.957362905509924,
+        0.9216098639060137,
+        0.7353622558770876,
+        0.6872982046377928,
+        0.7305447511809895,
+        0.5961295471171111
+      ],
+      "train_time": 123.1492269039154
+    },
+    "LightGBM": {
+      "accuracy": 0.7171633128005006,
+      "macro_f1": 0.7544758921410613,
+      "weighted_f1": 0.7132615895545028,
+      "category_f1": [
+        0.935935416975263,
+        0.9138033154551903,
+        0.7062976648598991,
+        0.6741299937988081,
+        0.7118902877295655,
+        0.5847986740276411
+      ],
+      "train_time": 908.1027657985687
+    },
+    "CatBoost": {
+      "accuracy": 0.6939119108721072,
+      "macro_f1": 0.7282242704570816,
+      "weighted_f1": 0.6905046222436687,
+      "category_f1": [
+        0.917131562419182,
+        0.8690708122937457,
+        0.6597419724388733,
+        0.6694591528949791,
+        0.6823638641985729,
+        0.5715782584971366
+      ],
+      "train_time": 626.0968174934387
+    }
+  },
+  "best_model": "XGBoost",
+  "features": [
+    "Amount_clean",
+    "Amount_log",
+    "AmountBin",
+    "Hour",
+    "DayOfWeek",
+    "DayOfMonth",
+    "IsWeekend",
+    "IsNight",
+    "IsBusinessHour",
+    "IsLunchTime",
+    "IsEvening",
+    "IsMorningRush",
+    "User_AvgAmount",
+    "User_StdAmount",
+    "User_TxCount",
+    "User_교통_Ratio",
+    "User_생활_Ratio",
+    "User_쇼핑_Ratio",
+    "User_식료품_Ratio",
+    "User_외식_Ratio",
+    "User_주유_Ratio",
+    "Previous_Category",
+    "Transaction_Sequence",
+    "Time_Since_Last"
+  ],
+  "n_features": 24,
+  "created_at": "2025-12-08T22:47:12.849891"
+}

@@ -3,9 +3,9 @@ name: Frontend CI (build, test, lint)
 # 2025-12-05: 비활성화 (frontend/ 폴더 삭제됨, 20_frontend_user.yml / 21_frontend_admin.yml로 대체)
 # on:
 #   push:
-#     branches: [ "front-sjw" ]
+#     branches: [ "develop" ]
 #   pull_request:
-#     branches: [ "front-sjw" ]
+#     branches: [ "develop" ]
 
 # 워크플로우 비활성화: 트리거 없음
 on:

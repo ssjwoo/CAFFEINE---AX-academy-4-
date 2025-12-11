@@ -1,36 +1,82 @@
 version: "3.9"
 
 services:
+  # ============================================================
+  # PostgreSQL 데이터베이스
+  # ============================================================
+  db:
+    image: postgres:15
+    container_name: caf_db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: caffeineapprds
+      POSTGRES_DB: caffeine_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # ============================================================
+  # FastAPI 백엔드
+  # ============================================================
   backend:
     build: ./10_backend
     container_name: caf_backend
-    # 2025-12-05: PostgreSQL 연결 설정
     depends_on:
-      - db # DB 서비스가 먼저 시작되도록 대기
+      db:
+        condition: service_healthy
     environment:
-      # Docker 컨테이너 내부에서는 localhost가 아닌 서비스명(db)으로 접속
-      DB_HOST: db
-      DB_USER: user
-      DB_PASSWORD: password
+      # 2025-12-11: AWS RDS 우선, 연결 실패 시 로컬 DB 폴백
+      # Primary: AWS RDS
+      DB_HOST: caffeine-database.c58og6ke6t36.ap-northeast-2.rds.amazonaws.com
+      DB_USER: postgres
+      DB_PASSWORD: caffeineapprds
       DB_PORT: 5432
-      DB_NAME: caffeine_db
-      # JWT 설정 (운영환경에서는 .env 파일로 관리 권장)
+      DB_NAME: postgres
+      # Fallback: Local PostgreSQL (Docker 컨테이너)
+      LOCAL_DB_HOST: db
+      LOCAL_DB_PORT: 5432
+      LOCAL_DB_NAME: caffeine_db
+      LOCAL_DB_USER: postgres
+      LOCAL_DB_PASSWORD: caffeineapprds
+      # App
       SECRET_KEY: your-super-secret-key-change-in-production
     ports:
-      - "8000:8000"
+      - "8001:8000"
+    volumes:
+      - ./10_backend/app:/app/app # 핫 리로드용
 
-  app_front:
-    build: ./20_frontend_user
-    container_name: caf_front_user
-    ports:
-      - "5173:5173"
+  # ============================================================
+  # 프론트엔드 (사용자) - Expo 앱, 로컬에서 실행 권장
+  # cd 20_frontend_user && npm start
+  # ============================================================
+  # app_front:
+  #   build: ./20_frontend_user
+  #   container_name: caf_front_user
+  #   ports:
+  #     - "3000:3000"
+  #   depends_on:
+  #     - backend
 
+  # ============================================================
+  # 프론트엔드 (관리자)
+  # ============================================================
   admin_front:
     build: ./21_frontend_admin
     container_name: caf_front_admin
     ports:
-      - "5174:5174"
+      - "3001:3000"
+    depends_on:
+      - backend
 
+  # ============================================================
+  # Nginx (리버스 프록시)
+  # ============================================================
   nginx:
     build: ./30_nginx
     container_name: caf_nginx
@@ -38,75 +84,43 @@ services:
       - "80:80"
     depends_on:
       - backend
-      - ml_next
-      - ml_fraud
-      - llm_category
-      - llm_analysis
 
+  # ============================================================
+  # ML 서비스
+  # ============================================================
   ml_next:
     build: ./40_ml_next
     container_name: caf_ml_next
-    env_file:
-      - ./40_ml_next/.env # ⬅ 이 폴더에 .env 만들기
     ports:
       - "9001:9001"
+    volumes:
+      - ./10_backend/app/model_xgboost_acc_73.47.joblib:/app/model.joblib:ro
+    environment:
+      # 로컬 모델 경로 (기본값)
+      LOCAL_MODEL_PATH: /app/model.joblib
+      # S3 설정 (선택사항 - 설정하면 S3 우선 사용)
+      # AWS_ACCESS_KEY_ID: your-access-key
+      # AWS_SECRET_ACCESS_KEY: your-secret-key
+      # S3_BUCKET: caffeine-ml-models
+      # MODEL_KEY: models/model.joblib
 
-  ml_fraud:
-    build: ./41_ml_fraud
-    container_name: caf_ml_fraud
-    env_file:
-      - ./41_ml_fraud/.env # ⬅ 여기에도 .env
-    ports:
-      - "9002:9002"
+      # ml_fraud:
+      #   build: ./41_ml_fraud
+      #   container_name: caf_ml_fraud
+      #   ports:
+      #     - "9002:9002"
 
-  llm_category:
-    build: ./50_llm_category
-    container_name: caf_llm_category
-    # env_file:
-    #   - ./50_llm_category/.env
-    ports:
-      - "9100:9100"
+      # ============================================================
+      # LLM 서비스
+      # # ============================================================
+      # llm_category:
+      #   build: ./50_llm_category
+      #   container_name: caf_llm_category
+      #   ports:
+      #     - "9100:9100"
 
-  llm_analysis:
-    build: ./51_llm_analysis
-    container_name: caf_llm_analysis
-    # env_file:
-    #   - ./51_llm_analysis/.env
-    ports:
-      - "9101:9101"
-  # (옵션) CLEO 챗봇 LLM 쓸 거면
-  # llm_cleo:
-  #   build: ./52_llm_cleo
-  #   container_name: caf_llm_cleo
-  #   # env_file:
-  #   #   - ./52_llm_cleo/.env
-  #   ports:
-  #     - "9103:9103"
-
-  # DB 추가 (2025-12-05)
-  # 작동 원리 (파이썬 ORM 방식)
-  # 1. docker-compose up -d를 입력
-
-  # 2. Docker가 postgres:15와 backend 컨테이너를 동시에 실행
-  # caf_db: 텅 빈 상태로 켜져서 대기 (테이블 없음)
-  # 이후, backend 컨테이너에서 파이썬 프로그램(main.py)이 켜짐
-
-  # 3. backend 서버 구동 후 caf_db에 접속을 시도 -> caf_backend (FastAPI)가 켜짐
-
-  # 4. main.py에서 @app.on_event("startup") 부분이 실행 -> ensure_database_and_tables() 함수가 작동하면서 DB에 테이블을 쫙 깔아줌
-
-db:
-  image: postgres:15
-  container_name: caf_db
-  environment:
-    POSTGRES_USER: user
-    POSTGRES_PASSWORD: password
-    POSTGRES_DB: caffeine_db
-  ports:
-    - "5432:5432"
-  volumes:
-    # 데이터 저장소는 필수 (이게 없으면 껐다 켤 때마다 데이터 다 날아감)
-    - ./postgres_data:/var/lib/postgresql/data
-
-  networks:
-    - default
+      # llm_analysis:
+      #   build: ./51_llm_analysis
+      #   container_name: caf_llm_analysis
+      #   ports:
+      #     - "9102:9101"

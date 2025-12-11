@@ -1,68 +1,54 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, FlatList, StyleSheet, TouchableOpacity, Modal, TextInput } from 'react-native';
+import axios from 'axios';
 import { useTheme } from '../contexts/ThemeContext';
+import { useTransactions } from '../contexts/TransactionContext';
 import EmptyState from '../components/EmptyState';
 import { formatCurrency } from '../utils/currency';
 import { EMPTY_MESSAGES } from '../constants';
 
-// ============================================================
-// TODO: 백엔드 연결 시 삭제 필요
-// ============================================================
-// 현재는 MOCK 거래내역 데이터를 사용하고 있습니다.
-// 백엔드 API 연결 시 이 MOCK_TRANSACTIONS를 삭제하고
-// useEffect에서 실제 API를 호출하여 거래내역을 가져오세요.
-//
-// 백엔드 API 엔드포인트 예시:
-// - GET /api/transactions - 전체 거래내역 조회
-// - GET /api/transactions?category=식비 - 카테고리별 조회
-// - POST /api/transactions/{id}/anomaly - 이상거래 신고
-//
-// 응답 데이터 형식:
-// {
-//   transactions: [
-//     {
-//       id: number,
-//       merchant: string,
-//       businessName: string,
-//       amount: number,
-//       category: string,
-//       date: string (ISO 8601),
-//       notes: string,
-//       cardType: '신용' | '체크',
-//       accumulated?: number,  // 신용카드인 경우
-//       balance?: number        // 체크카드인 경우
-//     }
-//   ]
-// }
-//
-// ⚠️ 중요: ID 타입 변환
-// 백엔드가 숫자 ID를 반환하는 경우 문자열로 변환 필요:
-// const transactionsData = response.data.map(t => ({
-//     ...t,
-//     id: String(t.id) // 숫자 → 문자열 변환
-// }));
-// setTransactions(transactionsData);
-// ============================================================
-const MOCK_TRANSACTIONS = [
-    { id: 1, merchant: '스타벅스', businessName: '스타벅스커피코리아(주)', amount: 15000, category: '식비', date: '2024-11-29 10:00', notes: '아메리카노', cardType: '신용', accumulated: 215000 },
-    { id: 2, merchant: 'GS25', businessName: 'GS리테일(주)', amount: 5000, category: '교통', date: '2024-11-28 08:30', notes: 'T-money 충전', cardType: '체크', balance: 1250000 },
-    { id: 3, merchant: '올리브영', businessName: 'CJ올리브영(주)', amount: 45000, category: '쇼핑', date: '2024-11-27 14:20', notes: '화장품', cardType: '신용', accumulated: 200000 },
-    { id: 4, merchant: '김밥천국', businessName: '김밥천국 강남점', amount: 8000, category: '식비', date: '2024-11-26 12:15', notes: '점심', cardType: '체크', balance: 1255000 },
-    { id: 5, merchant: 'CGV', businessName: 'CJ CGV(주)', amount: 12000, category: '여가', date: '2024-11-25 19:00', notes: '영화 관람', cardType: '체크', balance: 1263000 },
-    { id: 6, merchant: '맥도날드', businessName: '맥도날드(유)', amount: 7000, category: '식비', date: '2024-11-24 18:00', notes: '저녁', cardType: '신용', accumulated: 155000 },
-    { id: 7, merchant: '다이소', businessName: '아성다이소(주)', amount: 35000, category: '쇼핑', date: '2024-11-23 15:30', notes: '생활용품', cardType: '체크', balance: 1270000 },
-    { id: 8, merchant: '이마트', businessName: '신세계이마트(주)', amount: 120000, category: '쇼핑', date: '2024-11-22 17:00', notes: '식료품', cardType: '신용', accumulated: 148000 },
-];
-
 export default function TransactionScreen({ navigation }) {
     const { colors } = useTheme();
-    const [transactions, setTransactions] = useState(MOCK_TRANSACTIONS);
+    const { transactions, updateTransactionNote } = useTransactions();
     const [selectedTransaction, setSelectedTransaction] = useState(null);
     const [modalVisible, setModalVisible] = useState(false);
     const [anomalyCategoryModalVisible, setAnomalyCategoryModalVisible] = useState(false);
     const [isEditingNote, setIsEditingNote] = useState(false);
     const [editedNote, setEditedNote] = useState('');
     const [searchQuery, setSearchQuery] = useState('');
+    const [prediction, setPrediction] = useState(null);
+
+
+
+    const fetchPrediction = async () => {
+        try {
+            // 가장 최근 거래 데이터를 기반으로 다음 소비 패턴 예측 (시뮬레이션)
+            // 실제로는 사용자의 최근 소비 패턴 전체를 분석해야 함
+            const recentTransaction = transactions[0];
+            const requestData = {
+                날짜: recentTransaction.date.split(' ')[0],
+                시간: recentTransaction.date.split(' ')[1],
+                타입: '지출',
+                대분류: recentTransaction.category,
+                소분류: '기타', // 상세 분류가 없으므로 기타로 처리
+                내용: recentTransaction.merchant,
+                금액: String(-recentTransaction.amount),
+                화폐: 'KRW',
+                결제수단: recentTransaction.cardType + '카드',
+                메모: recentTransaction.notes || ''
+            };
+
+            // 백엔드 API 호출
+            // 주의: 안드로이드 에뮬레이터에서는 localhost 대신 10.0.2.2 사용
+            const response = await axios.post('http://localhost:8001/ml/predict', {
+                features: requestData
+            });
+            setPrediction(response.data.prediction);
+        } catch (error) {
+            console.error('Prediction failed:', error);
+            alert('예측 실패: ' + (error.response?.data?.detail || error.message));
+        }
+    };
 
     const filteredTransactions = transactions.filter(t => {
         if (!searchQuery) return true;
@@ -163,14 +149,17 @@ export default function TransactionScreen({ navigation }) {
         }, 300);
     };
 
-    const handleSaveNote = () => {
+    const handleSaveNote = async () => {
         if (selectedTransaction) {
-            setTransactions(prev => prev.map(t =>
-                t.id === selectedTransaction.id ? { ...t, notes: editedNote } : t
-            ));
-            setSelectedTransaction({ ...selectedTransaction, notes: editedNote });
-            setIsEditingNote(false);
-            alert('메모가 저장되었습니다.');
+            const result = await updateTransactionNote(selectedTransaction.id, editedNote);
+
+            if (result.success) {
+                setSelectedTransaction({ ...selectedTransaction, notes: editedNote });
+                setIsEditingNote(false);
+                alert('메모가 저장되었습니다.');
+            } else {
+                alert('메모 저장 실패');
+            }
         }
     };
 
@@ -201,6 +190,39 @@ export default function TransactionScreen({ navigation }) {
                 </Text>
             </View>
 
+            {/* AI Prediction Card - 거래가 있을 때만 표시 */}
+            {transactions.length > 0 && (
+                <View style={styles(colors).predictionCard}>
+                    <View style={styles(colors).predictionHeader}>
+                        <Text style={styles(colors).predictionIcon}>🤖</Text>
+                        <Text style={styles(colors).predictionTitle}>AI 다음 소비 예측</Text>
+                    </View>
+
+                    {prediction !== null ? (
+                        <Text style={styles(colors).predictionText}>
+                            현재 소비 패턴 분석 결과, 다음 거래는
+                            <Text style={{ fontWeight: 'bold', color: colors.primary }}>
+                                {' '}{prediction}{' '}
+                            </Text>
+                            카테고리일 확률이 높습니다.
+                        </Text>
+                    ) : (
+                        <Text style={styles(colors).predictionText}>
+                            최근 거래 데이터를 분석하여 다음 소비 패턴을 예측합니다.
+                        </Text>
+                    )}
+
+                    <TouchableOpacity
+                        style={styles(colors).predictionButton}
+                        onPress={fetchPrediction}
+                    >
+                        <Text style={styles(colors).predictionButtonText}>
+                            {prediction !== null ? '다시 예측하기' : '다음 소비 예측하기'}
+                        </Text>
+                    </TouchableOpacity>
+                </View>
+            )}
+
             {/* Search Bar */}
             <View style={styles(colors).searchContainer}>
                 <Text style={styles(colors).searchIcon}>🔍</Text>
@@ -218,11 +240,21 @@ export default function TransactionScreen({ navigation }) {
                 ) : null}
             </View>
 
-            {filteredTransactions.length === 0 ? (
+            {transactions.length === 0 ? (
                 <EmptyState
-                    {...(searchQuery ? EMPTY_MESSAGES.NO_SEARCH_RESULTS : EMPTY_MESSAGES.NO_TRANSACTIONS)}
-                    actionText={searchQuery ? "검색 초기화" : undefined}
-                    onAction={searchQuery ? () => setSearchQuery('') : undefined}
+                    icon="📊"
+                    title="연동된 거래내역이 없습니다"
+                    message="프로필 → 데이터 동기화로 CSV 파일을 업로드하세요"
+                    actionText="동기화 하러 가기"
+                    onAction={() => navigation.navigate('프로필')}
+                />
+            ) : filteredTransactions.length === 0 ? (
+                <EmptyState
+                    icon="🔍"
+                    title="검색 결과 없음"
+                    message="검색 조건과 일치하는 거래가 없습니다"
+                    actionText="검색 초기화"
+                    onAction={() => setSearchQuery('')}
                 />
             ) : (
                 <FlatList
@@ -566,6 +598,57 @@ const styles = (colors) => StyleSheet.create({
     },
     categoryModalCancelText: {
         color: colors.text,
+        fontSize: 14,
+        fontWeight: 'bold',
+    },
+
+    // Prediction Card styles
+    predictionCard: {
+        margin: 20,
+        marginBottom: 0,
+        padding: 16,
+        backgroundColor: colors.cardBackground,
+        borderRadius: 12,
+        borderWidth: 1,
+        borderColor: colors.primary,
+        shadowColor: colors.primary,
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+        elevation: 3,
+    },
+    predictionHeader: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 8,
+    },
+    predictionIcon: {
+        fontSize: 20,
+        marginRight: 8,
+    },
+    predictionTitle: {
+        fontSize: 16,
+        fontWeight: 'bold',
+        color: colors.primary,
+    },
+    predictionText: {
+        fontSize: 14,
+        color: colors.text,
+        lineHeight: 20,
+        marginBottom: 12,
+    },
+    predictionButton: {
+        backgroundColor: colors.primary,
+        padding: 12,
+        borderRadius: 8,
+        alignItems: 'center',
+    },
+    predictionButtonDisabled: {
+        backgroundColor: colors.border,
+        opacity: 0.5,
+    },
+    predictionButtonText: {
+        color: '#fff',
         fontSize: 14,
         fontWeight: 'bold',
     },

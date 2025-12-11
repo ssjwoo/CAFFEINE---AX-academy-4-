@@ -1,6 +1,6 @@
-# 2025-12-05: PostgreSQL 전환
-# - URL 스키마: mysql+aiomysql → postgresql+asyncpg
-# - CREATE DATABASE 문법: MySQL의 백틱(`) 제거 (PostgreSQL에서는 불필요)
+# 2025-12-10: AWS RDS PostgreSQL 연동
+# - RDS에서는 DB가 이미 존재하므로 CREATE DATABASE 불필요
+# - 테이블 자동 생성 (CREATE TABLE IF NOT EXISTS)
 
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import create_async_engine
@@ -11,28 +11,41 @@ from app.db.database import Base
 # 이 import가 없으면 create_all()이 실행되어도 테이블이 생성되지 않음
 from app.db.model.user import User, LoginHistory
 from app.db.model.group import UserGroup
+from app.db.model.transaction import Transaction, Coupon  # 2025-12-10 추가
 
 
-# DB 및 테이블 생성 함수
 async def ensure_database_and_tables():
-    # DB 이름 추출
-    db_name = settings.db_name
+    """
+    RDS 데이터베이스에 테이블 생성
     
-    # DB 없이 연결하는 URL (DB 생성용)
-    # 2025-12-05: mysql+aiomysql → postgresql+asyncpg로 변경
-    base_url = f"postgresql+asyncpg://{settings.db_user}:{settings.db_password}@{settings.db_host}:{settings.db_port}"
+    AWS RDS에서는 DB가 이미 생성되어 있으므로,
+    테이블만 생성합니다 (CREATE TABLE IF NOT EXISTS)
+    """
+    try:
+        # 테이블 생성 (DB 포함된 URL로 엔진 생성)
+        full_engine = create_async_engine(settings.database_url, echo=False)
+        async with full_engine.begin() as conn:
+            await conn.run_sync(Base.metadata.create_all)
+        await full_engine.dispose()
+        
+        print("✅ RDS 테이블 생성/확인 완료")
+        
+    except Exception as e:
+        print(f"❌ DB 초기화 실패: {e}")
+        raise
 
-    # 1) DB 생성 (없으면)
-    tmp_engine = create_async_engine(base_url, isolation_level="AUTOCOMMIT")
-    async with tmp_engine.connect() as conn:
-        # 2025-12-05: PostgreSQL은 백틱(`) 불필요 (MySQL과 달리 식별자에 백틱 안 씀)
-        await conn.execute(text(f"CREATE DATABASE IF NOT EXISTS {db_name}"))
-    await tmp_engine.dispose()
 
-    # 2) 테이블 생성 (DB 포함된 URL로 새 엔진 생성)
-    full_engine = create_async_engine(settings.database_url, echo=False)
-    async with full_engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
-    await full_engine.dispose()
-
-    print("DB & 테이블 생성 완료")
+async def test_db_connection():
+    """
+    RDS 데이터베이스 연결 테스트
+    """
+    try:
+        engine = create_async_engine(settings.database_url, echo=False)
+        async with engine.connect() as conn:
+            result = await conn.execute(text("SELECT 1"))
+            print(f"✅ RDS 연결 성공: {settings.db_host}")
+        await engine.dispose()
+        return True
+    except Exception as e:
+        print(f"❌ RDS 연결 실패: {e}")
+        return False

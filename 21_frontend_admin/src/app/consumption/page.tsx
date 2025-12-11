@@ -1,9 +1,27 @@
 "use client";
 
+import { useState, useEffect } from 'react';
+
 import { PieChart, TrendingUp } from 'lucide-react';
 import { ConsumptionItem } from '@/components/ui/ConsumptionItem';
 
 export default function ConsumptionPage() {
+    const [consumptionData, setConsumptionData] = useState<any[]>([]);
+
+    useEffect(() => {
+        // 백엔드에서 소비 데이터 가져오기
+        const fetchConsumption = async () => {
+            try {
+                const response = await fetch('/api/v1/consumption/summary');
+                const data = await response.json();
+                setConsumptionData(data);
+            } catch (error) {
+                console.error('소비 데이터를 가져오는데 실패했습니다:', error);
+            }
+        };
+        fetchConsumption();
+    }, []);
+
     return (
         <div className="space-y-6">
             <div className="mb-6">
@@ -50,11 +68,7 @@ export default function ConsumptionPage() {
                             }, []);
                             
                         */}
-                        {[
-                            { name: '식비', amount: '₩450,000', percent: '35%' },
-                            { name: '쇼핑', amount: '₩320,000', percent: '25%' },
-                            { name: '교통', amount: '₩150,000', percent: '12%' },
-                        ].map((item, i) => (
+                        {consumptionData.map((item, i) => (
                             <ConsumptionItem
                                 key={i}
                                 name={item.name}

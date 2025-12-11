@@ -1,15 +1,31 @@
-# 2025-12-05: PostgreSQL 전환으로 인한 드라이버 변경
-# - 기존: aiomysql (MySQL용 비동기 드라이버)
-# - 변경: asyncpg (PostgreSQL용 비동기 드라이버)
+# FastAPI 핵심
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+pydantic==2.5.0
+pydantic-settings>=2.0.0
 
-fastapi
-uvicorn
-sqlalchemy
-asyncpg
-pydantic
-pydantic-settings
-python-dotenv
-greenlet
-passlib[bcrypt]
-python-jose[cryptography]
-python-multipart
+# 데이터베이스 (PostgreSQL - AWS RDS)
+sqlalchemy>=2.0.23
+psycopg2-binary>=2.9.9
+asyncpg>=0.29.0  # 비동기 PostgreSQL 드라이버
+greenlet>=3.0.0  # SQLAlchemy 비동기 지원
+
+# 인증 & 보안
+python-jose[cryptography]==3.3.0  # JWT
+passlib[bcrypt]==1.7.4            # 비밀번호 해싱
+python-multipart==0.0.6           # 폼 데이터 처리
+cryptography>=41.0.7              # Fernet 암호화
+
+# Rate Limiting
+slowapi==0.1.9
+
+# 기타
+python-dotenv>=1.0.0              # 환경 변수
+httpx>=0.25.2                     # HTTP 클라이언트
+
+# ML & Data Processing
+scikit-learn>=1.3.0
+xgboost>=2.0.0                    # XGBoost 모델 (acc 73.47%)
+joblib>=1.3.0
+pandas>=2.0.0
+numpy>=1.24.0

@@ -6,6 +6,7 @@ import { StatusBar } from 'expo-status-bar';
 import { Text, ActivityIndicator, View } from 'react-native';
 import { ThemeProvider, useTheme } from './src/contexts/ThemeContext';
 import { AuthProvider, useAuth } from './src/contexts/AuthContext';
+import { TransactionProvider } from './src/contexts/TransactionContext';
 import { useFonts, Inter_400Regular, Inter_600SemiBold, Inter_700Bold } from '@expo-google-fonts/inter';
 import * as SplashScreen from 'expo-splash-screen';
 
@@ -24,10 +25,10 @@ const Stack = createStackNavigator();
 
 const TabBarIcon = ({ name, focused }) => {
   const icons = {
-    '대시보드': '',
-    '거래내역': '',
-    '쿠폰함': '',
-    '프로필': ''
+    '대시보드': '📊',
+    '거래내역': '💳',
+    '쿠폰함': '🎟️',
+    '프로필': '👤'
   };
   return <Text style={{ fontSize: 24, opacity: focused ? 1 : 0.5 }}>{icons[name] || ''}</Text>;
 };
@@ -120,7 +121,9 @@ export default function App() {
     <View style={{ flex: 1 }} onLayout={onLayoutRootView}>
       <ThemeProvider>
         <AuthProvider>
-          <AppContent />
+          <TransactionProvider>
+            <AppContent />
+          </TransactionProvider>
         </AuthProvider>
       </ThemeProvider>
     </View>

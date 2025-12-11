@@ -4,3 +4,6 @@ joblib
 scikit-learn
 numpy
 pandas
+boto3
+python-dotenv
+xgboost
