@@ -1,7 +1,0 @@
-우리 프로젝트 RDS 정보
-
-1. **엔드포인트 (Endpoint) :**  [caffeine-database.c58og6ke6t36.ap-northeast-2.rds.amazonaws.com](http://caffeine-database.c58og6ke6t36.ap-northeast-2.rds.amazonaws.com/)
-2. **포트 (Port)**: 기본값 `5432` 
-3. **마스터 사용자 이름 (User):** postgres
-4. **마스터 비밀번호 (Password) : caffeineapprds**
-5. **데이터베이스 이름 (DB Name)**: `postgres`
