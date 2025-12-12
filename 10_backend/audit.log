@@ -1388,3 +1388,69 @@
 2025-12-12 11:42:18,263 - audit - INFO - Response: 200 | Duration: 0.016s
 2025-12-12 11:42:18,266 - audit - INFO - Request: GET /api/analysis/categories | Client: 127.0.0.1
 2025-12-12 11:42:18,282 - audit - INFO - Response: 200 | Duration: 0.016s
+2025-12-12 16:06:40,653 - app.main - INFO - ============================================================
+2025-12-12 16:06:40,747 - app.main - INFO - 환경: development
+2025-12-12 16:06:40,748 - app.main - INFO - CORS 허용 도메인: ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:8081', 'http://localhost:8082', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006']
+2025-12-12 16:06:44,164 - app.main - INFO - ============================================================
+2025-12-12 16:06:44,166 - app.main - INFO - ============================================================
+2025-12-12 16:06:44,180 - app.main - INFO - ============================================================
+2025-12-12 16:07:34,484 - app.main - INFO - ============================================================
+2025-12-12 16:07:34,497 - app.main - INFO - 환경: development
+2025-12-12 16:07:34,497 - app.main - INFO - CORS 허용 도메인: ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:8081', 'http://localhost:8082', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006']
+2025-12-12 16:07:35,543 - app.main - INFO - ============================================================
+2025-12-12 16:07:53,558 - app.main - INFO - ============================================================
+2025-12-12 16:07:53,561 - app.main - INFO - ============================================================
+2025-12-12 16:08:19,124 - app.main - INFO - ============================================================
+2025-12-12 16:08:19,136 - app.main - INFO - 환경: development
+2025-12-12 16:08:19,136 - app.main - INFO - CORS 허용 도메인: ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:8081', 'http://localhost:8082', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006']
+2025-12-12 16:08:20,100 - app.main - INFO - ============================================================
+2025-12-12 16:12:41,099 - app.main - INFO - ============================================================
+2025-12-12 16:12:41,103 - app.main - INFO - ============================================================
+2025-12-12 16:12:57,721 - app.main - INFO - ============================================================
+2025-12-12 16:12:57,732 - app.main - INFO - 환경: development
+2025-12-12 16:12:57,732 - app.main - INFO - CORS 허용 도메인: ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:8081', 'http://localhost:8082', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006']
+2025-12-12 16:12:58,764 - app.main - INFO - ============================================================
+2025-12-12 16:13:11,905 - audit - INFO - Request: POST /users/login | Client: 127.0.0.1
+2025-12-12 16:13:12,512 - passlib.handlers.bcrypt - WARNING - (trapped) error reading bcrypt version
+Traceback (most recent call last):
+  File "C:\Users\Jinwoo\AppData\Local\Programs\Python\Python313\Lib\site-packages\passlib\handlers\bcrypt.py", line 620, in _load_backend_mixin
+    version = _bcrypt.__about__.__version__
+              ^^^^^^^^^^^^^^^^^
+AttributeError: module 'bcrypt' has no attribute '__about__'
+2025-12-12 16:13:12,860 - audit - INFO - Response: 200 | Duration: 0.955s
+2025-12-12 16:13:12,864 - audit - INFO - Request: OPTIONS /users/me | Client: 127.0.0.1
+2025-12-12 16:13:12,865 - audit - INFO - Response: 200 | Duration: 0.001s
+2025-12-12 16:13:12,869 - audit - INFO - Request: GET /users/me | Client: 127.0.0.1
+2025-12-12 16:13:12,927 - audit - INFO - Response: 200 | Duration: 0.058s
+2025-12-12 16:13:13,051 - audit - INFO - Request: OPTIONS /api/analysis/full | Client: 127.0.0.1
+2025-12-12 16:13:13,052 - audit - INFO - Request: OPTIONS /api/analysis/full | Client: 127.0.0.1
+2025-12-12 16:13:13,053 - audit - INFO - Response: 200 | Duration: 0.003s
+2025-12-12 16:13:13,054 - audit - INFO - Response: 200 | Duration: 0.002s
+2025-12-12 16:13:13,059 - audit - INFO - Request: GET /api/analysis/full | Client: 127.0.0.1
+2025-12-12 16:13:13,200 - audit - INFO - Response: 200 | Duration: 0.141s
+2025-12-12 16:13:13,201 - audit - INFO - Request: GET /api/analysis/full | Client: 127.0.0.1
+2025-12-12 16:13:13,291 - audit - INFO - Response: 200 | Duration: 0.090s
+2025-12-12 16:13:23,789 - audit - INFO - Request: OPTIONS /api/analysis/categories | Client: 127.0.0.1
+2025-12-12 16:13:23,790 - audit - INFO - Request: OPTIONS /api/analysis/categories | Client: 127.0.0.1
+2025-12-12 16:13:23,790 - audit - INFO - Response: 200 | Duration: 0.002s
+2025-12-12 16:13:23,791 - audit - INFO - Response: 200 | Duration: 0.002s
+2025-12-12 16:13:23,794 - audit - INFO - Request: GET /api/analysis/categories | Client: 127.0.0.1
+2025-12-12 16:13:23,820 - audit - INFO - Response: 200 | Duration: 0.026s
+2025-12-12 16:13:23,822 - audit - INFO - Request: GET /api/analysis/categories | Client: 127.0.0.1
+2025-12-12 16:13:23,859 - audit - INFO - Response: 200 | Duration: 0.037s
+2025-12-12 16:13:31,891 - audit - INFO - Request: GET /api/analysis/categories | Client: 127.0.0.1
+2025-12-12 16:13:31,920 - audit - INFO - Response: 200 | Duration: 0.029s
+2025-12-12 16:13:31,922 - audit - INFO - Request: GET /api/analysis/categories | Client: 127.0.0.1
+2025-12-12 16:13:31,951 - audit - INFO - Response: 200 | Duration: 0.029s
+2025-12-12 16:13:33,256 - audit - INFO - Request: GET /api/analysis/full | Client: 127.0.0.1
+2025-12-12 16:13:33,325 - audit - INFO - Response: 200 | Duration: 0.069s
+2025-12-12 16:13:33,326 - audit - INFO - Request: GET /api/analysis/full | Client: 127.0.0.1
+2025-12-12 16:13:33,399 - audit - INFO - Response: 200 | Duration: 0.072s
+2025-12-12 16:13:37,681 - audit - INFO - Request: GET /api/analysis/full | Client: 127.0.0.1
+2025-12-12 16:13:37,764 - audit - INFO - Response: 200 | Duration: 0.084s
+2025-12-12 16:13:39,990 - audit - INFO - Request: OPTIONS /api/analysis/full | Client: 127.0.0.1
+2025-12-12 16:13:39,991 - audit - INFO - Response: 200 | Duration: 0.001s
+2025-12-12 16:13:39,993 - audit - INFO - Request: GET /api/analysis/full | Client: 127.0.0.1
+2025-12-12 16:13:40,061 - audit - INFO - Response: 200 | Duration: 0.069s
+2025-12-12 16:14:05,657 - app.main - INFO - ============================================================
+2025-12-12 16:14:05,661 - app.main - INFO - ============================================================
