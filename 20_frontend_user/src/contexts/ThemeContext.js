@@ -122,9 +122,11 @@ export const ThemeProvider = ({ children }) => {
      */
     const colors = isDarkMode ? {
         // ═══ Primary Colors (브랜드 색상) ═══
-        primary: '#bfa094',          // 메인 브랜드 색상 (베이지 브라운)
-        primaryDark: '#9a7d72',      // 어두운 primary (호버 효과 등)
-        primaryLight: '#d4b8ad',     // 밝은 primary (배경 등)
+        primary: '#9C27B0',          // 메인 브랜드 색상 (보라색)
+        primaryDark: '#7B1FA2',      // 어두운 primary
+        primaryLight: '#E1BEE7',     // 밝은 primary (배경 등)
+        accent: '#E91E63',           // 악센트 색상 (마젠타/핑크)
+        accentLight: '#FCE4EC',      // 밝은 악센트
 
         // ═══ Background Colors (배경) ═══
         background: '#1a1a1a',       // 메인 배경 (거의 검정)
@@ -144,29 +146,27 @@ export const ThemeProvider = ({ children }) => {
         warning: '#ff9800',          // 경고 (주황색)
         error: '#f44336',            // 에러/위험 (빨강색)
         info: '#2196f3',             // 정보 (파랑색)
+        positive: '#4CAF50',         // 수익 (녹색)
+        negative: '#E91E63',         // 지출 (핑크)
 
         // ═══ Special Backgrounds (특수 배경) ═══
-        // Alert나 상태별 카드에 사용되는 반투명 배경색
         warningBackground: '#2d2416',  // 경고 배경 (어두운 주황)
         successBackground: '#1a2d1a',  // 성공 배경 (어두운 녹색)
         errorBackground: '#2d1a1a',    // 에러 배경 (어두운 빨강)
         infoBackground: '#1a232d',     // 정보 배경 (어두운 파랑)
 
         // ═══ Chart Colors (차트 전용 색상 배열) ═══
-        // 파이차트, 막대그래프 등에서 사용
-        // 순서대로 카테고리에 할당됨
         chartColors: [
-            '#bfa094',  // 1. Primary (베이지 브라운)
-            '#ff9800',  // 2. 주황
-            '#4caf50',  // 3. 녹색
-            '#2196f3',  // 4. 파랑
-            '#9c27b0',  // 5. 보라
-            '#ff5722'   // 6. 적갈색
+            '#E91E63',  // 1. 마젠타/핑크
+            '#9C27B0',  // 2. 보라
+            '#AB47BC',  // 3. 밝은 보라
+            '#F48FB1',  // 4. 연핑크
+            '#CE93D8',  // 5. 연보라
+            '#FF80AB'   // 6. 핫핑크
         ],
 
         // ═══ Gradients (그라데이션) ═══
-        // LinearGradient 등에서 사용
-        primaryGradient: ['#bfa094', '#9a7d72'],      // Primary 그라데이션
+        primaryGradient: ['#9C27B0', '#E91E63'],      // Primary 그라데이션
         backgroundGradient: ['#1a1a1a', '#2d2d2d'],   // Background 그라데이션
 
         // ═══ Interactive (상호작용 요소) ═══
@@ -175,31 +175,33 @@ export const ThemeProvider = ({ children }) => {
 
     } : {
         // ═══ 라이트 모드 색상 ═══
-        // (구조는 동일, 색상만 밝게)
-
-        // Primary Colors
-        primary: '#bfa094',
-        primaryDark: '#9a7d72',
-        primaryLight: '#d4b8ad',
+        // Primary Colors (보라색/마젠타 테마)
+        primary: '#9C27B0',          // 보라색
+        primaryDark: '#7B1FA2',      // 어두운 보라
+        primaryLight: '#F3E5F5',     // 밝은 보라 배경
+        accent: '#E91E63',           // 마젠타/핑크
+        accentLight: '#FCE4EC',      // 밝은 핑크
 
         // Background Colors
-        background: '#f5f5f5',       // 밝은 회색 배경
+        background: '#FAFAFA',       // 밝은 회색 배경
         cardBackground: '#ffffff',   // 하얀색 카드
 
         // Text Colors
-        text: '#000000',             // 검정 텍스트
-        textSecondary: '#666666',    // 회색 텍스트
-        textTertiary: '#999999',     // 연회색 텍스트
+        text: '#212121',             // 진한 회색 텍스트
+        textSecondary: '#757575',    // 중간 회색 텍스트
+        textTertiary: '#9E9E9E',     // 연회색 텍스트
 
         // Border Colors
-        border: '#e0e0e0',
-        borderLight: '#f0f0f0',
+        border: '#E0E0E0',
+        borderLight: '#F5F5F5',
 
-        // Status Colors (다크모드와 동일한 색상 사용)
+        // Status Colors
         success: '#4caf50',
         warning: '#ff9800',
         error: '#f44336',
         info: '#2196f3',
+        positive: '#4CAF50',         // 수익 (녹색)
+        negative: '#E91E63',         // 지출 (핑크)
 
         // Special Backgrounds (밝은 파스텔 톤)
         warningBackground: '#fff3e0',
@@ -207,18 +209,23 @@ export const ThemeProvider = ({ children }) => {
         errorBackground: '#ffebee',
         infoBackground: '#e3f2fd',
 
-        // Chart Colors (다크모드와 동일)
+        // Chart Colors (보라색/핑크 계열)
         chartColors: [
-            '#bfa094', '#ff9800', '#4caf50', '#2196f3', '#9c27b0', '#ff5722'
+            '#E91E63',  // 1. 마젠타/핑크
+            '#9C27B0',  // 2. 보라
+            '#AB47BC',  // 3. 밝은 보라
+            '#F48FB1',  // 4. 연핑크
+            '#CE93D8',  // 5. 연보라
+            '#FF80AB'   // 6. 핫핑크
         ],
 
         // Gradients
-        primaryGradient: ['#bfa094', '#d4b8ad'],
-        backgroundGradient: ['#ffffff', '#f5f5f5'],
+        primaryGradient: ['#9C27B0', '#E91E63'],
+        backgroundGradient: ['#ffffff', '#F3E5F5'],
 
         // Interactive
-        disabled: '#cccccc',
-        placeholder: '#999999',
+        disabled: '#BDBDBD',
+        placeholder: '#9E9E9E',
     };
 
     /**

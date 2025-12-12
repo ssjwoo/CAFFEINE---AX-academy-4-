@@ -1,32 +1,23 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, Switch, TouchableOpacity, ScrollView, Modal, Share } from 'react-native';
+import { View, Text, StyleSheet, Switch, TouchableOpacity, ScrollView, Modal, Dimensions, ActivityIndicator } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
+import * as DocumentPicker from 'expo-document-picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useTheme } from '../contexts/ThemeContext';
 import { useAuth } from '../contexts/AuthContext';
 import { useTransactions } from '../contexts/TransactionContext';
-import * as DocumentPicker from 'expo-document-picker';
-import axios from 'axios';
 
-export default function ProfileScreen() {
+const { width: screenWidth } = Dimensions.get('window');
+
+export default function ProfileScreen({ navigation }) {
     const { colors, isDarkMode, toggleTheme } = useTheme();
     const { user, logout } = useAuth();
-    const { saveTransactions, clearTransactions, setLoading } = useTransactions();
+    const { saveTransactions, clearTransactions, loading: syncLoading } = useTransactions();
     const [infoModalVisible, setInfoModalVisible] = useState(false);
     const [infoContent, setInfoContent] = useState({ title: '', content: '' });
 
     const handleExportData = async () => {
         try {
-            const exportData = {
-                exportDate: new Date().toISOString(),
-                userData: {
-                    name: '홍길동',
-                    email: 'demo@caffeine.com'
-                },
-                summary: '총 81건의 거래, 125만원 지출',
-                note: '실제 앱에서는 CSV나 JSON 파일로 다운로드됩니다'
-            };
-
-            // 웹 환경에서는 Share API 대신 alert 사용
             const message = `데이터 내보내기\n\n내보내기 날짜: ${new Date().toLocaleDateString()}\n총 거래: 81건\n총 지출: 1,250,000원\n\n✅ 데이터가 준비되었습니다!`;
             alert(message);
         } catch (error) {
@@ -34,205 +25,128 @@ export default function ProfileScreen() {
         }
     };
 
-    // ... (중략)
+    // CSV 파일 파싱 함수
+    const parseCSV = (csvText) => {
+        const lines = csvText.trim().split('\n');
+        if (lines.length < 2) return [];
 
+        const headers = lines[0].split(',').map(h => h.trim());
+        const transactions = [];
+
+        for (let i = 1; i < lines.length; i++) {
+            const values = lines[i].split(',');
+            if (values.length < 6) continue;
+
+            // CSV 컬럼 매핑: 날짜,시간,타입,대분류,소분류,내용,금액,화폐,결제수단,메모
+            const transaction = {
+                id: String(i),
+                date: values[0]?.trim() + ' ' + (values[1]?.trim() || '00:00'),
+                category: values[3]?.trim() || '기타',
+                merchant: values[5]?.trim() || '알 수 없음',
+                amount: Math.abs(parseFloat(values[6]?.trim()) || 0),
+                cardType: values[8]?.includes('체크') ? '체크' : '신용',
+                notes: values[9]?.trim() || '',
+            };
+
+            if (transaction.amount > 0) {
+                transactions.push(transaction);
+            }
+        }
+
+        return transactions;
+    };
+
+    // 데이터 동기화 (CSV 파일 선택)
     const handleSyncData = async () => {
         try {
-            // 1. CSV 파일 선택
+            // 파일 선택 다이얼로그 열기
             const result = await DocumentPicker.getDocumentAsync({
-                type: ['text/csv', 'text/comma-separated-values', 'application/csv'],
-                copyToCacheDirectory: true
+                type: ['text/csv', 'text/comma-separated-values', 'application/csv', '*/*'],
+                copyToCacheDirectory: true,
             });
 
             if (result.canceled) {
                 return;
             }
 
-            const file = result.assets ? result.assets[0] : result;
+            const file = result.assets[0];
+            console.log('선택된 파일:', file.name);
 
-            // 2. FormData 생성
-            const formData = new FormData();
-            if (file.file) {
-                // 웹 환경
-                formData.append('file', file.file);
-            } else {
-                // 앱 환경
-                formData.append('file', {
-                    uri: file.uri,
-                    name: file.name,
-                    type: file.mimeType || 'text/csv'
-                });
+            // 파일 읽기
+            const response = await fetch(file.uri);
+            const csvText = await response.text();
+
+            // CSV 파싱
+            const transactions = parseCSV(csvText);
+
+            if (transactions.length === 0) {
+                alert('CSV 파일에서 거래 데이터를 찾을 수 없습니다.\n\n올바른 형식의 CSV 파일인지 확인해주세요.');
+                return;
             }
 
-            // 로딩 시작
-            setLoading(true);
-            alert('파일을 분석하고 거래 내역을 가져오는 중...');
-
-            // 3. 백엔드로 전송
-            const response = await axios.post(
-                'http://localhost:8001/ml/upload',
-                formData,
-                {
-                    headers: { 'Content-Type': 'multipart/form-data' },
-                    timeout: 60000  // 60초 타임아웃
-                }
-            );
-
-            const { transactions, summary } = response.data;
-
-            // 4. Context에 저장 (AsyncStorage 포함)
+            // TransactionContext에 저장
             const saveResult = await saveTransactions(transactions);
 
             if (saveResult.success) {
-                const categorySummary = Object.entries(summary.by_category)
-                    .map(([cat, cnt]) => `${cat}: ${cnt}건`)
-                    .join('\n');
-
-                alert(
-                    `✅ 동기화 완료!\n\n` +
-                    `총 거래: ${transactions.length}건\n\n` +
-                    `카테고리별 요약:\n${categorySummary}\n\n` +
-                    `거래 내역 탭에서 확인하세요!`
-                );
-
-                // 5. 다음 소비 예측 자동 실행
-                try {
-                    alert('🔮 다음 소비를 예측하는 중...');
-
-                    const predictResponse = await axios.post(
-                        'http://localhost:8001/ml/predict-next',
-                        formData,
-                        {
-                            headers: { 'Content-Type': 'multipart/form-data' },
-                            timeout: 30000
-                        }
-                    );
-
-                    const { predicted_category, confidence, probabilities, context } = predictResponse.data;
-
-                    // 확률 정렬 (높은 순)
-                    const sortedProbs = Object.entries(probabilities)
-                        .sort(([, a], [, b]) => b - a)
-                        .slice(0, 3)  // 상위 3개만
-                        .map(([cat, prob]) => `${cat}: ${(prob * 100).toFixed(1)}%`)
-                        .join('\n');
-
-                    // 결과 표시
-                    alert(`🔮 다음 소비 예측 결과\n\n` +
-                        `예측 카테고리: ${predicted_category}\n` +
-                        `신뢰도: ${(confidence * 100).toFixed(1)}%\n\n` +
-                        `📊 상위 3개 카테고리 확률:\n${sortedProbs}\n\n` +
-                        `📈 분석 정보:\n` +
-                        `• 총 거래: ${context.total_transactions}건\n` +
-                        `• 마지막 거래: ${context.last_category}\n` +
-                        `• 평균 금액: ${Math.round(context.user_avg_amount).toLocaleString()}원\n` +
-                        `• 주요 카테고리: ${context.most_frequent_category}`);
-
-                } catch (predictError) {
-                    console.error('예측 실패:', predictError);
-                    // 예측 실패해도 동기화는 성공이므로 에러 표시만
-                    alert('⚠️ 다음 소비 예측은 실패했지만 데이터 동기화는 성공했습니다.');
-                }
+                alert(`✅ 데이터 동기화 완료!\n\n${transactions.length}건의 거래 내역이 업데이트되었습니다.`);
+                // 대시보드로 자동 이동
+                navigation?.navigate('대시보드');
             } else {
-                throw new Error('저장 실패');
+                alert('데이터 저장 중 오류가 발생했습니다.');
             }
 
         } catch (error) {
             console.error('동기화 실패:', error);
-            alert('동기화 실패: ' + (error.response?.data?.detail || error.message));
-        } finally {
-            setLoading(false);
+            alert('파일을 읽는 중 오류가 발생했습니다.\n\n' + error.message);
         }
     };
 
     const handleClearCache = async () => {
-        if (!confirm('⚠️ 모든 거래 데이터를 삭제하시겠습니까?\n\n이 작업은 되돌릴 수 없습니다.')) {
-            return;
-        }
+        // 확인 다이얼로그
+        const confirmed = confirm('정말 모든 거래 데이터를 삭제하시겠습니까?\n\n이 작업은 되돌릴 수 없습니다.');
+        
+        if (!confirmed) return;
 
         try {
-            setLoading(true);
-
             // TransactionContext의 clearTransactions 호출
-            const result = await clearTransactions();
-
-            if (result.success) {
-                alert('✅ 모든 거래 데이터가 삭제되었습니다!\n\n다시 CSV를 업로드하려면 "데이터 동기화" 버튼을 사용하세요.');
-            } else {
-                throw new Error('삭제 실패');
+            await clearTransactions();
+            
+            // AsyncStorage에서도 삭제 (이중 보장)
+            await AsyncStorage.removeItem('transactions_cache');
+            await AsyncStorage.removeItem('last_sync_time');
+            
+            alert('✅ 캐시가 삭제되었습니다!\n\n모든 거래 데이터가 초기화되었습니다.\n다시 동기화해주세요.');
+            
+            // 페이지 새로고침 효과
+            if (typeof window !== 'undefined') {
+                window.location.reload();
             }
         } catch (error) {
-            console.error('데이터 삭제 실패:', error);
-            alert('❌ 데이터 삭제 실패: ' + error.message);
-        } finally {
-            setLoading(false);
+            console.error('캐시 삭제 실패:', error);
+            alert('캐시 삭제 중 오류가 발생했습니다.');
         }
     };
 
     const handleAppInfo = () => {
         setInfoContent({
-            title: 'ℹ앱 정보',
-            content: `Caffeine - 금융 관리 앱
-
-버전: 1.0.0
-개발자: Caffeine Team
-출시일: 2024.11
-
-주요 기능:
-• 스마트 소비 분석
-• AI 기반 이상 거래 탐지
-• 실시간 거래 내역 관리
-• 카테고리별 소비 분석
-• 다크모드 지원`
+            title: 'ℹ️ 앱 정보',
+            content: `Caffeine - 금융 관리 앱\n\n버전: 1.0.0\n개발자: Caffeine Team\n출시일: 2024.11\n\n주요 기능:\n• 스마트 소비 분석\n• AI 기반 이상 거래 탐지\n• 실시간 거래 내역 관리\n• 카테고리별 소비 분석\n• 다크모드 지원`
         });
         setInfoModalVisible(true);
     };
 
     const handleTermsOfService = () => {
         setInfoContent({
-            title: '이용약관',
-            content: `Caffeine 서비스 이용약관
-
-제1조 (목적)
-본 약관은 Caffeine(이하 "서비스")의 이용과 관련하여 회사와 이용자의 권리, 의무 및 책임사항을 규정함을 목적으로 합니다.
-
-제2조 (서비스의 제공)
-회사는 다음과 같은 서비스를 제공합니다:
-1. 소비 패턴 분석
-2. 거래 내역 관리
-3. 이상 거래 탐지
-4. 데이터 시각화
-
-제3조 (개인정보 보호)
-회사는 관련 법령이 정하는 바에 따라 이용자의 개인정보를 보호하기 위해 노력합니다.`
+            title: '📋 이용약관',
+            content: `Caffeine 서비스 이용약관\n\n제1조 (목적)\n본 약관은 Caffeine(이하 "서비스")의 이용과 관련하여 회사와 이용자의 권리, 의무 및 책임사항을 규정함을 목적으로 합니다.\n\n제2조 (서비스의 제공)\n회사는 다음과 같은 서비스를 제공합니다:\n1. 소비 패턴 분석\n2. 거래 내역 관리\n3. 이상 거래 탐지\n4. 데이터 시각화\n\n제3조 (개인정보 보호)\n회사는 관련 법령이 정하는 바에 따라 이용자의 개인정보를 보호하기 위해 노력합니다.`
         });
         setInfoModalVisible(true);
     };
 
     const handlePrivacyPolicy = () => {
         setInfoContent({
-            title: '개인정보 처리방침',
-            content: `Caffeine 개인정보 처리방침
-
-1. 수집하는 개인정보
-• 이름, 이메일 주소
-• 거래 내역 정보
-• 서비스 이용 기록
-
-2. 개인정보의 이용 목적
-• 서비스 제공 및 개선
-• 소비 패턴 분석
-• 이상 거래 탐지
-• 고객 지원
-
-3. 개인정보의 보관 기간
-• 회원 탈퇴 시까지
-• 법령에 따른 보관 의무 기간
-
-4. 개인정보의 안전성 확보
-• 암호화 저장
-• 접근 권한 관리
-• 정기적인 보안 점검`
+            title: '🔒 개인정보 처리방침',
+            content: `Caffeine 개인정보 처리방침\n\n1. 수집하는 개인정보\n• 이름, 이메일 주소\n• 거래 내역 정보\n• 서비스 이용 기록\n\n2. 개인정보의 이용 목적\n• 서비스 제공 및 개선\n• 소비 패턴 분석\n• 이상 거래 탐지\n• 고객 지원\n\n3. 개인정보의 보관 기간\n• 회원 탈퇴 시까지\n• 법령에 따른 보관 의무 기간\n\n4. 개인정보의 안전성 확보\n• 암호화 저장\n• 접근 권한 관리\n• 정기적인 보안 점검`
         });
         setInfoModalVisible(true);
     };
@@ -244,100 +158,308 @@ export default function ProfileScreen() {
         }
     };
 
-    const MenuItem = ({ icon, title, onPress }) => (
-        <TouchableOpacity style={styles(colors).menuItem} onPress={onPress}>
-            <Text style={styles(colors).menuIcon}>{icon}</Text>
-            <Text style={styles(colors).menuTitle}>{title}</Text>
-            <Text style={styles(colors).menuArrow}>›</Text>
+    const MenuItem = ({ icon, title, subtitle, onPress, showArrow = true, rightComponent }) => (
+        <TouchableOpacity style={styles.menuItem} onPress={onPress} activeOpacity={0.7}>
+            <View style={styles.menuIconContainer}>
+                <Text style={styles.menuIcon}>{icon}</Text>
+            </View>
+            <View style={styles.menuContent}>
+                <Text style={styles.menuTitle}>{title}</Text>
+                {subtitle && <Text style={styles.menuSubtitle}>{subtitle}</Text>}
+            </View>
+            {rightComponent ? rightComponent : (
+                showArrow && <Text style={styles.menuArrow}>›</Text>
+            )}
         </TouchableOpacity>
     );
 
     return (
-        <ScrollView style={styles(colors).container}>
-            <View style={styles(colors).header}>
-                <View style={styles(colors).avatar}>
-                    <Text style={styles(colors).avatarText}>{user?.name?.charAt(0) || '홍'}</Text>
-                </View>
-                <Text style={styles(colors).name}>{user?.name || '홍길동'}</Text>
-                <Text style={styles(colors).email}>{user?.email || 'demo@caffeine.com'}</Text>
-            </View>
-
-            <View style={styles(colors).section}>
-                <Text style={styles(colors).sectionTitle}>설정</Text>
-
-                <View style={styles(colors).menuItem}>
-                    <Text style={styles(colors).menuIcon}></Text>
-                    <Text style={styles(colors).menuTitle}>다크 모드</Text>
-                    <Switch
-                        value={isDarkMode}
-                        onValueChange={toggleTheme}
-                        trackColor={{ false: '#ccc', true: colors.primary }}
-                        thumbColor={isDarkMode ? '#fff' : '#f4f3f4'}
-                    />
+        <LinearGradient
+            colors={['#DBEAFE', '#EFF6FF', '#F8FAFC']}
+            style={styles.gradientContainer}
+        >
+            <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+                {/* Profile Header */}
+                <View style={styles.header}>
+                    <View style={styles.avatarContainer}>
+                        <LinearGradient
+                            colors={['#2563EB', '#1D4ED8']}
+                            style={styles.avatar}
+                        >
+                            <Text style={styles.avatarText}>{user?.name?.charAt(0) || '홍'}</Text>
+                        </LinearGradient>
+                    </View>
+                    <Text style={styles.name}>{user?.name || '홍길동'}</Text>
+                    <Text style={styles.email}>{user?.email || 'demo@caffeine.com'}</Text>
                 </View>
 
-                <MenuItem icon="" title="데이터 내보내기" onPress={handleExportData} />
-                <MenuItem icon="🔄" title="데이터 동기화 (예측 포함)" onPress={handleSyncData} />
-                <MenuItem icon="🗑️" title="거래 데이터 초기화" onPress={handleClearCache} />
-            </View>
-
-            <View style={styles(colors).section}>
-                <Text style={styles(colors).sectionTitle}>📱 정보</Text>
-                <MenuItem icon="ℹ" title="앱 정보" onPress={handleAppInfo} />
-                <MenuItem icon="" title="이용약관" onPress={handleTermsOfService} />
-                <MenuItem icon="" title="개인정보 처리방침" onPress={handlePrivacyPolicy} />
-            </View>
-
-            <TouchableOpacity style={styles(colors).logoutButton} onPress={handleLogout}>
-                <Text style={styles(colors).logoutText}>로그아웃</Text>
-            </TouchableOpacity>
-
-            {/* Info Modal */}
-            <Modal
-                animationType="fade"
-                transparent={true}
-                visible={infoModalVisible}
-                onRequestClose={() => setInfoModalVisible(false)}>
-                <View style={styles(colors).modalOverlay}>
-                    <View style={styles(colors).modalContent}>
-                        <Text style={styles(colors).modalTitle}>{infoContent.title}</Text>
-                        <ScrollView style={styles(colors).modalScroll}>
-                            <Text style={styles(colors).modalText}>{infoContent.content}</Text>
-                        </ScrollView>
-                        <TouchableOpacity style={styles(colors).modalButton} onPress={() => setInfoModalVisible(false)}>
-                            <Text style={styles(colors).modalButtonText}>닫기</Text>
-                        </TouchableOpacity>
+                {/* Settings Section */}
+                <View style={styles.section}>
+                    <Text style={styles.sectionTitle}>설정</Text>
+                    <View style={styles.card}>
+                        <View style={styles.menuItem}>
+                            <View style={styles.menuIconContainer}>
+                                <Text style={styles.menuIcon}>🌙</Text>
+                            </View>
+                            <View style={styles.menuContent}>
+                                <Text style={styles.menuTitle}>다크 모드</Text>
+                            </View>
+                            <Switch
+                                value={isDarkMode}
+                                onValueChange={toggleTheme}
+                                trackColor={{ false: '#E5E7EB', true: '#2563EB' }}
+                                thumbColor={'#FFFFFF'}
+                                ios_backgroundColor="#E5E7EB"
+                            />
+                        </View>
+                        <View style={styles.divider} />
+                        <MenuItem icon="📤" title="데이터 내보내기" subtitle="CSV, JSON 형식으로 저장" onPress={handleExportData} />
+                        <View style={styles.divider} />
+                        <MenuItem icon="🔄" title="데이터 동기화 (예측 포함)" subtitle="최신 거래 내역 불러오기" onPress={handleSyncData} />
+                        <View style={styles.divider} />
+                        <MenuItem icon="🗑️" title="거래 데이터 초기화" subtitle="캐시 및 임시 파일 삭제" onPress={handleClearCache} />
                     </View>
                 </View>
-            </Modal>
 
-            <View style={{ height: 40 }} />
-        </ScrollView>
+                {/* Info Section */}
+                <View style={styles.section}>
+                    <Text style={styles.sectionTitle}>정보</Text>
+                    <View style={styles.card}>
+                        <MenuItem icon="ℹ️" title="앱 정보" onPress={handleAppInfo} />
+                        <View style={styles.divider} />
+                        <MenuItem icon="📋" title="이용약관" onPress={handleTermsOfService} />
+                        <View style={styles.divider} />
+                        <MenuItem icon="🔒" title="개인정보 처리방침" onPress={handlePrivacyPolicy} />
+                    </View>
+                </View>
+
+                {/* Logout Button */}
+                <TouchableOpacity style={styles.logoutButton} onPress={handleLogout} activeOpacity={0.8}>
+                    <Text style={styles.logoutText}>로그아웃</Text>
+                </TouchableOpacity>
+
+                {/* Info Modal */}
+                <Modal
+                    animationType="slide"
+                    transparent={true}
+                    visible={infoModalVisible}
+                    onRequestClose={() => setInfoModalVisible(false)}
+                >
+                    <View style={styles.modalOverlay}>
+                        <View style={styles.modalContent}>
+                            <View style={styles.modalHandle} />
+                            <Text style={styles.modalTitle}>{infoContent.title}</Text>
+                            <ScrollView style={styles.modalScroll} showsVerticalScrollIndicator={false}>
+                                <Text style={styles.modalText}>{infoContent.content}</Text>
+                            </ScrollView>
+                            <TouchableOpacity 
+                                style={styles.modalButton} 
+                                onPress={() => setInfoModalVisible(false)}
+                                activeOpacity={0.8}
+                            >
+                                <LinearGradient
+                                    colors={['#2563EB', '#1D4ED8']}
+                                    style={styles.modalButtonGradient}
+                                >
+                                    <Text style={styles.modalButtonText}>닫기</Text>
+                                </LinearGradient>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                </Modal>
+
+                <View style={{ height: 100 }} />
+            </ScrollView>
+        </LinearGradient>
     );
 }
 
-const styles = (colors) => StyleSheet.create({
-    container: { flex: 1, backgroundColor: colors.background },
-    header: { padding: 40, alignItems: 'center', backgroundColor: colors.cardBackground, borderBottomWidth: 1, borderBottomColor: colors.border },
-    avatar: { width: 80, height: 80, borderRadius: 40, backgroundColor: colors.primary, justifyContent: 'center', alignItems: 'center', marginBottom: 16 },
-    avatarText: { fontSize: 32, fontWeight: 'bold', color: '#fff' },
-    name: { fontSize: 24, fontWeight: 'bold', color: colors.text, marginBottom: 4 },
-    email: { fontSize: 14, color: colors.textSecondary },
-    section: { marginTop: 20, padding: 20 },
-    sectionTitle: { fontSize: 18, fontWeight: 'bold', color: colors.text, marginBottom: 12 },
-    menuItem: { flexDirection: 'row', alignItems: 'center', backgroundColor: colors.cardBackground, padding: 16, borderRadius: 12, marginBottom: 8, borderWidth: 1, borderColor: colors.border },
-    menuIcon: { fontSize: 24, marginRight: 12 },
-    menuTitle: { flex: 1, fontSize: 16, color: colors.text },
-    menuArrow: { fontSize: 24, color: colors.textSecondary },
-    logoutButton: { margin: 20, padding: 16, backgroundColor: colors.error, borderRadius: 12, alignItems: 'center' },
-    logoutText: { fontSize: 16, fontWeight: 'bold', color: '#fff' },
+const styles = StyleSheet.create({
+    gradientContainer: {
+        flex: 1,
+    },
+    container: {
+        flex: 1,
+    },
 
-    // Modal styles
-    modalOverlay: { flex: 1, backgroundColor: 'rgba(0, 0, 0, 0.5)', justifyContent: 'center', alignItems: 'center', padding: 20 },
-    modalContent: { backgroundColor: colors.cardBackground, borderRadius: 16, padding: 24, width: '100%', maxWidth: 500, maxHeight: '80%', borderWidth: 1, borderColor: colors.border },
-    modalTitle: { fontSize: 20, fontWeight: 'bold', color: colors.text, marginBottom: 16, textAlign: 'center' },
-    modalScroll: { maxHeight: 400 },
-    modalText: { fontSize: 14, color: colors.text, lineHeight: 22 },
-    modalButton: { marginTop: 20, padding: 14, backgroundColor: colors.primary, borderRadius: 8, alignItems: 'center' },
-    modalButtonText: { color: '#fff', fontSize: 16, fontWeight: 'bold' },
+    // Header
+    header: {
+        alignItems: 'center',
+        paddingTop: 32,
+        paddingBottom: 24,
+    },
+    avatarContainer: {
+        marginBottom: 16,
+        shadowColor: '#2563EB',
+        shadowOffset: { width: 0, height: 8 },
+        shadowOpacity: 0.3,
+        shadowRadius: 16,
+        elevation: 10,
+    },
+    avatar: {
+        width: 100,
+        height: 100,
+        borderRadius: 50,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    avatarText: {
+        fontSize: 40,
+        fontWeight: '700',
+        color: '#FFFFFF',
+        fontFamily: 'Inter_700Bold',
+    },
+    name: {
+        fontSize: 26,
+        fontWeight: '700',
+        color: '#1F2937',
+        marginBottom: 4,
+        fontFamily: 'Inter_700Bold',
+    },
+    email: {
+        fontSize: 14,
+        color: '#6B7280',
+        fontFamily: 'Inter_400Regular',
+    },
+
+    // Section
+    section: {
+        paddingHorizontal: 20,
+        marginTop: 24,
+    },
+    sectionTitle: {
+        fontSize: 14,
+        fontWeight: '600',
+        color: '#6B7280',
+        marginBottom: 12,
+        marginLeft: 4,
+        fontFamily: 'Inter_600SemiBold',
+        textTransform: 'uppercase',
+        letterSpacing: 1,
+    },
+    card: {
+        backgroundColor: '#FFFFFF',
+        borderRadius: 20,
+        overflow: 'hidden',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.06,
+        shadowRadius: 8,
+        elevation: 2,
+    },
+
+    // Menu Item
+    menuItem: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        padding: 16,
+    },
+    menuIconContainer: {
+        width: 44,
+        height: 44,
+        borderRadius: 12,
+        backgroundColor: '#F3F4F6',
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginRight: 14,
+    },
+    menuIcon: {
+        fontSize: 22,
+    },
+    menuContent: {
+        flex: 1,
+    },
+    menuTitle: {
+        fontSize: 16,
+        fontWeight: '600',
+        color: '#1F2937',
+        fontFamily: 'Inter_600SemiBold',
+    },
+    menuSubtitle: {
+        fontSize: 13,
+        color: '#9CA3AF',
+        marginTop: 2,
+        fontFamily: 'Inter_400Regular',
+    },
+    menuArrow: {
+        fontSize: 22,
+        color: '#D1D5DB',
+        fontWeight: '300',
+    },
+    divider: {
+        height: 1,
+        backgroundColor: '#F3F4F6',
+        marginLeft: 74,
+    },
+
+    // Logout Button
+    logoutButton: {
+        marginHorizontal: 20,
+        marginTop: 32,
+        padding: 16,
+        backgroundColor: '#FEE2E2',
+        borderRadius: 16,
+        alignItems: 'center',
+        borderWidth: 1,
+        borderColor: '#FECACA',
+    },
+    logoutText: {
+        fontSize: 16,
+        fontWeight: '600',
+        color: '#DC2626',
+        fontFamily: 'Inter_600SemiBold',
+    },
+
+    // Modal
+    modalOverlay: {
+        flex: 1,
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        justifyContent: 'flex-end',
+    },
+    modalContent: {
+        backgroundColor: '#FFFFFF',
+        borderTopLeftRadius: 24,
+        borderTopRightRadius: 24,
+        padding: 24,
+        maxHeight: '80%',
+    },
+    modalHandle: {
+        width: 40,
+        height: 4,
+        backgroundColor: '#E5E7EB',
+        borderRadius: 2,
+        alignSelf: 'center',
+        marginBottom: 20,
+    },
+    modalTitle: {
+        fontSize: 22,
+        fontWeight: '700',
+        color: '#1F2937',
+        marginBottom: 16,
+        textAlign: 'center',
+        fontFamily: 'Inter_700Bold',
+    },
+    modalScroll: {
+        maxHeight: 400,
+    },
+    modalText: {
+        fontSize: 15,
+        color: '#4B5563',
+        lineHeight: 24,
+        fontFamily: 'Inter_400Regular',
+    },
+    modalButton: {
+        marginTop: 24,
+    },
+    modalButtonGradient: {
+        padding: 16,
+        borderRadius: 14,
+        alignItems: 'center',
+    },
+    modalButtonText: {
+        color: '#FFFFFF',
+        fontSize: 16,
+        fontWeight: '700',
+        fontFamily: 'Inter_700Bold',
+    },
 });

@@ -4,22 +4,29 @@
 
 // ==================== 색상 상수 ====================
 export const COLORS = {
-    // Chart Colors
-    CHART_PRIMARY: '#bfa094',
-    CHART_TEAL: '#14b8a6',
-    CHART_ORANGE: '#f59e0b',
-    CHART_PURPLE: '#8b5cf6',
-    CHART_PINK: '#ec4899',
-    CHART_INDIGO: '#6366f1',
+    // Primary & Accent
+    PRIMARY: '#9C27B0',
+    PRIMARY_DARK: '#7B1FA2',
+    PRIMARY_LIGHT: '#E1BEE7',
+    ACCENT: '#E91E63',
+    ACCENT_LIGHT: '#FCE4EC',
+    
+    // Chart Colors (보라색/핑크 계열)
+    CHART_MAGENTA: '#E91E63',
+    CHART_PURPLE: '#9C27B0',
+    CHART_PURPLE_LIGHT: '#AB47BC',
+    CHART_PINK: '#F48FB1',
+    CHART_LAVENDER: '#CE93D8',
+    CHART_HOT_PINK: '#FF80AB',
 };
 
 export const CHART_COLORS = [
-    COLORS.CHART_PRIMARY,
-    COLORS.CHART_TEAL,
-    COLORS.CHART_ORANGE,
+    COLORS.CHART_MAGENTA,
     COLORS.CHART_PURPLE,
+    COLORS.CHART_PURPLE_LIGHT,
     COLORS.CHART_PINK,
-    COLORS.CHART_INDIGO,
+    COLORS.CHART_LAVENDER,
+    COLORS.CHART_HOT_PINK,
 ];
 
 // ==================== 카테고리 상수 ====================
