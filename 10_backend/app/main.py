@@ -79,18 +79,37 @@ app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 # ============================================================
 # CORS 설정 (Cross-Origin Resource Sharing)
 # ============================================================
-# 프론트엔드 도메인에서 API에 접근할 수 있도록 허용합니다.
-# .env 파일의 ALLOWED_ORIGINS에서 쉼표로 구분된 도메인 목록을 읽습니다.
-# 예: ALLOWED_ORIGINS=http://localhost:3000,http://localhost:19006,http://localhost:8081
-allowed_origins = os.getenv("ALLOWED_ORIGINS", "http://localhost:3000,http://localhost:3001,http://localhost:8081,http://localhost:8082,http://localhost:8080,http://localhost:19000,http://localhost:19006").split(",")
+
+CLOUDFRONT_URL = "https://d26uyg5darllja.cloudfront.net"
+
+LOCAL_ORIGINS = [
+    "http://localhost:3000",
+    "http://localhost:3001",
+    "http://localhost:8081",
+    "http://localhost:8082",
+    "http://localhost:8080",
+    "http://localhost:19000",
+    "http://localhost:19006"
+]
+
+# 환경 변수 + CloudFront + 로컬 모두 합침
+allowed_origins = os.getenv("ALLOWED_ORIGINS", "").split(",")
+
+# 빈 문자열이면 로컬 기본값 사용
+allowed_origins = [o for o in allowed_origins if o] or LOCAL_ORIGINS
+
+# CloudFront 도메인을 강제로 추가
+if CLOUDFRONT_URL not in allowed_origins:
+    allowed_origins.append(CLOUDFRONT_URL)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=allowed_origins,           # 허용할 도메인 목록
-    allow_credentials=True,                  # 쿠키 포함 요청 허용
-    allow_methods=["GET", "POST", "PUT", "DELETE", "PATCH"],  # 허용할 HTTP 메서드
-    allow_headers=["*"],                     # 모든 헤더 허용
+    allow_origins=allowed_origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
+
 
 # ============================================================
 # 보안 헤더 미들웨어
