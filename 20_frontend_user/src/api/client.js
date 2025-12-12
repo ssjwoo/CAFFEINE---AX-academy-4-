@@ -1,9 +1,9 @@
 // 04_app_front/src/api/client.js
 
 import axios from "axios";
+import Constants from "expo-constants";
 
-// 개발용 기본 서버 주소 (나중에 .env로 분리 가능)
-const API_BASE_URL = "http://localhost:8001";
+const API_BASE_URL = Constants.expoConfig.extra.apiUrl;
 
 export const apiClient = axios.create({
   baseURL: API_BASE_URL,

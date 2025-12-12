@@ -1,5 +1,10 @@
 {
-  "plugins": [
-    "expo-font"
-  ]
+  "expo": {
+    "name": "caffeine-app",
+    "slug": "caffeine-app",
+    "version": "1.0.0",
+    "plugins": [
+      "expo-font"
+    ]
+  }
 }

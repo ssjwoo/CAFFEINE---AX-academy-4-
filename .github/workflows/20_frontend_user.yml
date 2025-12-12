@@ -2,7 +2,7 @@ name: Deploy User Frontend (Expo Web)
 
 on:
   push:
-    branches: ["develop"]              # 지금은 front-sjw에서만 배포
+    branches: ["main"]              # 지금은 front-sjw에서만 배포
     paths:
       - "20_frontend_user/**"
       - ".github/workflows/20_frontend_user.yml"

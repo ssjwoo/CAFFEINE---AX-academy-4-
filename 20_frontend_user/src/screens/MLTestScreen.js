@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, Alert, ScrollView, TouchableOpacity } from 'react-native';
-import axios from 'axios';
+import { apiClient } from '../api/client';
 
 const MLTestScreen = () => {
     // 초기값: CSV 샘플 데이터
@@ -32,13 +32,7 @@ const MLTestScreen = () => {
             // 만약 모델이 숫자를 기대한다면 여기서 변환: Number(form.금액)
 
             // 백엔드 API 호출
-            // 주의: 안드로이드 에뮬레이터에서는 localhost 대신 10.0.2.2 사용
-            // 웹에서는 localhost 사용 가능
-            const apiUrl = 'http://localhost:8001/ml/predict';
-
-            console.log("Sending data:", form);
-
-            const response = await axios.post(apiUrl, {
+            const response = await apiClient.post('/ml/predict', {
                 features: form
             });
 

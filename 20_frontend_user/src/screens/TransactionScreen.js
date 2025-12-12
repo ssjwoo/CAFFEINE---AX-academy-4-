@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, FlatList, StyleSheet, TouchableOpacity, Modal, TextInput } from 'react-native';
-import axios from 'axios';
+import { apiClient } from '../api/client';
 import { useTheme } from '../contexts/ThemeContext';
 import { useTransactions } from '../contexts/TransactionContext';
 import EmptyState from '../components/EmptyState';
@@ -39,8 +39,7 @@ export default function TransactionScreen({ navigation }) {
             };
 
             // 백엔드 API 호출
-            // 주의: 안드로이드 에뮬레이터에서는 localhost 대신 10.0.2.2 사용
-            const response = await axios.post('http://localhost:8001/ml/predict', {
+            const response = await apiClient.post('/ml/predict', {
                 features: requestData
             });
             setPrediction(response.data.prediction);

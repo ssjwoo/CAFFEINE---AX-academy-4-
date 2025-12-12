@@ -2,7 +2,7 @@ name: Deploy Admin Frontend (Next.js Export)
 
 on:
   push:
-    branches: ["develop"]                      # 필요하면 main 으로 바꾸면 됨
+    branches: ["main"]                      # 필요하면 main 으로 바꾸면 됨
     paths:
       - "21_frontend_admin/**"
       - ".github/workflows/21_frontend_admin.yml"
