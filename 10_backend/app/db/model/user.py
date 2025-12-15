@@ -19,6 +19,8 @@ class User(Base):
     role = Column(String(20), default="USER", nullable=False)  # USER/ADMIN 등
     is_superuser = Column(Boolean, default=False, nullable=False) # 슈퍼유저 여부
     is_active = Column(Boolean, default=True, nullable=False) # 계정 활성화 여부
+    status = Column(String(20), default="ACTIVE", nullable=False)  # ACTIVE/INACTIVE/SUSPENDED
+    group_id = Column(BigInteger, nullable=True)  # 사용자 그룹 ID (FK 제거)
     
     # 소셜 로그인
     social_provider = Column(String(20), nullable=True)  # LOCAL/GOOGLE/KAKAO/NAVER
