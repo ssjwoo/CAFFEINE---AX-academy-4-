@@ -1614,3 +1614,125 @@ AttributeError: module 'bcrypt' has no attribute '__about__'
 2025-12-15 11:28:16,926 - audit - INFO - Response: 200 | Duration: 0.001s
 =======
 >>>>>>> 7c7befb1cf3ba7f4d19f2deaaf455b6ca9ddb0ec
+2025-12-15 17:41:51,467 - app.main - INFO - ============================================================
+2025-12-15 17:41:51,467 - app.main - INFO - Caffeine API started
+2025-12-15 17:41:51,468 - app.main - INFO - Environment: development
+2025-12-15 17:41:51,469 - app.main - INFO - CORS Allowed Origins: ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:8081', 'http://localhost:8082', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006']
+2025-12-15 17:41:56,699 - app.routers.ml - INFO - XGBoost model loaded: model_xgboost_acc_73.47.joblib
+2025-12-15 17:43:12,945 - app.main - INFO - ============================================================
+2025-12-15 17:43:12,945 - app.main - INFO - Caffeine API started
+2025-12-15 17:43:12,946 - app.main - INFO - Environment: development
+2025-12-15 17:43:12,946 - app.main - INFO - CORS Allowed Origins: ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:8081', 'http://localhost:8082', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006']
+2025-12-15 17:43:15,079 - app.routers.ml - INFO - XGBoost model loaded: model_xgboost_acc_73.47.joblib
+2025-12-15 17:43:15,344 - apscheduler.scheduler - INFO - Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2025-12-15 17:43:15,344 - apscheduler.scheduler - INFO - Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2025-12-15 17:43:15,346 - apscheduler.scheduler - INFO - Added job "Send Weekly Report" to job store "default"
+2025-12-15 17:43:15,346 - apscheduler.scheduler - INFO - Added job "Send Monthly Report" to job store "default"
+2025-12-15 17:43:15,347 - apscheduler.scheduler - INFO - Scheduler started
+2025-12-15 17:43:15,347 - app.services.scheduler - INFO - ============================================================
+2025-12-15 17:43:15,347 - app.services.scheduler - INFO - Scheduler started
+2025-12-15 17:43:15,347 - app.services.scheduler - INFO -   - Weekly Report: Every Monday 09:00
+2025-12-15 17:43:15,347 - app.services.scheduler - INFO -   - Monthly Report: Every 1st day of month 09:00
+2025-12-15 17:43:15,347 - app.services.scheduler - INFO - ============================================================
+2025-12-15 17:43:59,552 - audit - INFO - Request: GET /api/analysis/full | Client: 127.0.0.1
+2025-12-15 17:43:59,563 - app.db.database - INFO - Connecting to AWS RDS: caffeine-database.c58og6ke6t36.ap-northeast-2.rds.amazonaws.com
+2025-12-15 17:44:00,061 - app.db.database - INFO - Connected to AWS RDS: caffeine-database.c58og6ke6t36.ap-northeast-2.rds.amazonaws.com
+2025-12-15 17:44:00,229 - audit - INFO - Response: 200 | Duration: 0.676s
+2025-12-15 17:44:11,026 - audit - INFO - Request: POST /users/login | Client: 127.0.0.1
+2025-12-15 17:44:11,097 - passlib.handlers.bcrypt - WARNING - (trapped) error reading bcrypt version
+Traceback (most recent call last):
+  File "C:\Users\Jinwoo\AppData\Local\Programs\Python\Python311\Lib\site-packages\passlib\handlers\bcrypt.py", line 620, in _load_backend_mixin
+    version = _bcrypt.__about__.__version__
+              ^^^^^^^^^^^^^^^^^
+AttributeError: module 'bcrypt' has no attribute '__about__'
+2025-12-15 17:44:11,627 - audit - INFO - Response: 200 | Duration: 0.601s
+2025-12-15 17:44:11,635 - audit - INFO - Request: OPTIONS /users/me | Client: 127.0.0.1
+2025-12-15 17:44:11,636 - audit - INFO - Response: 200 | Duration: 0.002s
+2025-12-15 17:44:11,647 - audit - INFO - Request: GET /users/me | Client: 127.0.0.1
+2025-12-15 17:44:11,707 - audit - INFO - Response: 200 | Duration: 0.060s
+2025-12-15 17:44:11,810 - audit - INFO - Request: OPTIONS /api/analysis/full | Client: 127.0.0.1
+2025-12-15 17:44:11,813 - audit - INFO - Response: 200 | Duration: 0.003s
+2025-12-15 17:44:11,816 - audit - INFO - Request: OPTIONS /api/analysis/full | Client: 127.0.0.1
+2025-12-15 17:44:11,817 - audit - INFO - Response: 200 | Duration: 0.001s
+2025-12-15 17:44:11,820 - audit - INFO - Request: GET /api/analysis/full | Client: 127.0.0.1
+2025-12-15 17:44:11,893 - audit - INFO - Response: 200 | Duration: 0.073s
+2025-12-15 17:44:11,897 - audit - INFO - Request: GET /api/analysis/full | Client: 127.0.0.1
+2025-12-15 17:44:12,240 - audit - INFO - Response: 200 | Duration: 0.343s
+2025-12-15 17:44:15,862 - audit - INFO - Request: OPTIONS /api/admin/settings | Client: 127.0.0.1
+2025-12-15 17:44:15,863 - audit - INFO - Request: OPTIONS /api/admin/settings | Client: 127.0.0.1
+2025-12-15 17:44:15,865 - audit - INFO - Response: 200 | Duration: 0.003s
+2025-12-15 17:44:15,866 - audit - INFO - Response: 200 | Duration: 0.003s
+2025-12-15 17:44:15,870 - audit - INFO - Request: GET /api/admin/settings | Client: 127.0.0.1
+2025-12-15 17:44:15,960 - audit - INFO - Response: 200 | Duration: 0.090s
+2025-12-15 17:44:15,963 - audit - INFO - Request: GET /api/admin/settings | Client: 127.0.0.1
+2025-12-15 17:44:16,055 - audit - INFO - Response: 200 | Duration: 0.092s
+2025-12-15 17:44:19,953 - audit - INFO - Request: OPTIONS /api/admin/reports/send-monthly | Client: 127.0.0.1
+2025-12-15 17:44:19,954 - audit - INFO - Response: 200 | Duration: 0.001s
+2025-12-15 17:44:19,958 - audit - INFO - Request: POST /api/admin/reports/send-monthly | Client: 127.0.0.1
+2025-12-15 17:44:20,039 - app.routers.reports - INFO - Manual monthly report requested (User: admin@caffeine.com)
+2025-12-15 17:44:20,741 - app.services.email_service - WARNING - SMTP 설정이 누락되었습니다. .env 파일에 SMTP 설정을 추가하거나 DEVELOPMENT_MODE=true를 설정하세요. 수신자: ygomania@naver.com
+2025-12-15 17:44:20,762 - audit - INFO - Response: 400 | Duration: 0.804s
+2025-12-15 17:46:08,948 - audit - INFO - Request: OPTIONS /api/admin/settings | Client: 127.0.0.1
+2025-12-15 17:46:08,950 - audit - INFO - Request: OPTIONS /users/me | Client: 127.0.0.1
+2025-12-15 17:46:08,952 - audit - INFO - Response: 200 | Duration: 0.003s
+2025-12-15 17:46:08,953 - audit - INFO - Response: 200 | Duration: 0.003s
+2025-12-15 17:46:08,959 - audit - INFO - Request: GET /api/admin/settings | Client: 127.0.0.1
+2025-12-15 17:46:09,020 - audit - INFO - Response: 200 | Duration: 0.061s
+2025-12-15 17:46:09,023 - audit - INFO - Request: GET /users/me | Client: 127.0.0.1
+2025-12-15 17:46:09,061 - audit - INFO - Response: 200 | Duration: 0.038s
+2025-12-15 17:46:12,197 - audit - INFO - Request: POST /api/admin/reports/send-monthly | Client: 127.0.0.1
+2025-12-15 17:46:12,224 - app.routers.reports - INFO - Manual monthly report requested (User: admin@caffeine.com)
+2025-12-15 17:46:12,289 - app.services.email_service - WARNING - SMTP 설정이 누락되었습니다. .env 파일에 SMTP 설정을 추가하거나 DEVELOPMENT_MODE=true를 설정하세요. 수신자: ygomania@naver.com
+2025-12-15 17:46:12,300 - audit - INFO - Response: 400 | Duration: 0.104s
+2025-12-15 17:46:29,397 - app.services.scheduler - INFO - Scheduler stopped
+2025-12-15 17:46:29,398 - app.main - INFO - Caffeine API stopped
+2025-12-15 17:46:29,398 - app.main - INFO - ============================================================
+2025-12-15 17:46:29,399 - apscheduler.scheduler - INFO - Scheduler has been shut down
+2025-12-15 17:46:37,243 - app.main - INFO - ============================================================
+2025-12-15 17:46:37,243 - app.main - INFO - Caffeine API started
+2025-12-15 17:46:37,243 - app.main - INFO - Environment: development
+2025-12-15 17:46:37,243 - app.main - INFO - CORS Allowed Origins: ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:8081', 'http://localhost:8082', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006']
+2025-12-15 17:46:38,728 - app.routers.ml - INFO - XGBoost model loaded: model_xgboost_acc_73.47.joblib
+2025-12-15 17:46:38,898 - apscheduler.scheduler - INFO - Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2025-12-15 17:46:38,898 - apscheduler.scheduler - INFO - Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2025-12-15 17:46:38,900 - apscheduler.scheduler - INFO - Added job "Send Weekly Report" to job store "default"
+2025-12-15 17:46:38,900 - apscheduler.scheduler - INFO - Added job "Send Monthly Report" to job store "default"
+2025-12-15 17:46:38,900 - apscheduler.scheduler - INFO - Scheduler started
+2025-12-15 17:46:38,901 - app.services.scheduler - INFO - ============================================================
+2025-12-15 17:46:38,901 - app.services.scheduler - INFO - Scheduler started
+2025-12-15 17:46:38,901 - app.services.scheduler - INFO -   - Weekly Report: Every Monday 09:00
+2025-12-15 17:46:38,901 - app.services.scheduler - INFO -   - Monthly Report: Every 1st day of month 09:00
+2025-12-15 17:46:38,903 - app.services.scheduler - INFO - ============================================================
+2025-12-15 17:46:53,546 - audit - INFO - Request: POST /users/login | Client: 127.0.0.1
+2025-12-15 17:46:53,559 - app.db.database - INFO - Connecting to AWS RDS: caffeine-database.c58og6ke6t36.ap-northeast-2.rds.amazonaws.com
+2025-12-15 17:46:53,809 - app.db.database - INFO - Connected to AWS RDS: caffeine-database.c58og6ke6t36.ap-northeast-2.rds.amazonaws.com
+2025-12-15 17:46:53,873 - passlib.handlers.bcrypt - WARNING - (trapped) error reading bcrypt version
+Traceback (most recent call last):
+  File "C:\Users\Jinwoo\AppData\Local\Programs\Python\Python311\Lib\site-packages\passlib\handlers\bcrypt.py", line 620, in _load_backend_mixin
+    version = _bcrypt.__about__.__version__
+              ^^^^^^^^^^^^^^^^^
+AttributeError: module 'bcrypt' has no attribute '__about__'
+2025-12-15 17:46:54,361 - audit - INFO - Response: 200 | Duration: 0.815s
+2025-12-15 17:46:54,368 - audit - INFO - Request: GET /users/me | Client: 127.0.0.1
+2025-12-15 17:46:54,552 - audit - INFO - Response: 200 | Duration: 0.185s
+2025-12-15 17:46:57,000 - audit - INFO - Request: GET /api/analysis/full | Client: 127.0.0.1
+2025-12-15 17:46:57,125 - audit - INFO - Response: 200 | Duration: 0.125s
+2025-12-15 17:46:57,130 - audit - INFO - Request: GET /api/analysis/full | Client: 127.0.0.1
+2025-12-15 17:46:57,249 - audit - INFO - Response: 200 | Duration: 0.119s
+2025-12-15 17:46:58,683 - audit - INFO - Request: GET /api/admin/settings | Client: 127.0.0.1
+2025-12-15 17:46:58,760 - audit - INFO - Response: 200 | Duration: 0.077s
+2025-12-15 17:46:58,763 - audit - INFO - Request: GET /api/admin/settings | Client: 127.0.0.1
+2025-12-15 17:46:58,842 - audit - INFO - Response: 200 | Duration: 0.078s
+2025-12-15 17:47:01,286 - audit - INFO - Request: POST /api/admin/reports/send-monthly | Client: 127.0.0.1
+2025-12-15 17:47:01,318 - app.routers.reports - INFO - Manual monthly report requested (User: admin@caffeine.com)
+2025-12-15 17:47:06,705 - app.services.email_service - INFO - Report email sent successfully: ygomania@naver.com
+2025-12-15 17:47:06,705 - app.routers.reports - INFO - Monthly report processing completed: Email sent to ygomania@naver.com.
+2025-12-15 17:47:06,707 - audit - INFO - Response: 200 | Duration: 5.421s
+2025-12-15 17:47:16,166 - audit - INFO - Request: GET /api/analysis/full | Client: 127.0.0.1
+2025-12-15 17:47:16,168 - audit - INFO - Request: GET /users/me | Client: 127.0.0.1
+2025-12-15 17:47:16,196 - audit - INFO - Response: 200 | Duration: 0.029s
+2025-12-15 17:47:16,229 - audit - INFO - Response: 200 | Duration: 0.063s
+2025-12-15 17:49:28,477 - app.services.scheduler - INFO - Scheduler stopped
+2025-12-15 17:49:28,477 - app.main - INFO - Caffeine API stopped
+2025-12-15 17:49:28,477 - app.main - INFO - ============================================================
+2025-12-15 17:49:28,477 - apscheduler.scheduler - INFO - Scheduler has been shut down
