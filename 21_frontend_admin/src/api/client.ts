@@ -58,6 +58,20 @@ export const apiClient = {
         }
         return response.json();
     },
+
+    async put(endpoint: string, data: any) {
+        const response = await fetchWithTimeout(`${API_BASE_URL}${endpoint}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data),
+        });
+        if (!response.ok) {
+            throw new Error(`API Error: ${response.status}`);
+        }
+        return response.json();
+    },
 };
 
 // Analysis API
@@ -97,3 +111,22 @@ export async function getTransactions() {
 export async function getTransactionStats() {
     return apiClient.get('/api/transactions/stats/summary');
 }
+
+// Settings API
+export async function getAdminSettings() {
+    return apiClient.get('/api/admin/settings');
+}
+
+export async function updateAdminSettings(settings: any) {
+    return apiClient.put('/api/admin/settings', settings);
+}
+
+// Reports API
+export async function sendWeeklyReport() {
+    return apiClient.post('/api/admin/reports/send-weekly', {});
+}
+
+export async function sendMonthlyReport() {
+    return apiClient.post('/api/admin/reports/send-monthly', {});
+}
+

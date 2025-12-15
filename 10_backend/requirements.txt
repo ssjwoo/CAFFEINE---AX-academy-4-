@@ -19,6 +19,11 @@ cryptography>=41.0.7              # Fernet 암호화
 # Rate Limiting
 slowapi==0.1.9
 
+# Email & Scheduling
+apscheduler>=3.10.0              # Task scheduler
+aiosmtplib>=3.0.0                # Async SMTP client
+jinja2>=3.1.0                    # HTML template engine
+
 # 기타
 python-dotenv>=1.0.0              # 환경 변수
 httpx>=0.25.2                     # HTTP 클라이언트

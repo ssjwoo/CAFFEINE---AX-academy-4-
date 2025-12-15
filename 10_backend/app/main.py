@@ -195,7 +195,7 @@ async def health(request: Request):
 # ============================================================
 # 라우터 등록
 # ============================================================
-from app.routers import ml, analysis, transactions, user
+from app.routers import ml, analysis, transactions, user, settings, reports
 
 # ML 예측 API (/ml/*)
 app.include_router(ml.router)
@@ -209,6 +209,12 @@ app.include_router(transactions.router)
 # 사용자/인증 API (/users/*)
 app.include_router(user.router)
 
+# 관리자 설정 API (/api/admin/settings/*)
+app.include_router(settings.router)
+
+# 관리자 리포트 API (/api/admin/reports/*)
+app.include_router(reports.router)
+
 # ============================================================
 # 시작 / 종료 이벤트
 # ============================================================
@@ -216,48 +222,33 @@ app.include_router(user.router)
 @app.on_event("startup")
 async def startup_event():
     """
-    애플리케이션 시작 시 실행되는 이벤트 핸들러
+    Application startup event handler
     """
     logger.info("=" * 60)
-    logger.info("🚀 Caffeine API 시작됨")
-    logger.info(f"환경: {os.getenv('ENVIRONMENT', 'development')}")
-    logger.info(f"CORS 허용 도메인: {allowed_origins}")
+    logger.info("Caffeine API started")
+    logger.info(f"Environment: {os.getenv('ENVIRONMENT', 'development')}")
+    logger.info(f"CORS Allowed Origins: {allowed_origins}")
     
     # ML 모델 로드
     ml.load_model()
     
-    logger.info("=" * 60)
+    # 스케줄러 시작
+    from app.services.scheduler import start_scheduler
+    start_scheduler()
+    
+    # DB 연결 초기화
+    from app.services.db_init import ensure_database_and_tables
+    await ensure_database_and_tables()
+
 
 @app.on_event("shutdown")
 async def shutdown_event():
     """
-    애플리케이션 종료 시 실행되는 이벤트 핸들러
-    
-    주요 작업:
-    - 종료 로그 기록
-    - 데이터베이스 연결 종료 (추후 추가)
-    - 리소스 정리 (추후 추가)
+    Application shutdown event handler
     """
+    # 스케줄러 종료
+    from app.services.scheduler import shutdown_scheduler
+    shutdown_scheduler()
+    
+    logger.info("Caffeine API stopped")
     logger.info("=" * 60)
-    logger.info("🛑 Caffeine API 종료됨")
-    logger.info("=" * 60)
-
-# ============================================================
-# 추후 확장 예정 (v2.0+)
-# ============================================================
-# 다음 기능들은 v2.0 이후 버전에서 구현될 예정입니다:
-#
-# 1. JWT 블랙리스트 (토큰 리보크)
-#    - 로그아웃 시 토큰을 블랙리스트에 추가
-#    - Redis 또는 DB 기반 블랙리스트 관리
-#    - 토큰 검증 시 블랙리스트 확인
-#
-# 2. 풀스펙 Audit 시스템 (DB 기반)
-#    - audit_logs 테이블에 모든 작업 영구 저장
-#    - 상세한 변경 이력 추적 (Before/After 값)
-#    - 관리자 대시보드에서 로그 조회/검색
-#
-# 3. 복잡한 보안 정책 문서
-#    - 데이터 분류 체계 (Public/Internal/Confidential/Restricted)
-#    - 접근 제어 매트릭스 (Role별 권한 상세 정의)
-#    - 사고 대응 절차 (Incident Response Plan)

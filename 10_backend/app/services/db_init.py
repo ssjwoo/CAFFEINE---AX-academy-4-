@@ -28,10 +28,10 @@ async def ensure_database_and_tables():
             await conn.run_sync(Base.metadata.create_all)
         await full_engine.dispose()
         
-        print("✅ RDS 테이블 생성/확인 완료")
+        print("RDS table verification/creation completed")
         
     except Exception as e:
-        print(f"❌ DB 초기화 실패: {e}")
+        print(f"DB initialization failed: {e}")
         raise
 
 
@@ -43,9 +43,9 @@ async def test_db_connection():
         engine = create_async_engine(settings.database_url, echo=False)
         async with engine.connect() as conn:
             result = await conn.execute(text("SELECT 1"))
-            print(f"✅ RDS 연결 성공: {settings.db_host}")
+            print(f"RDS connection successful: {settings.db_host}")
         await engine.dispose()
         return True
     except Exception as e:
-        print(f"❌ RDS 연결 실패: {e}")
+        print(f"RDS connection failed: {e}")
         return False

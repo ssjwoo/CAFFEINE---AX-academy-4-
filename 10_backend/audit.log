@@ -785,63 +785,63 @@
 2025-12-10 18:25:14,917 - audit - INFO - Request: GET /api/analysis/full | Client: 127.0.0.1
 2025-12-10 18:25:14,955 - audit - INFO - Response: 200 | Duration: 0.038s
 2025-12-11 18:55:57,028 - app.main - INFO - ============================================================
-2025-12-11 18:55:57,076 - app.main - INFO - È¯°æ: development
-2025-12-11 18:55:57,077 - app.main - INFO - CORS Çã¿ë µµ¸ÞÀÎ: ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:8081', 'http://localhost:8082', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006']
+2025-12-11 18:55:57,076 - app.main - INFO - È¯ï¿½ï¿½: development
+2025-12-11 18:55:57,077 - app.main - INFO - CORS ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½: ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:8081', 'http://localhost:8082', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006']
 2025-12-11 18:56:00,706 - app.main - INFO - ============================================================
 2025-12-11 19:00:42,682 - audit - INFO - Request: POST /users/login | Client: 127.0.0.1
 2025-12-11 19:02:02,996 - app.main - INFO - ============================================================
 2025-12-11 19:02:03,001 - app.main - INFO - ============================================================
 2025-12-11 19:02:04,668 - app.main - INFO - ============================================================
-2025-12-11 19:02:04,681 - app.main - INFO - È¯°æ: development
-2025-12-11 19:02:04,681 - app.main - INFO - CORS Çã¿ë µµ¸ÞÀÎ: ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:8081', 'http://localhost:8082', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006']
+2025-12-11 19:02:04,681 - app.main - INFO - È¯ï¿½ï¿½: development
+2025-12-11 19:02:04,681 - app.main - INFO - CORS ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½: ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:8081', 'http://localhost:8082', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006']
 2025-12-11 19:02:05,651 - app.main - INFO - ============================================================
 2025-12-11 19:02:33,205 - audit - INFO - Request: POST /users/login | Client: 127.0.0.1
 2025-12-11 19:03:12,325 - app.main - INFO - ============================================================
 2025-12-11 19:03:12,332 - app.main - INFO - ============================================================
 2025-12-11 19:03:26,670 - app.main - INFO - ============================================================
-2025-12-11 19:03:26,683 - app.main - INFO - È¯°æ: development
-2025-12-11 19:03:26,683 - app.main - INFO - CORS Çã¿ë µµ¸ÞÀÎ: ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:8081', 'http://localhost:8082', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006']
+2025-12-11 19:03:26,683 - app.main - INFO - È¯ï¿½ï¿½: development
+2025-12-11 19:03:26,683 - app.main - INFO - CORS ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½: ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:8081', 'http://localhost:8082', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006']
 2025-12-11 19:03:27,569 - app.main - INFO - ============================================================
 2025-12-11 19:03:40,470 - audit - INFO - Request: POST /users/login | Client: 127.0.0.1
 2025-12-11 19:04:47,607 - app.main - INFO - ============================================================
 2025-12-11 19:04:47,612 - app.main - INFO - ============================================================
 2025-12-11 19:04:49,246 - app.main - INFO - ============================================================
-2025-12-11 19:04:49,257 - app.main - INFO - È¯°æ: development
-2025-12-11 19:04:49,257 - app.main - INFO - CORS Çã¿ë µµ¸ÞÀÎ: ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:8081', 'http://localhost:8082', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006']
+2025-12-11 19:04:49,257 - app.main - INFO - È¯ï¿½ï¿½: development
+2025-12-11 19:04:49,257 - app.main - INFO - CORS ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½: ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:8081', 'http://localhost:8082', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006']
 2025-12-11 19:04:50,217 - app.main - INFO - ============================================================
 2025-12-11 19:04:50,218 - app.main - INFO - ============================================================
 2025-12-11 19:04:50,230 - app.main - INFO - ============================================================
 2025-12-11 19:05:32,291 - app.main - INFO - ============================================================
-2025-12-11 19:05:32,303 - app.main - INFO - È¯°æ: development
-2025-12-11 19:05:32,303 - app.main - INFO - CORS Çã¿ë µµ¸ÞÀÎ: ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:8081', 'http://localhost:8082', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006']
+2025-12-11 19:05:32,303 - app.main - INFO - È¯ï¿½ï¿½: development
+2025-12-11 19:05:32,303 - app.main - INFO - CORS ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½: ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:8081', 'http://localhost:8082', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006']
 2025-12-11 19:05:33,206 - app.main - INFO - ============================================================
 2025-12-11 19:06:03,338 - audit - INFO - Request: POST /users/login | Client: 127.0.0.1
 2025-12-11 19:07:36,404 - app.main - INFO - ============================================================
 2025-12-11 19:07:36,411 - app.main - INFO - ============================================================
 2025-12-11 19:08:19,182 - app.main - INFO - ============================================================
-2025-12-11 19:08:19,195 - app.main - INFO - È¯°æ: development
-2025-12-11 19:08:19,195 - app.main - INFO - CORS Çã¿ë µµ¸ÞÀÎ: ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:8081', 'http://localhost:8082', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006']
+2025-12-11 19:08:19,195 - app.main - INFO - È¯ï¿½ï¿½: development
+2025-12-11 19:08:19,195 - app.main - INFO - CORS ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½: ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:8081', 'http://localhost:8082', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006']
 2025-12-11 19:08:20,152 - app.main - INFO - ============================================================
 2025-12-11 19:08:21,342 - app.main - INFO - ============================================================
 2025-12-11 19:08:21,348 - app.main - INFO - ============================================================
 2025-12-11 19:08:32,044 - app.main - INFO - ============================================================
-2025-12-11 19:08:32,057 - app.main - INFO - È¯°æ: development
-2025-12-11 19:08:32,058 - app.main - INFO - CORS Çã¿ë µµ¸ÞÀÎ: ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:8081', 'http://localhost:8082', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006']
+2025-12-11 19:08:32,057 - app.main - INFO - È¯ï¿½ï¿½: development
+2025-12-11 19:08:32,058 - app.main - INFO - CORS ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½: ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:8081', 'http://localhost:8082', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006']
 2025-12-11 19:08:32,952 - app.main - INFO - ============================================================
 2025-12-12 09:29:28,216 - app.main - INFO - ============================================================
-2025-12-12 09:29:28,229 - app.main - INFO - È¯°æ: development
-2025-12-12 09:29:28,229 - app.main - INFO - CORS Çã¿ë µµ¸ÞÀÎ: ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:8081', 'http://localhost:8082', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006']
+2025-12-12 09:29:28,229 - app.main - INFO - È¯ï¿½ï¿½: development
+2025-12-12 09:29:28,229 - app.main - INFO - CORS ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½: ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:8081', 'http://localhost:8082', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006']
 2025-12-12 09:29:29,202 - app.main - INFO - ============================================================
 2025-12-12 09:29:54,200 - audit - INFO - Request: POST /users/login | Client: 127.0.0.1
 2025-12-12 09:31:00,942 - app.main - INFO - ============================================================
 2025-12-12 09:31:00,947 - app.main - INFO - ============================================================
 2025-12-12 09:31:08,615 - app.main - INFO - ============================================================
-2025-12-12 09:31:08,690 - app.main - INFO - È¯°æ: development
-2025-12-12 09:31:08,690 - app.main - INFO - CORS Çã¿ë µµ¸ÞÀÎ: ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:8081', 'http://localhost:8082', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006']
+2025-12-12 09:31:08,690 - app.main - INFO - È¯ï¿½ï¿½: development
+2025-12-12 09:31:08,690 - app.main - INFO - CORS ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½: ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:8081', 'http://localhost:8082', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006']
 2025-12-12 09:31:12,834 - app.main - INFO - ============================================================
 2025-12-12 09:31:21,667 - app.main - INFO - ============================================================
-2025-12-12 09:31:21,679 - app.main - INFO - È¯°æ: development
-2025-12-12 09:31:21,679 - app.main - INFO - CORS Çã¿ë µµ¸ÞÀÎ: ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:8081', 'http://localhost:8082', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006']
+2025-12-12 09:31:21,679 - app.main - INFO - È¯ï¿½ï¿½: development
+2025-12-12 09:31:21,679 - app.main - INFO - CORS ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½: ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:8081', 'http://localhost:8082', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006']
 2025-12-12 09:31:22,600 - app.main - INFO - ============================================================
 2025-12-12 09:31:36,998 - audit - INFO - Request: POST /users/login | Client: 127.0.0.1
 2025-12-12 09:32:12,579 - app.main - INFO - ============================================================
@@ -849,12 +849,12 @@
 2025-12-12 09:32:12,590 - app.main - INFO - ============================================================
 2025-12-12 09:32:12,590 - app.main - INFO - ============================================================
 2025-12-12 09:32:14,393 - app.main - INFO - ============================================================
-2025-12-12 09:32:14,406 - app.main - INFO - È¯°æ: development
-2025-12-12 09:32:14,406 - app.main - INFO - CORS Çã¿ë µµ¸ÞÀÎ: ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:8081', 'http://localhost:8082', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006']
+2025-12-12 09:32:14,406 - app.main - INFO - È¯ï¿½ï¿½: development
+2025-12-12 09:32:14,406 - app.main - INFO - CORS ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½: ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:8081', 'http://localhost:8082', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006']
 2025-12-12 09:32:15,337 - app.main - INFO - ============================================================
 2025-12-12 09:32:24,099 - app.main - INFO - ============================================================
-2025-12-12 09:32:24,115 - app.main - INFO - È¯°æ: development
-2025-12-12 09:32:24,115 - app.main - INFO - CORS Çã¿ë µµ¸ÞÀÎ: ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:8081', 'http://localhost:8082', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006']
+2025-12-12 09:32:24,115 - app.main - INFO - È¯ï¿½ï¿½: development
+2025-12-12 09:32:24,115 - app.main - INFO - CORS ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½: ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:8081', 'http://localhost:8082', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006']
 2025-12-12 09:32:25,075 - app.main - INFO - ============================================================
 2025-12-12 09:32:38,646 - audit - INFO - Request: POST /users/login | Client: 127.0.0.1
 2025-12-12 09:32:39,174 - audit - INFO - Response: 200 | Duration: 0.528s
@@ -863,22 +863,22 @@
 2025-12-12 09:44:26,923 - app.main - INFO - ============================================================
 2025-12-12 09:44:26,926 - app.main - INFO - ============================================================
 2025-12-12 09:44:28,610 - app.main - INFO - ============================================================
-2025-12-12 09:44:28,622 - app.main - INFO - È¯°æ: development
-2025-12-12 09:44:28,622 - app.main - INFO - CORS Çã¿ë µµ¸ÞÀÎ: ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:8081', 'http://localhost:8082', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006']
+2025-12-12 09:44:28,622 - app.main - INFO - È¯ï¿½ï¿½: development
+2025-12-12 09:44:28,622 - app.main - INFO - CORS ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½: ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:8081', 'http://localhost:8082', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006']
 2025-12-12 09:44:29,577 - app.main - INFO - ============================================================
 2025-12-12 09:44:57,875 - app.main - INFO - ============================================================
 2025-12-12 09:44:57,889 - app.main - INFO - ============================================================
 2025-12-12 09:46:03,658 - app.main - INFO - ============================================================
-2025-12-12 09:46:03,671 - app.main - INFO - È¯°æ: development
-2025-12-12 09:46:03,671 - app.main - INFO - CORS Çã¿ë µµ¸ÞÀÎ: ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:8081', 'http://localhost:8082', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006']
+2025-12-12 09:46:03,671 - app.main - INFO - È¯ï¿½ï¿½: development
+2025-12-12 09:46:03,671 - app.main - INFO - CORS ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½: ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:8081', 'http://localhost:8082', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006']
 2025-12-12 09:46:03,679 - app.main - INFO - ============================================================
-2025-12-12 09:46:03,690 - app.main - INFO - È¯°æ: development
-2025-12-12 09:46:03,691 - app.main - INFO - CORS Çã¿ë µµ¸ÞÀÎ: ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:8081', 'http://localhost:8082', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006']
+2025-12-12 09:46:03,690 - app.main - INFO - È¯ï¿½ï¿½: development
+2025-12-12 09:46:03,691 - app.main - INFO - CORS ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½: ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:8081', 'http://localhost:8082', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006']
 2025-12-12 09:46:04,807 - app.main - INFO - ============================================================
 2025-12-12 09:46:04,810 - app.main - INFO - ============================================================
 2025-12-12 09:46:05,842 - app.main - INFO - ============================================================
-2025-12-12 09:46:05,857 - app.main - INFO - È¯°æ: development
-2025-12-12 09:46:05,857 - app.main - INFO - CORS Çã¿ë µµ¸ÞÀÎ: ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:8081', 'http://localhost:8082', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006']
+2025-12-12 09:46:05,857 - app.main - INFO - È¯ï¿½ï¿½: development
+2025-12-12 09:46:05,857 - app.main - INFO - CORS ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½: ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:8081', 'http://localhost:8082', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006']
 2025-12-12 09:46:06,776 - app.main - INFO - ============================================================
 2025-12-12 09:46:20,757 - audit - INFO - Request: POST /users/login | Client: 127.0.0.1
 2025-12-12 09:47:14,846 - app.main - INFO - ============================================================
@@ -888,20 +888,20 @@
 2025-12-12 09:47:15,012 - app.main - INFO - ============================================================
 2025-12-12 09:47:15,017 - app.main - INFO - ============================================================
 2025-12-12 09:47:16,752 - app.main - INFO - ============================================================
-2025-12-12 09:47:16,766 - app.main - INFO - È¯°æ: development
-2025-12-12 09:47:16,766 - app.main - INFO - CORS Çã¿ë µµ¸ÞÀÎ: ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:8081', 'http://localhost:8082', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006']
+2025-12-12 09:47:16,766 - app.main - INFO - È¯ï¿½ï¿½: development
+2025-12-12 09:47:16,766 - app.main - INFO - CORS ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½: ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:8081', 'http://localhost:8082', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006']
 2025-12-12 09:47:16,792 - app.main - INFO - ============================================================
-2025-12-12 09:47:16,805 - app.main - INFO - È¯°æ: development
-2025-12-12 09:47:16,805 - app.main - INFO - CORS Çã¿ë µµ¸ÞÀÎ: ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:8081', 'http://localhost:8082', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006']
+2025-12-12 09:47:16,805 - app.main - INFO - È¯ï¿½ï¿½: development
+2025-12-12 09:47:16,805 - app.main - INFO - CORS ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½: ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:8081', 'http://localhost:8082', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006']
 2025-12-12 09:47:16,864 - app.main - INFO - ============================================================
-2025-12-12 09:47:16,876 - app.main - INFO - È¯°æ: development
-2025-12-12 09:47:16,876 - app.main - INFO - CORS Çã¿ë µµ¸ÞÀÎ: ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:8081', 'http://localhost:8082', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006']
+2025-12-12 09:47:16,876 - app.main - INFO - È¯ï¿½ï¿½: development
+2025-12-12 09:47:16,876 - app.main - INFO - CORS ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½: ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:8081', 'http://localhost:8082', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006']
 2025-12-12 09:47:17,885 - app.main - INFO - ============================================================
 2025-12-12 09:47:17,911 - app.main - INFO - ============================================================
 2025-12-12 09:47:18,025 - app.main - INFO - ============================================================
 2025-12-12 09:47:19,360 - app.main - INFO - ============================================================
-2025-12-12 09:47:19,371 - app.main - INFO - È¯°æ: development
-2025-12-12 09:47:19,371 - app.main - INFO - CORS Çã¿ë µµ¸ÞÀÎ: ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:8081', 'http://localhost:8082', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006']
+2025-12-12 09:47:19,371 - app.main - INFO - È¯ï¿½ï¿½: development
+2025-12-12 09:47:19,371 - app.main - INFO - CORS ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½: ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:8081', 'http://localhost:8082', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006']
 2025-12-12 09:47:20,297 - app.main - INFO - ============================================================
 2025-12-12 09:47:51,103 - audit - INFO - Request: POST /users/login | Client: 127.0.0.1
 2025-12-12 09:47:51,636 - audit - INFO - Response: 200 | Duration: 0.533s
@@ -964,14 +964,14 @@
 2025-12-12 10:18:56,608 - app.main - INFO - ============================================================
 2025-12-12 10:18:56,610 - app.main - INFO - ============================================================
 2025-12-12 10:18:56,610 - app.main - INFO - ============================================================
-2025-12-12 10:18:56,620 - app.main - INFO - È¯°æ: development
-2025-12-12 10:18:56,620 - app.main - INFO - CORS Çã¿ë µµ¸ÞÀÎ: ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:8081', 'http://localhost:8082', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006']
-2025-12-12 10:18:56,621 - app.main - INFO - È¯°æ: development
-2025-12-12 10:18:56,621 - app.main - INFO - CORS Çã¿ë µµ¸ÞÀÎ: ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:8081', 'http://localhost:8082', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006']
-2025-12-12 10:18:56,623 - app.main - INFO - È¯°æ: development
-2025-12-12 10:18:56,623 - app.main - INFO - CORS Çã¿ë µµ¸ÞÀÎ: ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:8081', 'http://localhost:8082', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006']
-2025-12-12 10:18:56,623 - app.main - INFO - È¯°æ: development
-2025-12-12 10:18:56,623 - app.main - INFO - CORS Çã¿ë µµ¸ÞÀÎ: ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:8081', 'http://localhost:8082', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006']
+2025-12-12 10:18:56,620 - app.main - INFO - È¯ï¿½ï¿½: development
+2025-12-12 10:18:56,620 - app.main - INFO - CORS ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½: ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:8081', 'http://localhost:8082', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006']
+2025-12-12 10:18:56,621 - app.main - INFO - È¯ï¿½ï¿½: development
+2025-12-12 10:18:56,621 - app.main - INFO - CORS ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½: ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:8081', 'http://localhost:8082', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006']
+2025-12-12 10:18:56,623 - app.main - INFO - È¯ï¿½ï¿½: development
+2025-12-12 10:18:56,623 - app.main - INFO - CORS ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½: ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:8081', 'http://localhost:8082', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006']
+2025-12-12 10:18:56,623 - app.main - INFO - È¯ï¿½ï¿½: development
+2025-12-12 10:18:56,623 - app.main - INFO - CORS ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½: ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:8081', 'http://localhost:8082', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006']
 2025-12-12 10:18:57,939 - app.main - INFO - ============================================================
 2025-12-12 10:18:57,945 - app.main - INFO - ============================================================
 2025-12-12 10:18:57,945 - app.main - INFO - ============================================================
@@ -997,17 +997,17 @@
 2025-12-12 10:21:50,140 - app.main - INFO - ============================================================
 2025-12-12 10:21:50,140 - app.main - INFO - ============================================================
 2025-12-12 10:21:52,038 - app.main - INFO - ============================================================
-2025-12-12 10:21:52,051 - app.main - INFO - È¯°æ: development
-2025-12-12 10:21:52,051 - app.main - INFO - CORS Çã¿ë µµ¸ÞÀÎ: ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:8081', 'http://localhost:8082', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006']
+2025-12-12 10:21:52,051 - app.main - INFO - È¯ï¿½ï¿½: development
+2025-12-12 10:21:52,051 - app.main - INFO - CORS ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½: ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:8081', 'http://localhost:8082', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006']
 2025-12-12 10:21:52,112 - app.main - INFO - ============================================================
-2025-12-12 10:21:52,124 - app.main - INFO - È¯°æ: development
-2025-12-12 10:21:52,124 - app.main - INFO - CORS Çã¿ë µµ¸ÞÀÎ: ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:8081', 'http://localhost:8082', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006']
+2025-12-12 10:21:52,124 - app.main - INFO - È¯ï¿½ï¿½: development
+2025-12-12 10:21:52,124 - app.main - INFO - CORS ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½: ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:8081', 'http://localhost:8082', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006']
 2025-12-12 10:21:52,128 - app.main - INFO - ============================================================
-2025-12-12 10:21:52,139 - app.main - INFO - È¯°æ: development
-2025-12-12 10:21:52,139 - app.main - INFO - CORS Çã¿ë µµ¸ÞÀÎ: ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:8081', 'http://localhost:8082', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006']
+2025-12-12 10:21:52,139 - app.main - INFO - È¯ï¿½ï¿½: development
+2025-12-12 10:21:52,139 - app.main - INFO - CORS ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½: ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:8081', 'http://localhost:8082', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006']
 2025-12-12 10:21:52,152 - app.main - INFO - ============================================================
-2025-12-12 10:21:52,165 - app.main - INFO - È¯°æ: development
-2025-12-12 10:21:52,165 - app.main - INFO - CORS Çã¿ë µµ¸ÞÀÎ: ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:8081', 'http://localhost:8082', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006']
+2025-12-12 10:21:52,165 - app.main - INFO - È¯ï¿½ï¿½: development
+2025-12-12 10:21:52,165 - app.main - INFO - CORS ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½: ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:8081', 'http://localhost:8082', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006']
 2025-12-12 10:21:53,197 - app.main - INFO - ============================================================
 2025-12-12 10:21:53,410 - app.main - INFO - ============================================================
 2025-12-12 10:21:53,447 - app.main - INFO - ============================================================
@@ -1021,17 +1021,17 @@
 2025-12-12 10:21:56,394 - app.main - INFO - ============================================================
 2025-12-12 10:21:56,401 - app.main - INFO - ============================================================
 2025-12-12 10:21:58,262 - app.main - INFO - ============================================================
-2025-12-12 10:21:58,274 - app.main - INFO - È¯°æ: development
-2025-12-12 10:21:58,275 - app.main - INFO - CORS Çã¿ë µµ¸ÞÀÎ: ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:8081', 'http://localhost:8082', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006']
+2025-12-12 10:21:58,274 - app.main - INFO - È¯ï¿½ï¿½: development
+2025-12-12 10:21:58,275 - app.main - INFO - CORS ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½: ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:8081', 'http://localhost:8082', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006']
 2025-12-12 10:21:58,450 - app.main - INFO - ============================================================
-2025-12-12 10:21:58,461 - app.main - INFO - È¯°æ: development
-2025-12-12 10:21:58,461 - app.main - INFO - CORS Çã¿ë µµ¸ÞÀÎ: ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:8081', 'http://localhost:8082', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006']
+2025-12-12 10:21:58,461 - app.main - INFO - È¯ï¿½ï¿½: development
+2025-12-12 10:21:58,461 - app.main - INFO - CORS ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½: ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:8081', 'http://localhost:8082', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006']
 2025-12-12 10:21:58,463 - app.main - INFO - ============================================================
-2025-12-12 10:21:58,476 - app.main - INFO - È¯°æ: development
-2025-12-12 10:21:58,476 - app.main - INFO - CORS Çã¿ë µµ¸ÞÀÎ: ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:8081', 'http://localhost:8082', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006']
+2025-12-12 10:21:58,476 - app.main - INFO - È¯ï¿½ï¿½: development
+2025-12-12 10:21:58,476 - app.main - INFO - CORS ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½: ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:8081', 'http://localhost:8082', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006']
 2025-12-12 10:21:58,541 - app.main - INFO - ============================================================
-2025-12-12 10:21:58,553 - app.main - INFO - È¯°æ: development
-2025-12-12 10:21:58,553 - app.main - INFO - CORS Çã¿ë µµ¸ÞÀÎ: ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:8081', 'http://localhost:8082', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006']
+2025-12-12 10:21:58,553 - app.main - INFO - È¯ï¿½ï¿½: development
+2025-12-12 10:21:58,553 - app.main - INFO - CORS ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½: ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:8081', 'http://localhost:8082', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006']
 2025-12-12 10:21:59,345 - app.main - INFO - ============================================================
 2025-12-12 10:21:59,629 - app.main - INFO - ============================================================
 2025-12-12 10:21:59,650 - app.main - INFO - ============================================================
@@ -1045,17 +1045,17 @@
 2025-12-12 10:22:00,995 - app.main - INFO - ============================================================
 2025-12-12 10:22:01,002 - app.main - INFO - ============================================================
 2025-12-12 10:22:02,997 - app.main - INFO - ============================================================
-2025-12-12 10:22:03,012 - app.main - INFO - È¯°æ: development
-2025-12-12 10:22:03,012 - app.main - INFO - CORS Çã¿ë µµ¸ÞÀÎ: ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:8081', 'http://localhost:8082', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006']
+2025-12-12 10:22:03,012 - app.main - INFO - È¯ï¿½ï¿½: development
+2025-12-12 10:22:03,012 - app.main - INFO - CORS ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½: ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:8081', 'http://localhost:8082', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006']
 2025-12-12 10:22:03,036 - app.main - INFO - ============================================================
 2025-12-12 10:22:03,050 - app.main - INFO - ============================================================
-2025-12-12 10:22:03,051 - app.main - INFO - È¯°æ: development
-2025-12-12 10:22:03,051 - app.main - INFO - CORS Çã¿ë µµ¸ÞÀÎ: ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:8081', 'http://localhost:8082', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006']
-2025-12-12 10:22:03,064 - app.main - INFO - È¯°æ: development
-2025-12-12 10:22:03,064 - app.main - INFO - CORS Çã¿ë µµ¸ÞÀÎ: ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:8081', 'http://localhost:8082', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006']
+2025-12-12 10:22:03,051 - app.main - INFO - È¯ï¿½ï¿½: development
+2025-12-12 10:22:03,051 - app.main - INFO - CORS ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½: ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:8081', 'http://localhost:8082', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006']
+2025-12-12 10:22:03,064 - app.main - INFO - È¯ï¿½ï¿½: development
+2025-12-12 10:22:03,064 - app.main - INFO - CORS ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½: ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:8081', 'http://localhost:8082', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006']
 2025-12-12 10:22:03,096 - app.main - INFO - ============================================================
-2025-12-12 10:22:03,108 - app.main - INFO - È¯°æ: development
-2025-12-12 10:22:03,108 - app.main - INFO - CORS Çã¿ë µµ¸ÞÀÎ: ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:8081', 'http://localhost:8082', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006']
+2025-12-12 10:22:03,108 - app.main - INFO - È¯ï¿½ï¿½: development
+2025-12-12 10:22:03,108 - app.main - INFO - CORS ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½: ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:8081', 'http://localhost:8082', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006']
 2025-12-12 10:22:04,298 - app.main - INFO - ============================================================
 2025-12-12 10:22:04,305 - app.main - INFO - ============================================================
 2025-12-12 10:22:04,337 - app.main - INFO - ============================================================
@@ -1069,17 +1069,17 @@
 2025-12-12 10:22:04,385 - app.main - INFO - ============================================================
 2025-12-12 10:22:04,396 - app.main - INFO - ============================================================
 2025-12-12 10:22:06,422 - app.main - INFO - ============================================================
-2025-12-12 10:22:06,435 - app.main - INFO - È¯°æ: development
-2025-12-12 10:22:06,436 - app.main - INFO - CORS Çã¿ë µµ¸ÞÀÎ: ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:8081', 'http://localhost:8082', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006']
+2025-12-12 10:22:06,435 - app.main - INFO - È¯ï¿½ï¿½: development
+2025-12-12 10:22:06,436 - app.main - INFO - CORS ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½: ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:8081', 'http://localhost:8082', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006']
 2025-12-12 10:22:06,471 - app.main - INFO - ============================================================
 2025-12-12 10:22:06,481 - app.main - INFO - ============================================================
-2025-12-12 10:22:06,484 - app.main - INFO - È¯°æ: development
-2025-12-12 10:22:06,484 - app.main - INFO - CORS Çã¿ë µµ¸ÞÀÎ: ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:8081', 'http://localhost:8082', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006']
-2025-12-12 10:22:06,492 - app.main - INFO - È¯°æ: development
-2025-12-12 10:22:06,492 - app.main - INFO - CORS Çã¿ë µµ¸ÞÀÎ: ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:8081', 'http://localhost:8082', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006']
+2025-12-12 10:22:06,484 - app.main - INFO - È¯ï¿½ï¿½: development
+2025-12-12 10:22:06,484 - app.main - INFO - CORS ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½: ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:8081', 'http://localhost:8082', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006']
+2025-12-12 10:22:06,492 - app.main - INFO - È¯ï¿½ï¿½: development
+2025-12-12 10:22:06,492 - app.main - INFO - CORS ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½: ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:8081', 'http://localhost:8082', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006']
 2025-12-12 10:22:06,497 - app.main - INFO - ============================================================
-2025-12-12 10:22:06,508 - app.main - INFO - È¯°æ: development
-2025-12-12 10:22:06,508 - app.main - INFO - CORS Çã¿ë µµ¸ÞÀÎ: ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:8081', 'http://localhost:8082', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006']
+2025-12-12 10:22:06,508 - app.main - INFO - È¯ï¿½ï¿½: development
+2025-12-12 10:22:06,508 - app.main - INFO - CORS ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½: ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:8081', 'http://localhost:8082', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006']
 2025-12-12 10:22:07,574 - app.main - INFO - ============================================================
 2025-12-12 10:22:07,731 - app.main - INFO - ============================================================
 2025-12-12 10:22:07,735 - app.main - INFO - ============================================================
@@ -1221,14 +1221,14 @@
 2025-12-12 10:32:17,593 - app.main - INFO - ============================================================
 2025-12-12 10:32:17,594 - app.main - INFO - ============================================================
 2025-12-12 10:32:17,596 - app.main - INFO - ============================================================
-2025-12-12 10:32:17,604 - app.main - INFO - È¯°æ: development
-2025-12-12 10:32:17,604 - app.main - INFO - CORS Çã¿ë µµ¸ÞÀÎ: ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:8081', 'http://localhost:8082', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006']
-2025-12-12 10:32:17,605 - app.main - INFO - È¯°æ: development
-2025-12-12 10:32:17,605 - app.main - INFO - CORS Çã¿ë µµ¸ÞÀÎ: ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:8081', 'http://localhost:8082', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006']
-2025-12-12 10:32:17,607 - app.main - INFO - È¯°æ: development
-2025-12-12 10:32:17,607 - app.main - INFO - CORS Çã¿ë µµ¸ÞÀÎ: ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:8081', 'http://localhost:8082', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006']
-2025-12-12 10:32:17,609 - app.main - INFO - È¯°æ: development
-2025-12-12 10:32:17,609 - app.main - INFO - CORS Çã¿ë µµ¸ÞÀÎ: ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:8081', 'http://localhost:8082', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006']
+2025-12-12 10:32:17,604 - app.main - INFO - È¯ï¿½ï¿½: development
+2025-12-12 10:32:17,604 - app.main - INFO - CORS ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½: ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:8081', 'http://localhost:8082', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006']
+2025-12-12 10:32:17,605 - app.main - INFO - È¯ï¿½ï¿½: development
+2025-12-12 10:32:17,605 - app.main - INFO - CORS ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½: ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:8081', 'http://localhost:8082', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006']
+2025-12-12 10:32:17,607 - app.main - INFO - È¯ï¿½ï¿½: development
+2025-12-12 10:32:17,607 - app.main - INFO - CORS ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½: ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:8081', 'http://localhost:8082', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006']
+2025-12-12 10:32:17,609 - app.main - INFO - È¯ï¿½ï¿½: development
+2025-12-12 10:32:17,609 - app.main - INFO - CORS ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½: ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:8081', 'http://localhost:8082', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006']
 2025-12-12 10:32:19,026 - app.main - INFO - ============================================================
 2025-12-12 10:32:19,029 - app.main - INFO - ============================================================
 2025-12-12 10:32:19,036 - app.main - INFO - ============================================================
@@ -1242,14 +1242,14 @@
 2025-12-12 10:32:21,852 - app.main - INFO - ============================================================
 2025-12-12 10:32:21,855 - app.main - INFO - ============================================================
 2025-12-12 10:32:21,858 - app.main - INFO - ============================================================
-2025-12-12 10:32:21,862 - app.main - INFO - È¯°æ: development
-2025-12-12 10:32:21,862 - app.main - INFO - CORS Çã¿ë µµ¸ÞÀÎ: ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:8081', 'http://localhost:8082', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006']
-2025-12-12 10:32:21,864 - app.main - INFO - È¯°æ: development
-2025-12-12 10:32:21,864 - app.main - INFO - CORS Çã¿ë µµ¸ÞÀÎ: ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:8081', 'http://localhost:8082', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006']
-2025-12-12 10:32:21,868 - app.main - INFO - È¯°æ: development
-2025-12-12 10:32:21,869 - app.main - INFO - CORS Çã¿ë µµ¸ÞÀÎ: ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:8081', 'http://localhost:8082', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006']
-2025-12-12 10:32:21,870 - app.main - INFO - È¯°æ: development
-2025-12-12 10:32:21,871 - app.main - INFO - CORS Çã¿ë µµ¸ÞÀÎ: ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:8081', 'http://localhost:8082', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006']
+2025-12-12 10:32:21,862 - app.main - INFO - È¯ï¿½ï¿½: development
+2025-12-12 10:32:21,862 - app.main - INFO - CORS ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½: ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:8081', 'http://localhost:8082', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006']
+2025-12-12 10:32:21,864 - app.main - INFO - È¯ï¿½ï¿½: development
+2025-12-12 10:32:21,864 - app.main - INFO - CORS ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½: ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:8081', 'http://localhost:8082', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006']
+2025-12-12 10:32:21,868 - app.main - INFO - È¯ï¿½ï¿½: development
+2025-12-12 10:32:21,869 - app.main - INFO - CORS ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½: ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:8081', 'http://localhost:8082', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006']
+2025-12-12 10:32:21,870 - app.main - INFO - È¯ï¿½ï¿½: development
+2025-12-12 10:32:21,871 - app.main - INFO - CORS ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½: ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:8081', 'http://localhost:8082', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006']
 2025-12-12 10:32:23,191 - app.main - INFO - ============================================================
 2025-12-12 10:32:23,192 - app.main - INFO - ============================================================
 2025-12-12 10:32:23,194 - app.main - INFO - ============================================================
@@ -1263,17 +1263,17 @@
 2025-12-12 10:32:28,238 - app.main - INFO - ============================================================
 2025-12-12 10:32:28,245 - app.main - INFO - ============================================================
 2025-12-12 10:32:30,282 - app.main - INFO - ============================================================
-2025-12-12 10:32:30,296 - app.main - INFO - È¯°æ: development
-2025-12-12 10:32:30,297 - app.main - INFO - CORS Çã¿ë µµ¸ÞÀÎ: ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:8081', 'http://localhost:8082', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006']
+2025-12-12 10:32:30,296 - app.main - INFO - È¯ï¿½ï¿½: development
+2025-12-12 10:32:30,297 - app.main - INFO - CORS ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½: ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:8081', 'http://localhost:8082', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006']
 2025-12-12 10:32:30,468 - app.main - INFO - ============================================================
 2025-12-12 10:32:30,480 - app.main - INFO - ============================================================
-2025-12-12 10:32:30,481 - app.main - INFO - È¯°æ: development
-2025-12-12 10:32:30,482 - app.main - INFO - CORS Çã¿ë µµ¸ÞÀÎ: ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:8081', 'http://localhost:8082', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006']
-2025-12-12 10:32:30,491 - app.main - INFO - È¯°æ: development
-2025-12-12 10:32:30,492 - app.main - INFO - CORS Çã¿ë µµ¸ÞÀÎ: ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:8081', 'http://localhost:8082', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006']
+2025-12-12 10:32:30,481 - app.main - INFO - È¯ï¿½ï¿½: development
+2025-12-12 10:32:30,482 - app.main - INFO - CORS ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½: ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:8081', 'http://localhost:8082', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006']
+2025-12-12 10:32:30,491 - app.main - INFO - È¯ï¿½ï¿½: development
+2025-12-12 10:32:30,492 - app.main - INFO - CORS ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½: ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:8081', 'http://localhost:8082', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006']
 2025-12-12 10:32:30,496 - app.main - INFO - ============================================================
-2025-12-12 10:32:30,509 - app.main - INFO - È¯°æ: development
-2025-12-12 10:32:30,509 - app.main - INFO - CORS Çã¿ë µµ¸ÞÀÎ: ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:8081', 'http://localhost:8082', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006']
+2025-12-12 10:32:30,509 - app.main - INFO - È¯ï¿½ï¿½: development
+2025-12-12 10:32:30,509 - app.main - INFO - CORS ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½: ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:8081', 'http://localhost:8082', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006']
 2025-12-12 10:32:31,475 - app.main - INFO - ============================================================
 2025-12-12 10:32:31,855 - app.main - INFO - ============================================================
 2025-12-12 10:32:31,859 - app.main - INFO - ============================================================
@@ -1388,6 +1388,7 @@
 2025-12-12 11:42:18,263 - audit - INFO - Response: 200 | Duration: 0.016s
 2025-12-12 11:42:18,266 - audit - INFO - Request: GET /api/analysis/categories | Client: 127.0.0.1
 2025-12-12 11:42:18,282 - audit - INFO - Response: 200 | Duration: 0.016s
+<<<<<<< HEAD
 2025-12-12 12:31:29,174 - audit - INFO - Request: GET /api/analysis/full | Client: 127.0.0.1
 2025-12-12 12:31:29,272 - audit - INFO - Response: 200 | Duration: 0.099s
 2025-12-15 09:35:12,875 - app.main - INFO - ============================================================
@@ -1611,3 +1612,5 @@ AttributeError: module 'bcrypt' has no attribute '__about__'
 2025-12-15 11:28:14,886 - audit - INFO - Response: 200 | Duration: 0.003s
 2025-12-15 11:28:16,925 - audit - INFO - Request: OPTIONS /users/login | Client: 127.0.0.1
 2025-12-15 11:28:16,926 - audit - INFO - Response: 200 | Duration: 0.001s
+=======
+>>>>>>> 7c7befb1cf3ba7f4d19f2deaaf455b6ca9ddb0ec

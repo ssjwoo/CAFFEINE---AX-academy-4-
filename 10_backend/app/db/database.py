@@ -31,7 +31,8 @@ async def create_engine_with_fallback():
     global _async_engine, _current_db_type
     
     # 1. AWS RDS 연결 시도
-    logger.info(f"🔄 AWS RDS 연결 시도: {settings.db_host}")
+    # 1. AWS RDS 연결 시도
+    logger.info(f"Connecting to AWS RDS: {settings.db_host}")
     rds_engine = create_async_engine(
         settings.database_url, 
         echo=False,
@@ -40,14 +41,14 @@ async def create_engine_with_fallback():
     )
     
     if await test_connection(rds_engine):
-        logger.info(f"✅ AWS RDS 연결 성공: {settings.db_host}")
+        logger.info(f"Connected to AWS RDS: {settings.db_host}")
         _async_engine = rds_engine
         _current_db_type = "rds"
         return _async_engine
     
     # 2. RDS 실패 시 로컬 DB 폴백
     await rds_engine.dispose()
-    logger.warning(f"⚠️ AWS RDS 연결 실패, 로컬 DB로 폴백 시도: {settings.local_db_host}")
+    logger.warning(f"AWS RDS connection failed, falling back to local DB: {settings.local_db_host}")
     
     local_engine = create_async_engine(
         settings.local_database_url,
@@ -57,14 +58,14 @@ async def create_engine_with_fallback():
     )
     
     if await test_connection(local_engine):
-        logger.info(f"✅ 로컬 DB 연결 성공: {settings.local_db_host}")
+        logger.info(f"Connected to local DB: {settings.local_db_host}")
         _async_engine = local_engine
         _current_db_type = "local"
         return _async_engine
     
     # 3. 둘 다 실패
     await local_engine.dispose()
-    raise Exception("❌ AWS RDS와 로컬 DB 모두 연결 실패!")
+    raise Exception("Failed to connect to both AWS RDS and local DB!")
 
 
 def get_engine():
@@ -108,5 +109,5 @@ async def get_db():
 
 
 # DB 연결 정보 출력 (개발용)
-print(f"🔹 Primary DB (AWS RDS): {settings.db_host}")
-print(f"🔹 Fallback DB (Local): {settings.local_db_host}")
+print(f"Primary DB (AWS RDS): {settings.db_host}")
+print(f"Fallback DB (Local): {settings.local_db_host}")
