@@ -195,7 +195,7 @@ async def health(request: Request):
 # ============================================================
 # 라우터 등록
 # ============================================================
-from app.routers import ml, analysis, transactions, user, settings, reports
+from app.routers import ml, analysis, transactions, user, settings, reports, anomalies
 
 # ML 예측 API (/ml/*)
 app.include_router(ml.router)
@@ -214,6 +214,10 @@ app.include_router(settings.router)
 
 # 관리자 리포트 API (/api/admin/reports/*)
 app.include_router(reports.router)
+
+# 이상 거래 탐지 API (/api/anomalies/*)
+app.include_router(anomalies.router)
+
 
 # ============================================================
 # 시작 / 종료 이벤트

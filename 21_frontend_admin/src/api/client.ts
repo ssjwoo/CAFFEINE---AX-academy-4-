@@ -130,3 +130,21 @@ export async function sendMonthlyReport() {
     return apiClient.post('/api/admin/reports/send-monthly', {});
 }
 
+// Anomalies API
+export async function getAnomalies(status?: string, riskLevel?: string, days: number = 30) {
+    const params = new URLSearchParams();
+    if (status) params.append('status', status);
+    if (riskLevel) params.append('risk_level', riskLevel);
+    params.append('days', days.toString());
+    const queryString = params.toString();
+    return apiClient.get(`/api/anomalies${queryString ? '?' + queryString : ''}`);
+}
+
+export async function approveAnomaly(anomalyId: number) {
+    return apiClient.post(`/api/anomalies/${anomalyId}/approve`, {});
+}
+
+export async function rejectAnomaly(anomalyId: number) {
+    return apiClient.post(`/api/anomalies/${anomalyId}/reject`, {});
+}
+
