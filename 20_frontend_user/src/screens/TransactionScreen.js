@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, FlatList, StyleSheet, TouchableOpacity, Modal, TextInput } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
+import { Feather } from '@expo/vector-icons';
 import { apiClient } from '../api/client';
 import { useTheme } from '../contexts/ThemeContext';
 import { useTransactions } from '../contexts/TransactionContext';
@@ -53,10 +55,10 @@ export default function TransactionScreen({ navigation }) {
         if (!searchQuery) return true;
         const query = searchQuery.toLowerCase();
         return (
-            t.merchant.toLowerCase().includes(query) ||
-            t.category.toLowerCase().includes(query) ||
+            t.merchant?.toLowerCase().includes(query) ||
+            t.category?.toLowerCase().includes(query) ||
             t.notes?.toLowerCase().includes(query) ||
-            t.businessName.toLowerCase().includes(query)
+            t.businessName?.toLowerCase().includes(query)
         );
     });
 
@@ -181,12 +183,18 @@ export default function TransactionScreen({ navigation }) {
     );
 
     return (
-        <View style={styles(colors).container}>
+        <LinearGradient colors={colors.screenGradient} style={styles(colors).container}>
+            {/* Header */}
             <View style={styles(colors).header}>
-                <Text style={styles(colors).title}>거래내역</Text>
-                <Text style={styles(colors).subtitle}>
-                    {searchQuery ? `검색 결과 ${filteredTransactions.length}건` : `총 ${transactions.length}건`}
-                </Text>
+                <View>
+                    <Text style={styles(colors).title}>거래내역</Text>
+                    <Text style={styles(colors).subtitle}>
+                        {searchQuery ? `검색 결과 ${filteredTransactions.length}건` : `총 ${transactions.length}건`}
+                    </Text>
+                </View>
+                <View style={styles(colors).headerIcon}>
+                    <Feather name="file-text" size={24} color="#2563EB" />
+                </View>
             </View>
 
             {/* AI Prediction Card - 거래가 있을 때만 표시 */}
@@ -243,7 +251,7 @@ export default function TransactionScreen({ navigation }) {
                 <EmptyState
                     icon="📊"
                     title="연동된 거래내역이 없습니다"
-                    message="프로필 → 데이터 동기화로 CSV 파일을 업로드하세요"
+                    description="프로필 → 데이터 동기화로 CSV 파일을 업로드하세요"
                     actionText="동기화 하러 가기"
                     onAction={() => navigation.navigate('프로필')}
                 />
@@ -251,7 +259,7 @@ export default function TransactionScreen({ navigation }) {
                 <EmptyState
                     icon="🔍"
                     title="검색 결과 없음"
-                    message="검색 조건과 일치하는 거래가 없습니다"
+                    description="검색 조건과 일치하는 거래가 없습니다"
                     actionText="검색 초기화"
                     onAction={() => setSearchQuery('')}
                 />
@@ -432,35 +440,62 @@ export default function TransactionScreen({ navigation }) {
                     </View>
                 </View>
             </Modal>
-        </View>
+        </LinearGradient>
     );
 }
 
 const styles = (colors) => StyleSheet.create({
-    container: { flex: 1, backgroundColor: colors.background },
-    header: { padding: 20, backgroundColor: colors.cardBackground, borderBottomWidth: 1, borderBottomColor: colors.border },
-    title: { fontSize: 24, fontWeight: 'bold', color: colors.text },
-    subtitle: { fontSize: 14, color: colors.textSecondary, marginTop: 4 },
-    list: { padding: 20 },
-    transactionCard: { backgroundColor: colors.cardBackground, borderRadius: 12, padding: 16, marginBottom: 12, borderWidth: 1, borderColor: colors.border },
+    container: { flex: 1 },
+    header: { 
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        paddingHorizontal: 24,
+        paddingVertical: 20,
+    },
+    headerIcon: {
+        width: 48,
+        height: 48,
+        borderRadius: 16,
+        backgroundColor: '#DBEAFE',
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderWidth: 1.5,
+        borderColor: '#93C5FD',
+    },
+    title: { fontSize: 28, fontWeight: '700', color: colors.text, fontFamily: 'Inter_700Bold' },
+    subtitle: { fontSize: 16, color: '#2563EB', marginTop: 6, fontWeight: '600' },
+    list: { padding: 16 },
+    transactionCard: { 
+        backgroundColor: colors.cardBackground, 
+        borderRadius: 16, 
+        padding: 16, 
+        marginBottom: 12, 
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.06,
+        shadowRadius: 8,
+        elevation: 3,
+    },
     transactionHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 },
     merchantInfo: { flexDirection: 'row', alignItems: 'center', gap: 8 },
     merchant: { fontSize: 16, fontWeight: 'bold', color: colors.text },
     cardTypeBadge: (type) => ({
         fontSize: 11,
-        color: type === '신용' ? colors.warning : colors.success,
-        backgroundColor: (type === '신용' ? colors.warning : colors.success) + '20',
+        color: type === '신용' ? '#2563EB' : '#059669',
+        backgroundColor: type === '신용' ? '#DBEAFE' : '#D1FAE5',
         paddingHorizontal: 8,
-        paddingVertical: 2,
+        paddingVertical: 3,
         borderRadius: 8,
-        fontWeight: 'bold',
+        fontWeight: '600',
+        overflow: 'hidden',
     }),
-    amount: { fontSize: 18, fontWeight: 'bold', color: colors.primary },
+    amount: { fontSize: 18, fontWeight: '700', color: '#2563EB' },
     transactionDetails: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 4 },
     category: { fontSize: 14, color: colors.textSecondary },
     date: { fontSize: 12, color: colors.textSecondary },
     notes: { fontSize: 12, color: colors.text, marginTop: 4, fontStyle: 'italic' },
-    clickHint: { fontSize: 11, color: colors.primary, marginTop: 8, opacity: 0.8 },
+    clickHint: { fontSize: 11, color: '#3B82F6', marginTop: 8, fontWeight: '500' },
 
     // Search styles
     searchContainer: { flexDirection: 'row', alignItems: 'center', padding: 16, backgroundColor: colors.cardBackground, borderBottomWidth: 1, borderBottomColor: colors.border },
@@ -603,52 +638,53 @@ const styles = (colors) => StyleSheet.create({
 
     // Prediction Card styles
     predictionCard: {
-        margin: 20,
-        marginBottom: 0,
-        padding: 16,
-        backgroundColor: colors.cardBackground,
-        borderRadius: 12,
-        borderWidth: 1,
-        borderColor: colors.primary,
-        shadowColor: colors.primary,
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 4,
-        elevation: 3,
+        marginHorizontal: 16,
+        marginTop: 8,
+        marginBottom: 16,
+        padding: 20,
+        backgroundColor: '#DBEAFE',
+        borderRadius: 16,
+        borderWidth: 1.5,
+        borderColor: '#93C5FD',
+        shadowColor: '#2563EB',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.15,
+        shadowRadius: 8,
+        elevation: 4,
     },
     predictionHeader: {
         flexDirection: 'row',
         alignItems: 'center',
-        marginBottom: 8,
+        marginBottom: 12,
     },
     predictionIcon: {
-        fontSize: 20,
-        marginRight: 8,
+        fontSize: 24,
+        marginRight: 10,
     },
     predictionTitle: {
         fontSize: 16,
-        fontWeight: 'bold',
-        color: colors.primary,
+        fontWeight: '700',
+        color: '#1E40AF',
     },
     predictionText: {
         fontSize: 14,
-        color: colors.text,
-        lineHeight: 20,
-        marginBottom: 12,
+        color: '#1E3A8A',
+        lineHeight: 22,
+        marginBottom: 16,
     },
     predictionButton: {
-        backgroundColor: colors.primary,
-        padding: 12,
-        borderRadius: 8,
+        backgroundColor: '#2563EB',
+        padding: 14,
+        borderRadius: 12,
         alignItems: 'center',
     },
     predictionButtonDisabled: {
-        backgroundColor: colors.border,
+        backgroundColor: '#93C5FD',
         opacity: 0.5,
     },
     predictionButtonText: {
-        color: '#fff',
-        fontSize: 14,
-        fontWeight: 'bold',
+        color: '#FFFFFF',
+        fontSize: 15,
+        fontWeight: '700',
     },
 });

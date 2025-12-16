@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, Switch, TouchableOpacity, ScrollView, Modal, Dimensions, ActivityIndicator } from 'react-native';
+import React, { useState, useRef, useEffect } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Modal, Dimensions, ActivityIndicator, Animated, Easing } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as DocumentPicker from 'expo-document-picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -10,11 +10,36 @@ import { useTransactions } from '../contexts/TransactionContext';
 const { width: screenWidth } = Dimensions.get('window');
 
 export default function ProfileScreen({ navigation }) {
-    const { colors, isDarkMode, toggleTheme } = useTheme();
+    const { colors } = useTheme();
     const { user, logout } = useAuth();
     const { saveTransactions, clearTransactions, loading: syncLoading } = useTransactions();
     const [infoModalVisible, setInfoModalVisible] = useState(false);
     const [infoContent, setInfoContent] = useState({ title: '', content: '' });
+    // ⭐ 동기화 진행 상태
+    const [syncModalVisible, setSyncModalVisible] = useState(false);
+    const [syncProgress, setSyncProgress] = useState('');
+    const spinValue = useRef(new Animated.Value(0)).current;
+    
+    // ⭐ 회전 애니메이션
+    useEffect(() => {
+        if (syncModalVisible) {
+            Animated.loop(
+                Animated.timing(spinValue, {
+                    toValue: 1,
+                    duration: 1500,
+                    easing: Easing.linear,
+                    useNativeDriver: false, // 웹 호환성을 위해 false
+                })
+            ).start();
+        } else {
+            spinValue.setValue(0);
+        }
+    }, [syncModalVisible]);
+    
+    const spin = spinValue.interpolate({
+        inputRange: [0, 1],
+        outputRange: ['0deg', '360deg'],
+    });
 
     const handleExportData = async () => {
         try {
@@ -56,7 +81,7 @@ export default function ProfileScreen({ navigation }) {
         return transactions;
     };
 
-    // 데이터 동기화 (CSV 파일 선택)
+    // 데이터 동기화 (CSV 파일 선택) - ⭐ 애니메이션 추가
     const handleSyncData = async () => {
         try {
             // 파일 선택 다이얼로그 열기
@@ -71,31 +96,54 @@ export default function ProfileScreen({ navigation }) {
 
             const file = result.assets[0];
             console.log('선택된 파일:', file.name);
+            
+            // ⭐ 동기화 모달 표시
+            setSyncModalVisible(true);
+            setSyncProgress('📂 파일 읽는 중...');
 
             // 파일 읽기
             const response = await fetch(file.uri);
             const csvText = await response.text();
+            
+            // ⭐ 진행 상태 업데이트
+            setSyncProgress('🔄 데이터 분석 중...');
+            await new Promise(resolve => setTimeout(resolve, 500)); // 시각적 효과
 
             // CSV 파싱
             const transactions = parseCSV(csvText);
 
             if (transactions.length === 0) {
+                setSyncModalVisible(false);
                 alert('CSV 파일에서 거래 데이터를 찾을 수 없습니다.\n\n올바른 형식의 CSV 파일인지 확인해주세요.');
                 return;
             }
+            
+            // ⭐ 진행 상태 업데이트
+            setSyncProgress(`💾 ${transactions.length}건 저장 중...`);
+            await new Promise(resolve => setTimeout(resolve, 500)); // 시각적 효과
 
             // TransactionContext에 저장
             const saveResult = await saveTransactions(transactions);
+            
+            // ⭐ 완료 상태
+            setSyncProgress('✅ 동기화 완료!');
+            await new Promise(resolve => setTimeout(resolve, 1000)); // 완료 표시
+            
+            setSyncModalVisible(false);
 
             if (saveResult.success) {
                 alert(`✅ 데이터 동기화 완료!\n\n${transactions.length}건의 거래 내역이 업데이트되었습니다.`);
-                // 대시보드로 자동 이동
-                navigation?.navigate('대시보드');
+                // 대시보드로 바로 이동 (스택 초기화)
+                navigation?.reset({
+                    index: 0,
+                    routes: [{ name: 'MainTabs' }],
+                });
             } else {
                 alert('데이터 저장 중 오류가 발생했습니다.');
             }
 
         } catch (error) {
+            setSyncModalVisible(false);
             console.error('동기화 실패:', error);
             alert('파일을 읽는 중 오류가 발생했습니다.\n\n' + error.message);
         }
@@ -164,18 +212,18 @@ export default function ProfileScreen({ navigation }) {
                 <Text style={styles.menuIcon}>{icon}</Text>
             </View>
             <View style={styles.menuContent}>
-                <Text style={styles.menuTitle}>{title}</Text>
-                {subtitle && <Text style={styles.menuSubtitle}>{subtitle}</Text>}
+                <Text style={[styles.menuTitle, { color: colors.text }]}>{title}</Text>
+                {subtitle && <Text style={[styles.menuSubtitle, { color: colors.textSecondary }]}>{subtitle}</Text>}
             </View>
             {rightComponent ? rightComponent : (
-                showArrow && <Text style={styles.menuArrow}>›</Text>
+                showArrow && <Text style={[styles.menuArrow, { color: colors.textSecondary }]}>›</Text>
             )}
         </TouchableOpacity>
     );
 
     return (
         <LinearGradient
-            colors={['#DBEAFE', '#EFF6FF', '#F8FAFC']}
+            colors={colors.screenGradient}
             style={styles.gradientContainer}
         >
             <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
@@ -189,46 +237,30 @@ export default function ProfileScreen({ navigation }) {
                             <Text style={styles.avatarText}>{user?.name?.charAt(0) || '홍'}</Text>
                         </LinearGradient>
                     </View>
-                    <Text style={styles.name}>{user?.name || '홍길동'}</Text>
-                    <Text style={styles.email}>{user?.email || 'demo@caffeine.com'}</Text>
+                    <Text style={[styles.name, { color: colors.text }]}>{user?.name || '홍길동'}</Text>
+                    <Text style={[styles.email, { color: colors.textSecondary }]}>{user?.email || 'demo@caffeine.com'}</Text>
                 </View>
 
                 {/* Settings Section */}
                 <View style={styles.section}>
-                    <Text style={styles.sectionTitle}>설정</Text>
-                    <View style={styles.card}>
-                        <View style={styles.menuItem}>
-                            <View style={styles.menuIconContainer}>
-                                <Text style={styles.menuIcon}>🌙</Text>
-                            </View>
-                            <View style={styles.menuContent}>
-                                <Text style={styles.menuTitle}>다크 모드</Text>
-                            </View>
-                            <Switch
-                                value={isDarkMode}
-                                onValueChange={toggleTheme}
-                                trackColor={{ false: '#E5E7EB', true: '#2563EB' }}
-                                thumbColor={'#FFFFFF'}
-                                ios_backgroundColor="#E5E7EB"
-                            />
-                        </View>
-                        <View style={styles.divider} />
+                    <Text style={[styles.sectionTitle, { color: colors.textSecondary }]}>데이터 관리</Text>
+                    <View style={[styles.card, { backgroundColor: colors.cardBackground }]}>
                         <MenuItem icon="📤" title="데이터 내보내기" subtitle="CSV, JSON 형식으로 저장" onPress={handleExportData} />
-                        <View style={styles.divider} />
+                        <View style={[styles.divider, { backgroundColor: colors.border }]} />
                         <MenuItem icon="🔄" title="데이터 동기화 (예측 포함)" subtitle="최신 거래 내역 불러오기" onPress={handleSyncData} />
-                        <View style={styles.divider} />
+                        <View style={[styles.divider, { backgroundColor: colors.border }]} />
                         <MenuItem icon="🗑️" title="거래 데이터 초기화" subtitle="캐시 및 임시 파일 삭제" onPress={handleClearCache} />
                     </View>
                 </View>
 
                 {/* Info Section */}
                 <View style={styles.section}>
-                    <Text style={styles.sectionTitle}>정보</Text>
-                    <View style={styles.card}>
+                    <Text style={[styles.sectionTitle, { color: colors.textSecondary }]}>정보</Text>
+                    <View style={[styles.card, { backgroundColor: colors.cardBackground }]}>
                         <MenuItem icon="ℹ️" title="앱 정보" onPress={handleAppInfo} />
-                        <View style={styles.divider} />
+                        <View style={[styles.divider, { backgroundColor: colors.border }]} />
                         <MenuItem icon="📋" title="이용약관" onPress={handleTermsOfService} />
-                        <View style={styles.divider} />
+                        <View style={[styles.divider, { backgroundColor: colors.border }]} />
                         <MenuItem icon="🔒" title="개인정보 처리방침" onPress={handlePrivacyPolicy} />
                     </View>
                 </View>
@@ -246,11 +278,11 @@ export default function ProfileScreen({ navigation }) {
                     onRequestClose={() => setInfoModalVisible(false)}
                 >
                     <View style={styles.modalOverlay}>
-                        <View style={styles.modalContent}>
+                        <View style={[styles.modalContent, { backgroundColor: colors.cardBackground }]}>
                             <View style={styles.modalHandle} />
-                            <Text style={styles.modalTitle}>{infoContent.title}</Text>
+                            <Text style={[styles.modalTitle, { color: colors.text }]}>{infoContent.title}</Text>
                             <ScrollView style={styles.modalScroll} showsVerticalScrollIndicator={false}>
-                                <Text style={styles.modalText}>{infoContent.content}</Text>
+                                <Text style={[styles.modalText, { color: colors.text }]}>{infoContent.content}</Text>
                             </ScrollView>
                             <TouchableOpacity 
                                 style={styles.modalButton} 
@@ -264,6 +296,46 @@ export default function ProfileScreen({ navigation }) {
                                     <Text style={styles.modalButtonText}>닫기</Text>
                                 </LinearGradient>
                             </TouchableOpacity>
+                        </View>
+                    </View>
+                </Modal>
+
+                {/* ⭐ 동기화 진행 모달 */}
+                <Modal
+                    animationType="fade"
+                    transparent={true}
+                    visible={syncModalVisible}
+                    onRequestClose={() => {}}
+                >
+                    <View style={styles.syncModalOverlay}>
+                        <View style={[styles.syncModalContent, { backgroundColor: colors.cardBackground }]}>
+                            {/* 회전 애니메이션 아이콘 */}
+                            <Animated.View style={{ transform: [{ rotate: spin }] }}>
+                                <LinearGradient
+                                    colors={['#2563EB', '#1D4ED8']}
+                                    style={styles.syncIconContainer}
+                                >
+                                    <Text style={styles.syncIcon}>🔄</Text>
+                                </LinearGradient>
+                            </Animated.View>
+                            <Text style={[styles.syncTitle, { color: colors.text }]}>데이터 동기화</Text>
+                            <Text style={[styles.syncProgress, { color: colors.textSecondary }]}>{syncProgress}</Text>
+                            
+                            {/* 진행 바 애니메이션 */}
+                            <View style={styles.progressBarContainer}>
+                                <View style={styles.progressBar}>
+                                    <Animated.View 
+                                        style={[
+                                            styles.progressBarFill,
+                                            { 
+                                                width: syncProgress.includes('완료') ? '100%' : 
+                                                       syncProgress.includes('저장') ? '70%' :
+                                                       syncProgress.includes('분석') ? '40%' : '20%' 
+                                            }
+                                        ]} 
+                                    />
+                                </View>
+                            </View>
                         </View>
                     </View>
                 </Modal>
@@ -290,6 +362,10 @@ const styles = StyleSheet.create({
     },
     avatarContainer: {
         marginBottom: 16,
+        width: 100,
+        height: 100,
+        borderRadius: 50,
+        overflow: 'hidden',
         shadowColor: '#2563EB',
         shadowOffset: { width: 0, height: 8 },
         shadowOpacity: 0.3,
@@ -297,9 +373,9 @@ const styles = StyleSheet.create({
         elevation: 10,
     },
     avatar: {
-        width: 100,
-        height: 100,
-        borderRadius: 50,
+        flex: 1,
+        width: '100%',
+        height: '100%',
         justifyContent: 'center',
         alignItems: 'center',
     },
@@ -461,5 +537,65 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontWeight: '700',
         fontFamily: 'Inter_700Bold',
+    },
+
+    // ⭐ 동기화 모달 스타일
+    syncModalOverlay: {
+        flex: 1,
+        backgroundColor: 'rgba(0, 0, 0, 0.6)',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    syncModalContent: {
+        backgroundColor: '#FFFFFF',
+        borderRadius: 24,
+        padding: 32,
+        alignItems: 'center',
+        width: screenWidth * 0.8,
+        maxWidth: 320,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 10 },
+        shadowOpacity: 0.3,
+        shadowRadius: 20,
+        elevation: 20,
+    },
+    syncIconContainer: {
+        width: 80,
+        height: 80,
+        borderRadius: 40,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginBottom: 20,
+    },
+    syncIcon: {
+        fontSize: 36,
+    },
+    syncTitle: {
+        fontSize: 20,
+        fontWeight: '700',
+        color: '#1F2937',
+        marginBottom: 8,
+        fontFamily: 'Inter_700Bold',
+    },
+    syncProgress: {
+        fontSize: 16,
+        color: '#6B7280',
+        marginBottom: 20,
+        fontFamily: 'Inter_400Regular',
+    },
+    progressBarContainer: {
+        width: '100%',
+        paddingHorizontal: 10,
+    },
+    progressBar: {
+        height: 8,
+        backgroundColor: '#E5E7EB',
+        borderRadius: 4,
+        overflow: 'hidden',
+    },
+    progressBarFill: {
+        height: '100%',
+        backgroundColor: '#2563EB',
+        borderRadius: 4,
     },
 });

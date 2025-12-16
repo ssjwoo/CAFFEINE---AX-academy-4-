@@ -6,26 +6,55 @@ export default function EmptyState({ icon = '📊', title, description, actionTe
     const fadeAnim = useRef(new Animated.Value(0)).current;
     const scaleAnim = useRef(new Animated.Value(0.9)).current;
     const slideAnim = useRef(new Animated.Value(30)).current;
+    
+    // 점 애니메이션
+    const dot1Anim = useRef(new Animated.Value(0)).current;
+    const dot2Anim = useRef(new Animated.Value(0)).current;
+    const dot3Anim = useRef(new Animated.Value(0)).current;
 
     useEffect(() => {
         Animated.parallel([
             Animated.timing(fadeAnim, {
                 toValue: 1,
                 duration: 600,
-                useNativeDriver: true,
+                useNativeDriver: false,
             }),
             Animated.spring(scaleAnim, {
                 toValue: 1,
                 friction: 8,
                 tension: 40,
-                useNativeDriver: true,
+                useNativeDriver: false,
             }),
             Animated.timing(slideAnim, {
                 toValue: 0,
                 duration: 500,
-                useNativeDriver: true,
+                useNativeDriver: false,
             }),
         ]).start();
+        
+        // 점 통통 튀는 애니메이션
+        const createBounceAnimation = (anim, delay) => {
+            return Animated.loop(
+                Animated.sequence([
+                    Animated.delay(delay),
+                    Animated.timing(anim, {
+                        toValue: -8,
+                        duration: 300,
+                        useNativeDriver: false,
+                    }),
+                    Animated.timing(anim, {
+                        toValue: 0,
+                        duration: 300,
+                        useNativeDriver: false,
+                    }),
+                    Animated.delay(600),
+                ])
+            );
+        };
+        
+        createBounceAnimation(dot1Anim, 0).start();
+        createBounceAnimation(dot2Anim, 150).start();
+        createBounceAnimation(dot3Anim, 300).start();
     }, []);
 
     return (
@@ -76,11 +105,26 @@ export default function EmptyState({ icon = '📊', title, description, actionTe
                     </TouchableOpacity>
                 )}
 
-                {/* Decorative Elements */}
+                {/* Decorative Elements - 애니메이션 적용 */}
                 <View style={styles.decorativeContainer}>
-                    <View style={[styles.decorativeDot, { backgroundColor: '#BFDBFE' }]} />
-                    <View style={[styles.decorativeDot, { backgroundColor: '#93C5FD', width: 8, height: 8 }]} />
-                    <View style={[styles.decorativeDot, { backgroundColor: '#60A5FA' }]} />
+                    <Animated.View 
+                        style={[
+                            styles.decorativeDot, 
+                            { backgroundColor: '#BFDBFE', transform: [{ translateY: dot1Anim }] }
+                        ]} 
+                    />
+                    <Animated.View 
+                        style={[
+                            styles.decorativeDot, 
+                            { backgroundColor: '#93C5FD', width: 8, height: 8, transform: [{ translateY: dot2Anim }] }
+                        ]} 
+                    />
+                    <Animated.View 
+                        style={[
+                            styles.decorativeDot, 
+                            { backgroundColor: '#60A5FA', transform: [{ translateY: dot3Anim }] }
+                        ]} 
+                    />
                 </View>
             </Animated.View>
         </LinearGradient>
@@ -135,6 +179,8 @@ const styles = StyleSheet.create({
         paddingHorizontal: 20,
     },
     buttonContainer: {
+        borderRadius: 16,
+        overflow: 'hidden',
         shadowColor: '#2563EB',
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.3,

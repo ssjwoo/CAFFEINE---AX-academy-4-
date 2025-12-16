@@ -168,6 +168,15 @@ export const ThemeProvider = ({ children }) => {
         // ═══ Gradients (그라데이션) ═══
         primaryGradient: ['#9C27B0', '#E91E63'],      // Primary 그라데이션
         backgroundGradient: ['#1a1a1a', '#2d2d2d'],   // Background 그라데이션
+        screenGradient: ['#1E293B', '#0F172A', '#0F172A'], // 화면 배경 그라디언트
+        cardGradient: ['#1E40AF', '#1E3A8A', '#172554'], // 카드 그라디언트
+
+        // ═══ UI Colors (블루 테마) ═══
+        headerBackground: '#1E293B',
+        tabBarBackground: '#1E293B',
+        tabBarBorder: '#334155',
+        tabBarActive: '#60A5FA',
+        tabBarInactive: '#94A3B8',
 
         // ═══ Interactive (상호작용 요소) ═══
         disabled: '#666666',         // 비활성화된 요소
@@ -222,6 +231,15 @@ export const ThemeProvider = ({ children }) => {
         // Gradients
         primaryGradient: ['#9C27B0', '#E91E63'],
         backgroundGradient: ['#ffffff', '#F3E5F5'],
+        screenGradient: ['#DBEAFE', '#EFF6FF', '#F8FAFC'], // 화면 배경 그라디언트
+        cardGradient: ['#2563EB', '#1D4ED8', '#1E40AF'], // 카드 그라디언트
+
+        // UI Colors (블루 테마)
+        headerBackground: '#F0F7FF',
+        tabBarBackground: '#F0F7FF',
+        tabBarBorder: '#DBEAFE',
+        tabBarActive: '#2563EB',
+        tabBarInactive: '#64748B',
 
         // Interactive
         disabled: '#BDBDBD',

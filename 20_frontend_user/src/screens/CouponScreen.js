@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, FlatList, StyleSheet, TouchableOpacity, TextInput, ScrollView } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
+import { Feather } from '@expo/vector-icons';
 import { useTheme } from '../contexts/ThemeContext';
 import { formatCurrency } from '../utils/currency';
 import EmptyState from '../components/EmptyState';
@@ -148,6 +150,8 @@ export default function CouponScreen() {
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedCategory, setSelectedCategory] = useState('전체');
     const [showUsed, setShowUsed] = useState(false);
+    // ⭐ 쿠폰 1개 제한: 선택된 쿠폰 ID 관리
+    const [selectedCouponId, setSelectedCouponId] = useState(null);
 
     const categories = ['전체', '식비', '쇼핑', '편의점', '여가'];
 
@@ -223,25 +227,69 @@ export default function CouponScreen() {
     //     }
     // };
     // ============================================================
+    // ⭐ 쿠폰 선택 핸들러 (1개만 선택 가능)
+    const handleSelectCoupon = (coupon) => {
+        // 이미 선택된 쿠폰을 다시 누르면 선택 해제
+        if (selectedCouponId === coupon.id) {
+            setSelectedCouponId(null);
+            return;
+        }
+        
+        // 다른 쿠폰이 이미 선택되어 있으면 경고
+        if (selectedCouponId !== null) {
+            alert('⚠️ 쿠폰은 한 번에 1개만 선택 가능합니다!\n\n현재 선택된 쿠폰을 먼저 해제하거나 사용해주세요.');
+            return;
+        }
+        
+        // 쿠폰 선택
+        setSelectedCouponId(coupon.id);
+    };
+
+    // ⭐ 쿠폰 실제 사용 핸들러
     const handleUseCoupon = (coupon) => {
-        // 현재는 Mock 처리 (백엔드 연결 시 위 주석 참고하여 API 호출로 교체)
-        alert(`${coupon.merchant} 쿠폰 사용하기\n\n할인 금액: ${formatCurrency(coupon.discount)}\n최소 구매금액: ${formatCurrency(coupon.minPurchase)}\n\n실제 앱에서는 QR 코드나 바코드가 표시됩니다.`);
+        alert(`✅ ${coupon.merchant} 쿠폰 사용!\n\n할인 금액: ${formatCurrency(coupon.discount)}\n최소 구매금액: ${formatCurrency(coupon.minPurchase)}\n\n다음 소비에 자동 적용됩니다.`);
+        
+        // 쿠폰 상태를 used로 변경
+        setCoupons(prev => prev.map(c => 
+            c.id === coupon.id 
+                ? { ...c, status: 'used', usedDate: new Date().toISOString().split('T')[0] }
+                : c
+        ));
+        
+        // 선택 상태 초기화
+        setSelectedCouponId(null);
+    };
+
+    // ⭐ 선택 해제 핸들러
+    const handleDeselectCoupon = () => {
+        setSelectedCouponId(null);
     };
 
     const CouponCard = ({ item }) => {
         const isExpiringSoon = item.status === 'available' && item.daysLeft <= 7;
         const isUsed = item.status === 'used' || item.status === 'expired';
+        // ⭐ 선택 상태 체크
+        const isSelected = selectedCouponId === item.id;
 
         return (
             <TouchableOpacity
                 style={[
                     styles(colors).couponCard,
                     isUsed && styles(colors).couponCardUsed,
-                    isExpiringSoon && styles(colors).couponCardExpiring
+                    isExpiringSoon && styles(colors).couponCardExpiring,
+                    // ⭐ 선택된 쿠폰 하이라이트
+                    isSelected && styles(colors).couponCardSelected
                 ]}
-                onPress={() => !isUsed && handleUseCoupon(item)}
+                onPress={() => !isUsed && handleSelectCoupon(item)}
                 disabled={isUsed}
                 activeOpacity={0.7}>
+
+                {/* ⭐ 선택됨 배지 */}
+                {isSelected && (
+                    <View style={styles(colors).selectedBadge}>
+                        <Text style={styles(colors).selectedBadgeText}>✓ 선택됨</Text>
+                    </View>
+                )}
 
                 <View style={styles(colors).couponHeader}>
                     <Text style={styles(colors).couponIcon}>{item.icon}</Text>
@@ -253,7 +301,7 @@ export default function CouponScreen() {
                             {item.category}
                         </Text>
                     </View>
-                    {item.status === 'available' && (
+                    {item.status === 'available' && !isSelected && (
                         <View style={[
                             styles(colors).statusBadge,
                             isExpiringSoon && styles(colors).statusBadgeWarning
@@ -312,12 +360,38 @@ export default function CouponScreen() {
                     </View>
                 </View>
 
+                {/* ⭐ 버튼 영역: 선택 상태에 따라 다른 버튼 표시 */}
                 {item.status === 'available' && (
-                    <TouchableOpacity
-                        style={styles(colors).useCouponButton}
-                        onPress={() => handleUseCoupon(item)}>
-                        <Text style={styles(colors).useCouponButtonText}>사용하기</Text>
-                    </TouchableOpacity>
+                    <View style={styles(colors).couponButtonContainer}>
+                        {isSelected ? (
+                            <>
+                                <TouchableOpacity
+                                    style={styles(colors).useCouponButton}
+                                    onPress={() => handleUseCoupon(item)}>
+                                    <Text style={styles(colors).useCouponButtonText}>🎫 사용하기</Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity
+                                    style={styles(colors).deselectButton}
+                                    onPress={handleDeselectCoupon}>
+                                    <Text style={styles(colors).deselectButtonText}>선택 해제</Text>
+                                </TouchableOpacity>
+                            </>
+                        ) : (
+                            <TouchableOpacity
+                                style={[
+                                    styles(colors).selectCouponButton,
+                                    selectedCouponId !== null && styles(colors).selectCouponButtonDisabled
+                                ]}
+                                onPress={() => handleSelectCoupon(item)}>
+                                <Text style={[
+                                    styles(colors).selectCouponButtonText,
+                                    selectedCouponId !== null && styles(colors).selectCouponButtonTextDisabled
+                                ]}>
+                                    {selectedCouponId !== null ? '다른 쿠폰 선택됨' : '선택하기'}
+                                </Text>
+                            </TouchableOpacity>
+                        )}
+                    </View>
                 )}
             </TouchableOpacity>
         );
@@ -333,13 +407,18 @@ export default function CouponScreen() {
     );
 
     return (
-        <View style={styles(colors).container}>
+        <LinearGradient colors={colors.screenGradient} style={styles(colors).container}>
             {/* Header */}
             <View style={styles(colors).header}>
-                <Text style={styles(colors).title}>내 쿠폰</Text>
-                <Text style={styles(colors).subtitle}>
-                    사용 가능: {availableCoupons.length + expiringSoonCoupons.length}개
-                </Text>
+                <View>
+                    <Text style={styles(colors).title}>내 쿠폰</Text>
+                    <Text style={styles(colors).subtitle}>
+                        사용 가능: {availableCoupons.length + expiringSoonCoupons.length}개
+                    </Text>
+                </View>
+                <View style={styles(colors).headerIcon}>
+                    <Feather name="gift" size={24} color="#D97706" />
+                </View>
             </View>
 
             {/* Search Bar */}
@@ -432,27 +511,36 @@ export default function CouponScreen() {
                     />
                 )}
             </ScrollView>
-        </View>
+        </LinearGradient>
     );
 }
 
 const styles = (colors) => StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: colors.background
     },
 
     // Header
     header: {
-        padding: 20,
-        backgroundColor: colors.cardBackground,
-        borderBottomWidth: 1,
-        borderBottomColor: colors.border
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        paddingHorizontal: 24,
+        paddingVertical: 20,
+    },
+    headerIcon: {
+        width: 48,
+        height: 48,
+        borderRadius: 16,
+        backgroundColor: '#FEF3C7',
+        justifyContent: 'center',
+        alignItems: 'center',
     },
     title: {
-        fontSize: 24,
-        fontWeight: 'bold',
+        fontSize: 28,
+        fontWeight: '700',
         color: colors.text,
+        fontFamily: 'Inter_700Bold',
         marginBottom: 4
     },
     subtitle: {
@@ -465,9 +553,15 @@ const styles = (colors) => StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         backgroundColor: colors.cardBackground,
-        padding: 12,
-        borderBottomWidth: 1,
-        borderBottomColor: colors.border
+        marginHorizontal: 16,
+        marginBottom: 12,
+        padding: 14,
+        borderRadius: 16,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.06,
+        shadowRadius: 8,
+        elevation: 3,
     },
     searchIcon: { fontSize: 18, marginRight: 10 },
     searchInput: { flex: 1, fontSize: 15, color: colors.text, padding: 0 },
@@ -495,8 +589,8 @@ const styles = (colors) => StyleSheet.create({
         justifyContent: 'center'
     },
     categoryChipActive: {
-        backgroundColor: colors.primary,
-        borderColor: colors.primary
+        backgroundColor: '#2563EB',
+        borderColor: '#2563EB'
     },
     categoryChipText: {
         fontSize: 13,
@@ -526,7 +620,7 @@ const styles = (colors) => StyleSheet.create({
         color: colors.text
     },
     countBadge: {
-        backgroundColor: colors.primary,
+        backgroundColor: '#2563EB',
         paddingHorizontal: 8,
         paddingVertical: 2,
         borderRadius: 10
@@ -542,16 +636,19 @@ const styles = (colors) => StyleSheet.create({
         backgroundColor: colors.cardBackground,
         marginHorizontal: 16,
         marginBottom: 12,
-        borderRadius: 12,
+        borderRadius: 16,
         overflow: 'hidden',
-        borderWidth: 1,
-        borderColor: colors.border
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.06,
+        shadowRadius: 8,
+        elevation: 3,
     },
     couponCardUsed: {
         opacity: 0.6
     },
     couponCardExpiring: {
-        borderColor: '#ffc107',
+        borderColor: '#3B82F6',
         borderWidth: 2
     },
 
@@ -579,13 +676,13 @@ const styles = (colors) => StyleSheet.create({
     },
 
     statusBadge: {
-        backgroundColor: '#28a745',
+        backgroundColor: '#059669',
         paddingHorizontal: 10,
         paddingVertical: 4,
         borderRadius: 12
     },
     statusBadgeWarning: {
-        backgroundColor: '#ffc107'
+        backgroundColor: '#3B82F6'
     },
     statusBadgeText: {
         color: '#fff',
@@ -593,10 +690,10 @@ const styles = (colors) => StyleSheet.create({
         fontWeight: 'bold'
     },
     statusBadgeTextWarning: {
-        color: '#000'
+        color: '#fff'
     },
     statusBadgeUsed: {
-        backgroundColor: '#6c757d',
+        backgroundColor: '#6B7280',
         paddingHorizontal: 10,
         paddingVertical: 4,
         borderRadius: 12
@@ -607,7 +704,7 @@ const styles = (colors) => StyleSheet.create({
         fontWeight: 'bold'
     },
     statusBadgeExpired: {
-        backgroundColor: '#dc3545',
+        backgroundColor: '#EF4444',
         paddingHorizontal: 10,
         paddingVertical: 4,
         borderRadius: 12
@@ -646,8 +743,8 @@ const styles = (colors) => StyleSheet.create({
     },
     couponDiscount: {
         fontSize: 20,
-        fontWeight: 'bold',
-        color: colors.primary
+        fontWeight: '700',
+        color: '#2563EB'
     },
     couponDetailValue: {
         fontSize: 14,
@@ -656,14 +753,16 @@ const styles = (colors) => StyleSheet.create({
     },
 
     useCouponButton: {
-        backgroundColor: colors.primary,
-        padding: 16,
-        alignItems: 'center'
+        flex: 1,
+        backgroundColor: '#2563EB',
+        padding: 14,
+        alignItems: 'center',
+        borderRadius: 12,
     },
     useCouponButtonText: {
         color: '#fff',
         fontSize: 16,
-        fontWeight: 'bold'
+        fontWeight: '700'
     },
 
     textMuted: {
@@ -690,5 +789,68 @@ const styles = (colors) => StyleSheet.create({
     usedToggleIcon: {
         fontSize: 14,
         color: colors.textSecondary
+    },
+
+    // ⭐ 쿠폰 1개 제한 관련 스타일
+    couponCardSelected: {
+        borderColor: '#10B981',
+        borderWidth: 3,
+        backgroundColor: '#ECFDF5'
+    },
+    selectedBadge: {
+        position: 'absolute',
+        top: 12,
+        right: 12,
+        backgroundColor: '#10B981',
+        paddingHorizontal: 10,
+        paddingVertical: 4,
+        borderRadius: 12,
+        zIndex: 1
+    },
+    selectedBadgeText: {
+        color: '#FFFFFF',
+        fontSize: 12,
+        fontWeight: 'bold'
+    },
+    couponButtonContainer: {
+        flexDirection: 'row',
+        paddingHorizontal: 16,
+        paddingBottom: 16,
+        gap: 10
+    },
+    selectCouponButton: {
+        flex: 1,
+        backgroundColor: '#E0E7FF',
+        padding: 16,
+        alignItems: 'center',
+        borderRadius: 12,
+        borderWidth: 2,
+        borderColor: '#2563EB'
+    },
+    selectCouponButtonText: {
+        color: '#2563EB',
+        fontSize: 16,
+        fontWeight: '700'
+    },
+    selectCouponButtonDisabled: {
+        backgroundColor: '#F3F4F6',
+        borderColor: '#D1D5DB'
+    },
+    selectCouponButtonTextDisabled: {
+        color: '#9CA3AF'
+    },
+    deselectButton: {
+        flex: 1,
+        backgroundColor: '#FEE2E2',
+        padding: 14,
+        alignItems: 'center',
+        borderRadius: 12,
+        borderWidth: 1,
+        borderColor: '#FECACA'
+    },
+    deselectButtonText: {
+        color: '#DC2626',
+        fontSize: 16,
+        fontWeight: '600'
     }
 });
