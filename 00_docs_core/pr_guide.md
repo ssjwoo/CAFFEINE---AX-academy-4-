@@ -1,24 +1,24 @@
-🔥 1. 브랜치 전략 (Git Flow 기반)
+ 1. 브랜치 전략 (Git Flow 기반)
 ```
-main        ← 최종 배포용 브랜치
-develop     ← 팀 개발 통합 브랜치
-feature/*   ← 개인이 기능 개발하는 브랜치
-hotfix/*    ← 오류 긴급 수정할 때
+main         최종 배포용 브랜치
+develop      팀 개발 통합 브랜치
+feature/*    개인이 기능 개발하는 브랜치
+hotfix/*     오류 긴급 수정할 때
 ```
-✔ main 브랜치
+ main 브랜치
 
 배포 가능한 안정된 코드만 존재
 
 PR을 통해서만 merge 가능
 (직접 push 금지)
 
-✔ develop 브랜치
+ develop 브랜치
 
 모든 기능 개발(feature 브랜치)이 합쳐지는 공용 개발 브랜치
 
 테스트 환경 구성용
 
-✔ feature 브랜치
+ feature 브랜치
 
 개인 기능 개발용 브랜치
 예시:
@@ -33,18 +33,18 @@ feature/llm-category
 ```
 git checkout -b feature/login develop
 ```
-✔ hotfix 브랜치
+ hotfix 브랜치
 
 main에서 즉시 수정해야 하는 버그를 고칠 때 사용
 
-🔥 2. PR(Pull Request) 규칙
-✔ PR 목적
+ 2. PR(Pull Request) 규칙
+ PR 목적
 
 다른 팀원에게
 “내 기능을 develop/main 브랜치에 merge 해도 될까요?”
 라고 요청하는 절차.
 
-✔ PR 생성 조건
+ PR 생성 조건
 
 기능 개발이 완료되었을 때
 
@@ -52,11 +52,11 @@ main에서 즉시 수정해야 하는 버그를 고칠 때 사용
 
 커밋 메시지가 명확할 때
 
-✔ PR 생성 방법
+ PR 생성 방법
 
 feature 브랜치 작업 후 push
 
-GitHub → Pull Request → New Pull Request
+GitHub  Pull Request  New Pull Request
 
 base = develop, compare = feature/* 선택
 
@@ -66,13 +66,13 @@ base = develop, compare = feature/* 선택
 
 승인(Approve) 후 merge
 
-🔥 3. PR 작성 템플릿 (README에 포함 추천)
+ 3. PR 작성 템플릿 (README에 포함 추천)
 
 아래 내용을 GitHub PR Template으로 추가하면 팀원이 자동으로 보게 됨.
 ```
-# 📝 PR 내용
+#  PR 내용
 
-## 📌 작업 내용
+##  작업 내용
 - [ ] 기능 추가
 - [ ] 버그 수정
 - [ ] 리팩토링
@@ -82,17 +82,17 @@ base = develop, compare = feature/* 선택
 
 ---
 
-## 📌 테스트 방법
+##  테스트 방법
 - [ ] 로컬에서 docker-compose up 동작 확인
 - [ ] API 정상 호출 확인
 - [ ] 프론트/백엔드 연동 테스트 완료
 
 ---
 
-## 📌 확인 요청
-리뷰 부탁드립니다 🙏
+##  확인 요청
+리뷰 부탁드립니다 
 ```
-🔥 4. 커밋 규칙
+ 4. 커밋 규칙
 ```
 feat: 로그인 API 구현
 fix: CORS 오류 해결
@@ -101,7 +101,7 @@ refactor: 폴더 구조 개선
 style: 포맷팅 적용
 chore: 설정 파일 수정
 ```
-🔥 5. 팀 공통 Git 사용 흐름
+ 5. 팀 공통 Git 사용 흐름
 1) develop 최신 코드 받기
 ```
 git checkout develop

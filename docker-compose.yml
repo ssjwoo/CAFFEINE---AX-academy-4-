@@ -12,7 +12,7 @@ services:
       POSTGRES_PASSWORD: caffeineapprds
       POSTGRES_DB: caffeine_db
     ports:
-      - "5432:5432"
+      - "5434:5432"
     volumes:
       - ./postgres_data:/var/lib/postgresql/data
     healthcheck:
@@ -25,7 +25,8 @@ services:
   # FastAPI 백엔드
   # ============================================================
   backend:
-    build: ./10_backend
+    # build: ./10_backend
+    image: caffeine-backend:latest
     container_name: caf_backend
     depends_on:
       db:
@@ -67,7 +68,8 @@ services:
   # 프론트엔드 (관리자)
   # ============================================================
   admin_front:
-    build: ./21_frontend_admin
+    # build: ./21_frontend_admin
+    image: caffeine-admin-front:latest
     container_name: caf_front_admin
     ports:
       - "3001:3000"
@@ -78,7 +80,8 @@ services:
   # Nginx (리버스 프록시)
   # ============================================================
   nginx:
-    build: ./30_nginx
+    # build: ./30_nginx
+    image: caffeine-nginx:latest
     container_name: caf_nginx
     ports:
       - "80:80"
@@ -89,7 +92,8 @@ services:
   # ML 서비스
   # ============================================================
   ml_next:
-    build: ./40_ml_next
+    # build: ./40_ml_next
+    image: caffeine-ml-next:latest
     container_name: caf_ml_next
     ports:
       - "9001:9001"
@@ -104,23 +108,26 @@ services:
       # S3_BUCKET: caffeine-ml-models
       # MODEL_KEY: models/model.joblib
 
-      # ml_fraud:
-      #   build: ./41_ml_fraud
-      #   container_name: caf_ml_fraud
-      #   ports:
-      #     - "9002:9002"
+  ml_fraud:
+    build: ./41_ml_fraud
+    container_name: caf_ml_fraud
+    ports:
+      - "9002:9002"
 
-      # ============================================================
-      # LLM 서비스
-      # # ============================================================
-      # llm_category:
-      #   build: ./50_llm_category
-      #   container_name: caf_llm_category
-      #   ports:
-      #     - "9100:9100"
+  # ============================================================
+  # LLM 서비스
+  # ============================================================
+  llm_category:
+    build: ./50_llm_category
+    container_name: caf_llm_category
+    ports:
+      - "9100:9100"
 
-      # llm_analysis:
-      #   build: ./51_llm_analysis
-      #   container_name: caf_llm_analysis
-      #   ports:
-      #     - "9102:9101"
+  llm_analysis:
+    # build: ./51_llm_analysis
+    image: caffeine-llm-analysis:latest
+    container_name: caf_llm_analysis
+    ports:
+      - "9102:9102"
+    environment:
+      GEMINI_API_KEY: AIzaSyDQ4GpW4Vs6eyYvqFi_GNevT5v9Bx50zhM

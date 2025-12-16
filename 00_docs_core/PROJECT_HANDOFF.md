@@ -1,7 +1,7 @@
-# 🚀 Caffeine App - Project Handoff Document
+#  Caffeine App - Project Handoff Document
 ## 다른 기기에서 작업 이어하기 가이드
 
-> **📌 목적**: 이 문서는 프로젝트를 다른 컴퓨터나 개발자에게 인계할 때 필요한 모든 정보를 담고 있습니다.
+> ** 목적**: 이 문서는 프로젝트를 다른 컴퓨터나 개발자에게 인계할 때 필요한 모든 정보를 담고 있습니다.
 
 **마지막 업데이트**: 2024-12-01  
 **프로젝트 버전**: 1.0.0 (Frontend Complete)  
@@ -9,7 +9,7 @@
 
 ---
 
-## 📚 목차
+##  목차
 
 1. [프로젝트 개요](#1-프로젝트-개요)
 2. [빠른 시작](#2-빠른-시작)
@@ -34,7 +34,7 @@
 사용자의 카드 거래를 분석하고 이상 거래를 탐지하는 React Native(Expo) 앱
 
 ### 현재 상태
-✅ **프론트엔드 100% 완성**
+ **프론트엔드 100% 완성**
 - 모든 UI 화면 구현 완료
 - Mock 데이터로 동작
 - 백엔드 연결 준비 완료
@@ -103,130 +103,130 @@ npm start
 ```
 caffeine-app/
 │
-├── 📁 src/                          # 소스 코드
-│   ├── 📁 contexts/                 # Context API (전역 상태)
-│   │   ├── AuthContext.js          # ⭐ 인증 (상세 주석)
+├──  src/                          # 소스 코드
+│   ├──  contexts/                 # Context API (전역 상태)
+│   │   ├── AuthContext.js          #  인증 (상세 주석)
 │   │   └── ThemeContext.js         # 테마/다크모드
 │   │
-│   ├── 📁 screens/                  # 화면 컴포넌트
+│   ├──  screens/                  # 화면 컴포넌트
 │   │   ├── LoginScreen.js          # 로그인
 │   │   ├── SignupScreen.js         # 회원가입
-│   │   ├── DashboardScreen.js      # 🔴 대시보드 (백엔드 중요)
-│   │   ├── TransactionScreen.js    # 🔴 거래내역 (백엔드 중요)
-│   │   ├── AnomalyDetectionScreen.js # 🔴 이상탐지 (백엔드 중요)
+│   │   ├── DashboardScreen.js      #  대시보드 (백엔드 중요)
+│   │   ├── TransactionScreen.js    #  거래내역 (백엔드 중요)
+│   │   ├── AnomalyDetectionScreen.js #  이상탐지 (백엔드 중요)
 │   │   └── ProfileScreen.js        # 프로필/설정
 │   │
-│   └── 📁 components/               # 재사용 컴포넌트
+│   └──  components/               # 재사용 컴포넌트
 │       ├── EmptyState.js           # 빈 상태 UI
 │       └── SkeletonCard.js         # 로딩 UI
 │
-├── 📄 App.js                        # 앱 진입점
-├── 📄 package.json                  # 패키지 목록
-├── 📄 app.json                      # Expo 설정
+├──  App.js                        # 앱 진입점
+├──  package.json                  # 패키지 목록
+├──  app.json                      # Expo 설정
 │
-├── 📖 README.md                     # 프로젝트 소개
-├── 📖 BACKEND_INTEGRATION_GUIDE.md # ⭐ 백엔드 연결 가이드
-└── 📖 PROJECT_HANDOFF.md           # ⭐ 이 문서 (작업 인계 가이드)
+├──  README.md                     # 프로젝트 소개
+├──  BACKEND_INTEGRATION_GUIDE.md #  백엔드 연결 가이드
+└──  PROJECT_HANDOFF.md           #  이 문서 (작업 인계 가이드)
 ```
 
 ### 중요 파일 설명
 
 | 파일 | 역할 | 우선순위 |
 |------|------|---------|
-| `src/contexts/AuthContext.js` | 인증 관리, 상세 주석 있음 | ⭐⭐⭐ |
-| `BACKEND_INTEGRATION_GUIDE.md` | 백엔드 연결 완벽 가이드 | ⭐⭐⭐ |
-| `src/screens/DashboardScreen.js` | 대시보드, Mock 데이터 많음 | ⭐⭐ |
-| `src/screens/TransactionScreen.js` | 거래내역, 검색 기능 | ⭐⭐ |
-| `App.js` | Navigation 설정 | ⭐ |
+| `src/contexts/AuthContext.js` | 인증 관리, 상세 주석 있음 |  |
+| `BACKEND_INTEGRATION_GUIDE.md` | 백엔드 연결 완벽 가이드 |  |
+| `src/screens/DashboardScreen.js` | 대시보드, Mock 데이터 많음 |  |
+| `src/screens/TransactionScreen.js` | 거래내역, 검색 기능 |  |
+| `App.js` | Navigation 설정 |  |
 
 ---
 
 ## 4. 완성된 기능
 
-### 4.1 인증 시스템 ✅
+### 4.1 인증 시스템 
 
 **파일**: `src/contexts/AuthContext.js`, `LoginScreen.js`, `SignupScreen.js`
 
 **기능**:
-- ✅ 로그인 (Mock)
-- ✅ 회원가입 (Mock)
-- ✅ 로그아웃
-- ✅ 자동 로그인 (AsyncStorage)
-- ✅ 비밀번호 표시/숨김 토글 (👁️)
+-  로그인 (Mock)
+-  회원가입 (Mock)
+-  로그아웃
+-  자동 로그인 (AsyncStorage)
+-  비밀번호 표시/숨김 토글 ()
 
 **현재 상태**:
 - Mock 인증 (가짜 데이터)
 - AsyncStorage에만 저장
-- 🔴 **백엔드 API 필요**
+-  **백엔드 API 필요**
 
-### 4.2 Dashboard ✅
+### 4.2 Dashboard 
 
 **파일**: `src/screens/DashboardScreen.js`
 
 **기능**:
-- ✅ 요약 카드 (총 소비, 평균 거래액 등)
-- ✅ 월별 추이 LineChart
-- ✅ 카테고리별 PieChart
-- ✅ AI 인사이트 섹션
-- ✅ Pull-to-Refresh
-- ✅ 인터랙티브 카드
+-  요약 카드 (총 소비, 평균 거래액 등)
+-  월별 추이 LineChart
+-  카테고리별 PieChart
+-  AI 인사이트 섹션
+-  Pull-to-Refresh
+-  인터랙티브 카드
 
 **현재 상태**:
 - Mock 데이터 사용 (Line 6-24)
-- 🔴 **3개 API 필요**: summary, monthly-stats, category-stats
+-  **3개 API 필요**: summary, monthly-stats, category-stats
 
-### 4.3 거래내역 ✅
+### 4.3 거래내역 
 
 **파일**: `src/screens/TransactionScreen.js`
 
 **기능**:
-- ✅ 거래 목록 표시
-- ✅ 🔍 실시간 검색
-- ✅ 상세 정보 Modal
-- ✅ 메모 편집
-- ✅ 신용/체크 카드 구분
-- ✅ Empty State (검색 결과 없을 때)
-- ✅ 이상거래로 표시 기능
+-  거래 목록 표시
+-   실시간 검색
+-  상세 정보 Modal
+-  메모 편집
+-  신용/체크 카드 구분
+-  Empty State (검색 결과 없을 때)
+-  이상거래로 표시 기능
 
 **현재 상태**:
 - Mock 데이터 8개 거래 (Line 6-15)
-- 🔴 **API 필요**: GET /transactions, PATCH /note, POST /mark-anomaly
+-  **API 필요**: GET /transactions, PATCH /note, POST /mark-anomaly
 
-### 4.4 이상 탐지 ✅
+### 4.4 이상 탐지 
 
 **파일**: `src/screens/AnomalyDetectionScreen.js`
 
 **기능**:
-- ✅ 의심 거래 목록
-- ✅ 위험 수준 (높음/중간/낮음)
-- ✅ 상세 정보 Modal
-- ✅ 정상 거래로 표시
-- ✅ 카드 정지 요청
-- ✅ Empty State (의심 거래 없을 때)
+-  의심 거래 목록
+-  위험 수준 (높음/중간/낮음)
+-  상세 정보 Modal
+-  정상 거래로 표시
+-  카드 정지 요청
+-  Empty State (의심 거래 없을 때)
 
 **현재 상태**:
 - Mock 데이터 3개 (Line 5-9)
-- 🔴 **API 필요**: GET /anomalies, POST /mark-normal, POST /block-card
+-  **API 필요**: GET /anomalies, POST /mark-normal, POST /block-card
 
-### 4.5 프로필 ✅
+### 4.5 프로필 
 
 **파일**: `src/screens/ProfileScreen.js`
 
 **기능**:
-- ✅ 사용자 정보 표시
-- ✅ 다크모드 토글
-- ✅ 데이터 내보내기 (Mock alert)
-- ✅ 데이터 동기화 (Mock alert)
-- ✅ 캐시 삭제
-- ✅ 앱 정보
-- ✅ 약관/개인정보
-- ✅ 로그아웃
+-  사용자 정보 표시
+-  다크모드 토글
+-  데이터 내보내기 (Mock alert)
+-  데이터 동기화 (Mock alert)
+-  캐시 삭제
+-  앱 정보
+-  약관/개인정보
+-  로그아웃
 
 **현재 상태**:
 - Mock 알림만 표시
-- 🔴 **API 필요**: GET /users/me, GET /export-data, POST /sync
+-  **API 필요**: GET /users/me, GET /export-data, POST /sync
 
-### 4.6 공통 컴포넌트 ✅
+### 4.6 공통 컴포넌트 
 
 **EmptyState** (`src/components/EmptyState.js`):
 - 빈 상태 UI
@@ -296,8 +296,8 @@ caffeine-app/
 
 | 소프트웨어 | 버전 | 필수 | 다운로드 |
 |-----------|------|------|----------|
-| Node.js | 18.x 이상 | ✅ 필수 | https://nodejs.org/ |
-| npm | 9.x 이상 | ✅ 필수 | Node.js 포함 |
+| Node.js | 18.x 이상 |  필수 | https://nodejs.org/ |
+| npm | 9.x 이상 |  필수 | Node.js 포함 |
 | Git | 최신 | 선택 | https://git-scm.com/ |
 | VS Code | 최신 | 권장 | https://code.visualstudio.com/ |
 
@@ -312,7 +312,7 @@ caffeine-app/
 
 ### 6.3 환경 변수 (필요 시)
 
-📁 `.env` (아직 생성 안 됨, 백엔드 연결 시 필요)
+ `.env` (아직 생성 안 됨, 백엔드 연결 시 필요)
 
 ```env
 API_BASE_URL=https://your-api.com/api
@@ -380,16 +380,16 @@ npx eas build --platform ios
 
 ## 8. Mock 데이터 위치
 
-> 🔴 **중요**: 백엔드 연결 시 이 데이터를 API 호출로 교체해야 합니다!
+>  **중요**: 백엔드 연결 시 이 데이터를 API 호출로 교체해야 합니다!
 
 ### 8.1 AuthContext (인증)
 
-📁 `src/contexts/AuthContext.js`
+ `src/contexts/AuthContext.js`
 
 **Line 35-49**: `login` 함수
 ```javascript
 const login = async (email, password) => {
-    // ⚠️ Mock 로그인 - 백엔드 API로 교체 필요!
+    //  Mock 로그인 - 백엔드 API로 교체 필요!
     if (email && password) {
         const userData = { id: 1, name: '홍길동', email, ... };
         // ...
@@ -400,7 +400,7 @@ const login = async (email, password) => {
 **Line 51-65**: `signup` 함수
 ```javascript
 const signup = async (name, email, password) => {
-    // ⚠️ Mock 회원가입 - 백엔드 API로 교체 필요!
+    //  Mock 회원가입 - 백엔드 API로 교체 필요!
     const userData = { id: Date.now(), name, email, ... };
     // ...
 };
@@ -408,7 +408,7 @@ const signup = async (name, email, password) => {
 
 ### 8.2 Dashboard
 
-📁 `src/screens/DashboardScreen.js`
+ `src/screens/DashboardScreen.js`
 
 **Line 6-24**: `MOCK_DATA`
 ```javascript
@@ -430,7 +430,7 @@ const MOCK_DATA = {
 
 ### 8.3 Transaction (거래내역)
 
-📁 `src/screens/TransactionScreen.js`
+ `src/screens/TransactionScreen.js`
 
 **Line 6-15**: `MOCK_TRANSACTIONS`
 ```javascript
@@ -445,7 +445,7 @@ const MOCK_TRANSACTIONS = [
 
 ### 8.4 Anomaly (이상탐지)
 
-📁 `src/screens/AnomalyDetectionScreen.js`
+ `src/screens/AnomalyDetectionScreen.js`
 
 **Line 5-9**: `MOCK_ANOMALIES`
 ```javascript
@@ -462,7 +462,7 @@ const MOCK_ANOMALIES = [
 
 ## 9. 다음 작업
 
-### 9.1 우선순위 1: 백엔드 개발 🔴
+### 9.1 우선순위 1: 백엔드 개발 
 
 **필요한 API 엔드포인트** (17개):
 
@@ -495,7 +495,7 @@ const MOCK_ANOMALIES = [
 16. `POST /ai/analyze-transaction` - 거래 분석
 17. `GET /ai/insights` - AI 인사이트
 
-**→ 상세 스펙: BACKEND_INTEGRATION_GUIDE.md**
+** 상세 스펙: BACKEND_INTEGRATION_GUIDE.md**
 
 ### 9.2 우선순위 2: 백엔드 연결
 
@@ -525,7 +525,7 @@ export default apiClient;
 - TransactionScreen
 - AnomalyDetectionScreen
 
-**→ 상세 가이드: BACKEND_INTEGRATION_GUIDE.md**
+** 상세 가이드: BACKEND_INTEGRATION_GUIDE.md**
 
 ### 9.3 우선순위 3: 추가 기능 (선택)
 
@@ -567,14 +567,14 @@ CMD ["npm", "start"]
 
 ## 10. 중요 문서
 
-### 10.1 필수 문서 📖
+### 10.1 필수 문서 
 
 | 문서 | 용도 | 우선순위 |
 |------|------|---------|
-| [BACKEND_INTEGRATION_GUIDE.md](./BACKEND_INTEGRATION_GUIDE.md) | 백엔드 연결 완벽 가이드 | ⭐⭐⭐ |
-| [PROJECT_HANDOFF.md](./PROJECT_HANDOFF.md) | 프로젝트 인계 (이 문서) | ⭐⭐⭐ |
-| [README.md](./README.md) | 프로젝트 소개 | ⭐⭐ |
-| [src/contexts/AuthContext.js](./src/contexts/AuthContext.js) | 상세 주석 예시 | ⭐⭐ |
+| [BACKEND_INTEGRATION_GUIDE.md](./BACKEND_INTEGRATION_GUIDE.md) | 백엔드 연결 완벽 가이드 |  |
+| [PROJECT_HANDOFF.md](./PROJECT_HANDOFF.md) | 프로젝트 인계 (이 문서) |  |
+| [README.md](./README.md) | 프로젝트 소개 |  |
+| [src/contexts/AuthContext.js](./src/contexts/AuthContext.js) | 상세 주석 예시 |  |
 
 ### 10.2 Artifact 문서 (참고용)
 
@@ -741,33 +741,33 @@ web-build/
 
 ## 15. 요약
 
-### ✅ 완성된 것
-- 🎨 전체 Frontend UI
-- 🔐 인증 시스템 (Mock)
-- 📊 Dashboard
-- 💳 거래내역 + 검색
-- ⚠️ 이상 탐지
-- ⚙️ 프로필/설정
-- 🌙 다크모드
-- 📖 완벽한 백엔드 연결 가이드
-- 📝 상세 주석 (AuthContext)
+###  완성된 것
+-  전체 Frontend UI
+-  인증 시스템 (Mock)
+-  Dashboard
+-  거래내역 + 검색
+-  이상 탐지
+-  프로필/설정
+-  다크모드
+-  완벽한 백엔드 연결 가이드
+-  상세 주석 (AuthContext)
 
 ### ⏳ 필요한 것
-- 🔴 Backend API 개발
-- 🔴 데이터베이스 설정
-- 🔴 Mock 데이터 → API 연결
-- 🔴 Docker 설정
-- 🔴 배포
+-  Backend API 개발
+-  데이터베이스 설정
+-  Mock 데이터  API 연결
+-  Docker 설정
+-  배포
 
-### 📖 핵심 문서
+###  핵심 문서
 1. **BACKEND_INTEGRATION_GUIDE.md** - API 연결 가이드
 2. **PROJECT_HANDOFF.md** - 이 문서
 3. **AuthContext.js** - 상세 주석 예시
 
 ---
 
-**🎉 프론트엔드 개발 완료!**
-**🚀 다음: 백엔드 개발**
+** 프론트엔드 개발 완료!**
+** 다음: 백엔드 개발**
 
 ---
 
