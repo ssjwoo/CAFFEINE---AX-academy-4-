@@ -32,6 +32,10 @@ class User(Base):
     group = relationship("UserGroup", back_populates="users")
     login_histories = relationship("LoginHistory", back_populates="user", cascade="all, delete-orphan")
 
+    @property
+    def is_superuser(self) -> bool:
+        return self.role == "ADMIN"
+
     def __repr__(self):
         return f"<User(id={self.id}, email='{self.email}', name='{self.name}')>"
 

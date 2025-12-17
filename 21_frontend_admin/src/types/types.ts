@@ -45,16 +45,17 @@ export interface Transaction {
     category: string;
     transaction_date: string;
     description?: string;
-    status: string;
+    status: 'completed' | 'pending' | 'failed' | 'cancelled';
     currency: string;
 }
 
 export interface TransactionListResponse {
+    transactions: Transaction[];
     total: number;
     page: number;
     page_size: number;
-    transactions: Transaction[];
-    data_source: string;
+    total_pages: number;
+    data_source?: string;
 }
 
 export interface TransactionStats {
@@ -72,4 +73,15 @@ export interface TransactionFilters {
     max_amount?: number;
     search?: string;
     status?: string;
+}
+
+export interface NotificationSettings {
+    anomalyDetection: boolean;
+    reports: boolean;
+    threshold: number;
+    recipientEmail?: string | null;
+}
+
+export interface SettingsResponse {
+    notifications: NotificationSettings;
 }

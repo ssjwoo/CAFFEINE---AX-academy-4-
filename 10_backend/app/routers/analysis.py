@@ -39,6 +39,7 @@ class DashboardSummary(BaseModel):
     transaction_count: int
     top_category: str
     month_over_month_change: float
+    transaction_count_mom_change: float = 0.0  # Added field
     data_source: str = "DB"
 
 
@@ -78,7 +79,7 @@ class AnalysisResponse(BaseModel):
 def get_mock_summary() -> DashboardSummary:
     return DashboardSummary(
         total_spending=1250000, average_transaction=25000, transaction_count=50,
-        top_category="외식", month_over_month_change=-5.2, data_source="[MOCK]"
+        top_category="외식", month_over_month_change=-5.2, transaction_count_mom_change=8.3, data_source="[MOCK]"
     )
 
 def get_mock_category_breakdown() -> List[CategoryBreakdown]:
@@ -155,6 +156,7 @@ async def get_dashboard_summary(
             transaction_count=count,
             top_category=top_category or "없음",
             month_over_month_change=0.0,  # 간단화
+            transaction_count_mom_change=0.0,  # 간단화
             data_source="DB (AWS RDS)"
         )
         

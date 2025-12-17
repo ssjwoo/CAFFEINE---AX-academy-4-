@@ -39,7 +39,7 @@ def load_model():
             return
 
         model = joblib.load(model_path)
-        logger.info(f"✅ XGBoost 모델 로드 완료: {os.path.basename(model_path)}")
+        logger.info(f"XGBoost model loaded: {os.path.basename(model_path)}")
         
     except Exception as e:
         logger.error(f"Failed to load model: {e}")

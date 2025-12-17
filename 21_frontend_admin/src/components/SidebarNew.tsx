@@ -3,7 +3,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, Users, CreditCard, PieChart, FileText, Settings, AlertTriangle } from 'lucide-react';
+import { LayoutDashboard, Users, PieChart, FileText, Settings, AlertTriangle } from 'lucide-react';
 import { clsx } from 'clsx';
 
 interface MenuItem {
@@ -15,8 +15,6 @@ interface MenuItem {
 
 const menuItems: MenuItem[] = [
     { name: '대시보드', href: '/', icon: LayoutDashboard },
-    { name: '사용자 관리', href: '/users', icon: Users },
-    { name: '거래 관리', href: '/transactions', icon: CreditCard },
     { name: '소비 분석', href: '/consumption', icon: PieChart },
     { name: '이상 거래 탐지', href: '/consumption/anomalies', icon: AlertTriangle },
     { name: '분석 요약', href: '/summary', icon: FileText },

@@ -60,7 +60,7 @@ async def capture():
             print("Capturing Mobile App pages...")
             
             # 1. 메인 화면
-            await mobile_page.goto("http://localhost:8081", timeout=20000)
+            await mobile_page.goto("http://localhost:8001", timeout=20000)
             await mobile_page.wait_for_timeout(5000)
             await mobile_page.screenshot(path="80_psh/screenshots/app_main.png")
             print("  - app_main.png")

@@ -85,11 +85,13 @@ CLOUDFRONT_URL = "https://d26uyg5darllja.cloudfront.net"
 LOCAL_ORIGINS = [
     "http://localhost:3000",
     "http://localhost:3001",
-    "http://localhost:8081",
+    "http://localhost:8001",
     "http://localhost:8082",
     "http://localhost:8080",
     "http://localhost:19000",
-    "http://localhost:19006"
+    "http://localhost:19006",
+    "http://127.0.0.1:3000",
+    "http://127.0.0.1:8001",
 ]
 
 allowed_origins = LOCAL_ORIGINS + [CLOUDFRONT_URL]
@@ -206,7 +208,8 @@ async def health(request: Request):
 # ============================================================
 # 라우터 등록
 # ============================================================
-from app.routers import ml, analysis, transactions
+from app.routers import ml, analysis, transactions, reports, settings, user
+from app.services.scheduler import start_scheduler, shutdown_scheduler
 
 # ML 예측 API (/ml/*)
 app.include_router(ml.router)
@@ -216,6 +219,15 @@ app.include_router(analysis.router)
 
 # 거래 내역 API (/api/transactions/*)
 app.include_router(transactions.router)
+
+# 사용자 API (/users/*)
+app.include_router(user.router)
+
+# 리포트 API (/api/reports/*)
+app.include_router(reports.router)
+
+# 설정 API (/api/settings/*)
+app.include_router(settings.router)
 
 # ============================================================
 # 시작 / 종료 이벤트
@@ -227,12 +239,15 @@ async def startup_event():
     애플리케이션 시작 시 실행되는 이벤트 핸들러
     """
     logger.info("=" * 60)
-    logger.info("🚀 Caffeine API 시작됨")
-    logger.info(f"환경: {os.getenv('ENVIRONMENT', 'development')}")
-    logger.info(f"CORS 허용 도메인: {allowed_origins}")
+    logger.info("Caffeine API Started")
+    logger.info(f"Environment: {os.getenv('ENVIRONMENT', 'development')}")
+    logger.info(f"Allowed Origins: {allowed_origins}")
     
     # ML 모델 로드
     ml.load_model()
+
+    # 스케줄러 시작 (리포트 자동 발송)
+    start_scheduler()
     
     logger.info("=" * 60)
 
@@ -247,7 +262,7 @@ async def shutdown_event():
     - 리소스 정리 (추후 추가)
     """
     logger.info("=" * 60)
-    logger.info("🛑 Caffeine API 종료됨")
+    logger.info("Caffeine API Stopped")
     logger.info("=" * 60)
 
 # ============================================================

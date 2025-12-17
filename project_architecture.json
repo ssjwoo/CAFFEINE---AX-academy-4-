@@ -13,7 +13,7 @@
                 "framework": "Expo (React Native)",
                 "language": "JavaScript",
                 "directory": "20_frontend_user",
-                "port": 8081,
+                "port": 8001,
                 "docker": false,
                 "features": [
                     "거래 내역 조회",

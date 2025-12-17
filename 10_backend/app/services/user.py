@@ -39,17 +39,20 @@ async def login_user(
     # 로그인 시간 업데이트
     await user_crud.update_user_login_timestamp(db, user.id)
 
-    # 로그인 이력 기록
-    await user_crud.create_login_history(
-        db,
-        LoginHistoryCreate(
-            user_id=user.id,
-            ip_address=ip_address,
-            user_agent=user_agent,
-            device_info=device_info,
-            is_success=True,
-        ),
-    )
+    # 로그인 이력 기록 (선택적 - 실패해도 로그인은 성공)
+    try:
+        await user_crud.create_login_history(
+            db,
+            LoginHistoryCreate(
+                user_id=user.id,
+                ip_address=ip_address,
+                user_agent=user_agent,
+                device_info=device_info,
+                is_success=True,
+            ),
+        )
+    except Exception as e:
+        print(f"Warning: Failed to create login history: {e}")
 
     return {
         "user": user,
