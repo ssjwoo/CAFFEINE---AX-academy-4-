@@ -1,212 +1,55 @@
-2025-12-17 11:51:14,454 - app.main - INFO - ============================================================
-2025-12-17 11:51:14,454 - app.main - INFO - Caffeine API started
-2025-12-17 11:51:14,455 - app.main - INFO - Environment: development
-2025-12-17 11:51:14,456 - app.main - INFO - CORS Allowed Origins: ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:8081', 'http://localhost:8082', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006', 'https://d26uyg5darllja.cloudfront.net']
-2025-12-17 11:51:15,805 - app.routers.ml - INFO - XGBoost model loaded: model_xgboost_acc_73.47.joblib
-2025-12-17 11:51:15,991 - apscheduler.scheduler - INFO - Adding job tentatively -- it will be properly scheduled when the scheduler starts
-2025-12-17 11:51:15,994 - apscheduler.scheduler - INFO - Adding job tentatively -- it will be properly scheduled when the scheduler starts
-2025-12-17 11:51:15,995 - apscheduler.scheduler - INFO - Added job "Send Weekly Report" to job store "default"
-2025-12-17 11:51:15,995 - apscheduler.scheduler - INFO - Added job "Send Monthly Report" to job store "default"
-2025-12-17 11:51:15,995 - apscheduler.scheduler - INFO - Scheduler started
-2025-12-17 11:51:15,995 - app.services.scheduler - INFO - ============================================================
-2025-12-17 11:51:15,995 - app.services.scheduler - INFO - Scheduler started
-2025-12-17 11:51:15,995 - app.services.scheduler - INFO -   - Weekly Report: Every Monday 09:00
-2025-12-17 11:51:15,995 - app.services.scheduler - INFO -   - Monthly Report: Every 1st day of month 09:00
-2025-12-17 11:51:15,997 - app.services.scheduler - INFO - ============================================================
-2025-12-17 11:52:12,607 - audit - INFO - Request: GET /health | Client: 127.0.0.1
-2025-12-17 11:52:12,612 - audit - INFO - Response: 200 | Duration: 0.005s
-2025-12-17 12:01:11,856 - app.services.scheduler - INFO - Scheduler stopped
-2025-12-17 12:01:11,856 - app.main - INFO - Caffeine API stopped
-2025-12-17 12:01:11,856 - app.main - INFO - ============================================================
-2025-12-17 12:01:11,856 - apscheduler.scheduler - INFO - Scheduler has been shut down
-2025-12-17 12:01:14,693 - app.main - INFO - ============================================================
-2025-12-17 12:01:14,693 - app.main - INFO - Caffeine API started
-2025-12-17 12:01:14,693 - app.main - INFO - Environment: development
-2025-12-17 12:01:14,694 - app.main - INFO - CORS Allowed Origins: ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:8081', 'http://localhost:8082', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006', 'https://d26uyg5darllja.cloudfront.net']
-2025-12-17 12:01:16,010 - app.routers.ml - INFO - XGBoost model loaded: model_xgboost_acc_73.47.joblib
-2025-12-17 12:01:16,160 - apscheduler.scheduler - INFO - Adding job tentatively -- it will be properly scheduled when the scheduler starts
-2025-12-17 12:01:16,160 - apscheduler.scheduler - INFO - Adding job tentatively -- it will be properly scheduled when the scheduler starts
-2025-12-17 12:01:16,162 - apscheduler.scheduler - INFO - Added job "Send Weekly Report" to job store "default"
-2025-12-17 12:01:16,162 - apscheduler.scheduler - INFO - Added job "Send Monthly Report" to job store "default"
-2025-12-17 12:01:16,163 - apscheduler.scheduler - INFO - Scheduler started
-2025-12-17 12:01:16,163 - app.services.scheduler - INFO - ============================================================
-2025-12-17 12:01:16,163 - app.services.scheduler - INFO - Scheduler started
-2025-12-17 12:01:16,163 - app.services.scheduler - INFO -   - Weekly Report: Every Monday 09:00
-2025-12-17 12:01:16,163 - app.services.scheduler - INFO -   - Monthly Report: Every 1st day of month 09:00
-2025-12-17 12:01:16,163 - app.services.scheduler - INFO - ============================================================
-2025-12-17 12:01:16,771 - app.services.scheduler - INFO - Scheduler stopped
-2025-12-17 12:01:16,772 - app.main - INFO - Caffeine API stopped
-2025-12-17 12:01:16,772 - app.main - INFO - ============================================================
-2025-12-17 12:01:16,783 - apscheduler.scheduler - INFO - Scheduler has been shut down
-2025-12-17 12:01:18,870 - app.main - INFO - ============================================================
-2025-12-17 12:01:18,870 - app.main - INFO - Caffeine API started
-2025-12-17 12:01:18,870 - app.main - INFO - Environment: development
-2025-12-17 12:01:18,870 - app.main - INFO - CORS Allowed Origins: ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:8001', 'http://localhost:8082', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006', 'https://d26uyg5darllja.cloudfront.net']
-2025-12-17 12:01:19,828 - app.routers.ml - INFO - XGBoost model loaded: model_xgboost_acc_73.47.joblib
-2025-12-17 12:01:19,972 - apscheduler.scheduler - INFO - Adding job tentatively -- it will be properly scheduled when the scheduler starts
-2025-12-17 12:01:19,972 - apscheduler.scheduler - INFO - Adding job tentatively -- it will be properly scheduled when the scheduler starts
-2025-12-17 12:01:19,974 - apscheduler.scheduler - INFO - Added job "Send Weekly Report" to job store "default"
-2025-12-17 12:01:19,974 - apscheduler.scheduler - INFO - Added job "Send Monthly Report" to job store "default"
-2025-12-17 12:01:19,974 - apscheduler.scheduler - INFO - Scheduler started
-2025-12-17 12:01:19,975 - app.services.scheduler - INFO - ============================================================
-2025-12-17 12:01:19,975 - app.services.scheduler - INFO - Scheduler started
-2025-12-17 12:01:19,975 - app.services.scheduler - INFO -   - Weekly Report: Every Monday 09:00
-2025-12-17 12:01:19,975 - app.services.scheduler - INFO -   - Monthly Report: Every 1st day of month 09:00
-2025-12-17 12:01:19,975 - app.services.scheduler - INFO - ============================================================
-2025-12-17 12:03:19,541 - app.services.scheduler - INFO - Scheduler stopped
-2025-12-17 12:03:19,542 - app.main - INFO - Caffeine API stopped
-2025-12-17 12:03:19,542 - app.main - INFO - ============================================================
-2025-12-17 12:03:19,542 - apscheduler.scheduler - INFO - Scheduler has been shut down
-2025-12-17 12:04:46,010 - app.main - INFO - ============================================================
-2025-12-17 12:04:46,010 - app.main - INFO - Caffeine API started
-2025-12-17 12:04:46,010 - app.main - INFO - Environment: development
-2025-12-17 12:04:46,010 - app.main - INFO - CORS Allowed Origins: ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:8001', 'http://localhost:8082', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006', 'https://d26uyg5darllja.cloudfront.net']
-2025-12-17 12:04:46,893 - app.routers.ml - INFO - XGBoost model loaded: model_xgboost_acc_73.47.joblib
-2025-12-17 12:04:47,032 - apscheduler.scheduler - INFO - Adding job tentatively -- it will be properly scheduled when the scheduler starts
-2025-12-17 12:04:47,032 - apscheduler.scheduler - INFO - Adding job tentatively -- it will be properly scheduled when the scheduler starts
-2025-12-17 12:04:47,033 - apscheduler.scheduler - INFO - Added job "Send Weekly Report" to job store "default"
-2025-12-17 12:04:47,033 - apscheduler.scheduler - INFO - Added job "Send Monthly Report" to job store "default"
-2025-12-17 12:04:47,033 - apscheduler.scheduler - INFO - Scheduler started
-2025-12-17 12:04:47,033 - app.services.scheduler - INFO - ============================================================
-2025-12-17 12:04:47,033 - app.services.scheduler - INFO - Scheduler started
-2025-12-17 12:04:47,033 - app.services.scheduler - INFO -   - Weekly Report: Every Monday 09:00
-2025-12-17 12:04:47,033 - app.services.scheduler - INFO -   - Monthly Report: Every 1st day of month 09:00
-2025-12-17 12:04:47,033 - app.services.scheduler - INFO - ============================================================
-2025-12-17 12:05:15,619 - audit - INFO - Request: GET /health | Client: 127.0.0.1
-2025-12-17 12:05:15,625 - audit - INFO - Response: 200 | Duration: 0.005s
-2025-12-17 12:14:37,899 - audit - INFO - Request: GET /api/analysis/full | Client: 127.0.0.1
-2025-12-17 12:14:37,902 - app.db.database - INFO - Connecting to AWS RDS: caffeine-database.c58og6ke6t36.ap-northeast-2.rds.amazonaws.com
-2025-12-17 12:14:38,153 - app.db.database - INFO - Connected to AWS RDS: caffeine-database.c58og6ke6t36.ap-northeast-2.rds.amazonaws.com
-2025-12-17 12:14:38,303 - audit - INFO - Response: 200 | Duration: 0.404s
-2025-12-17 12:14:38,306 - audit - INFO - Request: GET /api/analysis/full | Client: 127.0.0.1
-2025-12-17 12:14:38,589 - audit - INFO - Response: 200 | Duration: 0.283s
-2025-12-17 12:14:38,590 - audit - INFO - Request: GET /api/analysis/full | Client: 127.0.0.1
-2025-12-17 12:14:38,653 - audit - INFO - Response: 200 | Duration: 0.063s
-2025-12-17 12:14:45,436 - audit - INFO - Request: POST /users/login | Client: 127.0.0.1
-2025-12-17 12:14:45,505 - passlib.handlers.bcrypt - WARNING - (trapped) error reading bcrypt version
+2025-12-17 12:35:30,733 - app.main - INFO - ============================================================
+2025-12-17 12:35:30,733 - app.main - INFO - Caffeine API started
+2025-12-17 12:35:30,735 - app.main - INFO - Environment: development
+2025-12-17 12:35:30,735 - app.main - INFO - CORS Allowed Origins: ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:8001', 'http://localhost:8082', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006', 'https://d26uyg5darllja.cloudfront.net']
+2025-12-17 12:35:32,427 - app.routers.ml - INFO - XGBoost model loaded: model_xgboost_acc_73.47.joblib
+2025-12-17 12:35:32,678 - apscheduler.scheduler - INFO - Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2025-12-17 12:35:32,685 - apscheduler.scheduler - INFO - Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2025-12-17 12:35:32,688 - apscheduler.scheduler - INFO - Added job "Send Weekly Report" to job store "default"
+2025-12-17 12:35:32,688 - apscheduler.scheduler - INFO - Added job "Send Monthly Report" to job store "default"
+2025-12-17 12:35:32,688 - apscheduler.scheduler - INFO - Scheduler started
+2025-12-17 12:35:32,688 - app.services.scheduler - INFO - ============================================================
+2025-12-17 12:35:32,689 - app.services.scheduler - INFO - Scheduler started
+2025-12-17 12:35:32,689 - app.services.scheduler - INFO -   - Weekly Report: Every Monday 09:00
+2025-12-17 12:35:32,689 - app.services.scheduler - INFO -   - Monthly Report: Every 1st day of month 09:00
+2025-12-17 12:35:32,689 - app.services.scheduler - INFO - ============================================================
+2025-12-17 12:35:50,702 - audit - INFO - Request: GET /api/analysis/full | Client: 127.0.0.1
+2025-12-17 12:35:50,708 - app.db.database - INFO - Connecting to AWS RDS: caffeine-database.c58og6ke6t36.ap-northeast-2.rds.amazonaws.com
+2025-12-17 12:35:51,079 - app.db.database - INFO - Connected to AWS RDS: caffeine-database.c58og6ke6t36.ap-northeast-2.rds.amazonaws.com
+2025-12-17 12:35:51,231 - audit - INFO - Response: 200 | Duration: 0.528s
+2025-12-17 12:35:51,235 - audit - INFO - Request: GET /api/analysis/full | Client: 127.0.0.1
+2025-12-17 12:35:51,497 - audit - INFO - Response: 200 | Duration: 0.262s
+2025-12-17 12:35:51,501 - audit - INFO - Request: GET /api/analysis/full | Client: 127.0.0.1
+2025-12-17 12:35:51,572 - audit - INFO - Response: 200 | Duration: 0.071s
+2025-12-17 12:36:35,082 - audit - INFO - Request: POST /users/login | Client: 127.0.0.1
+2025-12-17 12:36:35,145 - passlib.handlers.bcrypt - WARNING - (trapped) error reading bcrypt version
 Traceback (most recent call last):
   File "C:\Users\Jinwoo\AppData\Local\Programs\Python\Python311\Lib\site-packages\passlib\handlers\bcrypt.py", line 620, in _load_backend_mixin
     version = _bcrypt.__about__.__version__
               ^^^^^^^^^^^^^^^^^
 AttributeError: module 'bcrypt' has no attribute '__about__'
-2025-12-17 12:14:46,063 - audit - INFO - Response: 200 | Duration: 0.626s
-2025-12-17 12:14:46,070 - audit - INFO - Request: OPTIONS /users/me | Client: 127.0.0.1
-2025-12-17 12:14:46,074 - audit - INFO - Response: 200 | Duration: 0.004s
-2025-12-17 12:14:46,081 - audit - INFO - Request: GET /users/me | Client: 127.0.0.1
-2025-12-17 12:14:46,194 - audit - INFO - Response: 200 | Duration: 0.113s
-2025-12-17 12:14:46,356 - audit - INFO - Request: OPTIONS /api/analysis/full | Client: 127.0.0.1
-2025-12-17 12:14:46,358 - audit - INFO - Response: 200 | Duration: 0.002s
-2025-12-17 12:14:46,360 - audit - INFO - Request: OPTIONS /api/analysis/full | Client: 127.0.0.1
-2025-12-17 12:14:46,361 - audit - INFO - Response: 200 | Duration: 0.001s
-2025-12-17 12:14:46,365 - audit - INFO - Request: GET /api/analysis/full | Client: 127.0.0.1
-2025-12-17 12:14:46,449 - audit - INFO - Response: 200 | Duration: 0.085s
-2025-12-17 12:14:46,453 - audit - INFO - Request: GET /api/analysis/full | Client: 127.0.0.1
-2025-12-17 12:14:46,582 - audit - INFO - Response: 200 | Duration: 0.130s
-2025-12-17 12:14:51,153 - audit - INFO - Request: OPTIONS /api/admin/settings | Client: 127.0.0.1
-2025-12-17 12:14:51,157 - audit - INFO - Request: OPTIONS /api/admin/settings | Client: 127.0.0.1
-2025-12-17 12:14:51,159 - audit - INFO - Response: 200 | Duration: 0.007s
-2025-12-17 12:14:51,168 - audit - INFO - Response: 200 | Duration: 0.010s
-2025-12-17 12:14:51,172 - audit - INFO - Request: GET /api/admin/settings | Client: 127.0.0.1
-2025-12-17 12:14:51,272 - audit - INFO - Response: 200 | Duration: 0.101s
-2025-12-17 12:14:51,276 - audit - INFO - Request: GET /api/admin/settings | Client: 127.0.0.1
-2025-12-17 12:14:51,349 - audit - INFO - Response: 200 | Duration: 0.073s
-2025-12-17 12:14:54,037 - audit - INFO - Request: OPTIONS /api/admin/reports/send-monthly | Client: 127.0.0.1
-2025-12-17 12:14:54,041 - audit - INFO - Response: 200 | Duration: 0.004s
-2025-12-17 12:14:54,046 - audit - INFO - Request: POST /api/admin/reports/send-monthly | Client: 127.0.0.1
-2025-12-17 12:14:54,082 - app.routers.reports - INFO - Manual monthly report requested (User: admin@caffeine.com)
-2025-12-17 12:14:58,929 - app.services.email_service - INFO - Report email sent successfully: ygomania@naver.com
-2025-12-17 12:14:58,929 - app.routers.reports - INFO - Monthly report processing completed: Email sent to ygomania@naver.com.
-2025-12-17 12:14:58,932 - audit - INFO - Response: 200 | Duration: 4.887s
-2025-12-17 12:15:06,560 - app.services.scheduler - INFO - Scheduler stopped
-2025-12-17 12:15:06,561 - app.main - INFO - Caffeine API stopped
-2025-12-17 12:15:06,561 - app.main - INFO - ============================================================
-2025-12-17 12:15:06,562 - apscheduler.scheduler - INFO - Scheduler has been shut down
-2025-12-17 12:22:34,674 - app.main - INFO - ============================================================
-2025-12-17 12:22:34,675 - app.main - INFO - Caffeine API started
-2025-12-17 12:22:34,675 - app.main - INFO - Environment: development
-2025-12-17 12:22:34,675 - app.main - INFO - CORS Allowed Origins: ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:8001', 'http://localhost:8082', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006', 'https://d26uyg5darllja.cloudfront.net']
-2025-12-17 12:22:36,294 - app.routers.ml - INFO - XGBoost model loaded: model_xgboost_acc_73.47.joblib
-2025-12-17 12:22:36,505 - apscheduler.scheduler - INFO - Adding job tentatively -- it will be properly scheduled when the scheduler starts
-2025-12-17 12:22:36,505 - apscheduler.scheduler - INFO - Adding job tentatively -- it will be properly scheduled when the scheduler starts
-2025-12-17 12:22:36,507 - apscheduler.scheduler - INFO - Added job "Send Weekly Report" to job store "default"
-2025-12-17 12:22:36,507 - apscheduler.scheduler - INFO - Added job "Send Monthly Report" to job store "default"
-2025-12-17 12:22:36,507 - apscheduler.scheduler - INFO - Scheduler started
-2025-12-17 12:22:36,509 - app.services.scheduler - INFO - ============================================================
-2025-12-17 12:22:36,509 - app.services.scheduler - INFO - Scheduler started
-2025-12-17 12:22:36,509 - app.services.scheduler - INFO -   - Weekly Report: Every Monday 09:00
-2025-12-17 12:22:36,509 - app.services.scheduler - INFO -   - Monthly Report: Every 1st day of month 09:00
-2025-12-17 12:22:36,510 - app.services.scheduler - INFO - ============================================================
-2025-12-17 12:23:48,399 - audit - INFO - Request: POST /users/login | Client: 127.0.0.1
-2025-12-17 12:23:48,409 - app.db.database - INFO - Connecting to AWS RDS: caffeine-database.c58og6ke6t36.ap-northeast-2.rds.amazonaws.com
-2025-12-17 12:23:48,678 - app.db.database - INFO - Connected to AWS RDS: caffeine-database.c58og6ke6t36.ap-northeast-2.rds.amazonaws.com
-2025-12-17 12:23:48,753 - passlib.handlers.bcrypt - WARNING - (trapped) error reading bcrypt version
-Traceback (most recent call last):
-  File "C:\Users\Jinwoo\AppData\Local\Programs\Python\Python311\Lib\site-packages\passlib\handlers\bcrypt.py", line 620, in _load_backend_mixin
-    version = _bcrypt.__about__.__version__
-              ^^^^^^^^^^^^^^^^^
-AttributeError: module 'bcrypt' has no attribute '__about__'
-2025-12-17 12:23:49,256 - audit - INFO - Response: 200 | Duration: 0.857s
-2025-12-17 12:23:49,264 - audit - INFO - Request: OPTIONS /users/me | Client: 127.0.0.1
-2025-12-17 12:23:49,270 - audit - INFO - Response: 200 | Duration: 0.007s
-2025-12-17 12:23:49,276 - audit - INFO - Request: GET /users/me | Client: 127.0.0.1
-2025-12-17 12:23:49,413 - audit - INFO - Response: 200 | Duration: 0.138s
-2025-12-17 12:23:49,673 - audit - INFO - Request: OPTIONS /api/analysis/full | Client: 127.0.0.1
-2025-12-17 12:23:49,674 - audit - INFO - Request: OPTIONS /api/analysis/full | Client: 127.0.0.1
-2025-12-17 12:23:49,676 - audit - INFO - Response: 200 | Duration: 0.003s
-2025-12-17 12:23:49,679 - audit - INFO - Response: 200 | Duration: 0.004s
-2025-12-17 12:23:49,681 - audit - INFO - Request: GET /api/analysis/full | Client: 127.0.0.1
-2025-12-17 12:23:49,826 - audit - INFO - Response: 200 | Duration: 0.145s
-2025-12-17 12:23:49,828 - audit - INFO - Request: GET /api/analysis/full | Client: 127.0.0.1
-2025-12-17 12:23:50,139 - audit - INFO - Response: 200 | Duration: 0.311s
-2025-12-17 12:23:52,227 - audit - INFO - Request: OPTIONS /api/admin/settings | Client: 127.0.0.1
-2025-12-17 12:23:52,228 - audit - INFO - Response: 200 | Duration: 0.001s
-2025-12-17 12:23:52,230 - audit - INFO - Request: OPTIONS /api/admin/settings | Client: 127.0.0.1
-2025-12-17 12:23:52,232 - audit - INFO - Response: 200 | Duration: 0.002s
-2025-12-17 12:23:52,236 - audit - INFO - Request: GET /api/admin/settings | Client: 127.0.0.1
-2025-12-17 12:23:52,324 - audit - INFO - Response: 200 | Duration: 0.088s
-2025-12-17 12:23:52,326 - audit - INFO - Request: GET /api/admin/settings | Client: 127.0.0.1
-2025-12-17 12:23:52,415 - audit - INFO - Response: 200 | Duration: 0.089s
-2025-12-17 12:23:56,751 - audit - INFO - Request: OPTIONS /users | Client: 127.0.0.1
-2025-12-17 12:23:56,754 - audit - INFO - Request: OPTIONS /users | Client: 127.0.0.1
-2025-12-17 12:23:56,755 - audit - INFO - Response: 200 | Duration: 0.004s
-2025-12-17 12:23:56,757 - audit - INFO - Response: 200 | Duration: 0.005s
-2025-12-17 12:23:56,760 - audit - INFO - Request: GET /users | Client: 127.0.0.1
-2025-12-17 12:23:56,762 - audit - INFO - Response: 307 | Duration: 0.002s
-2025-12-17 12:23:56,764 - audit - INFO - Request: GET /users | Client: 127.0.0.1
-2025-12-17 12:23:56,766 - audit - INFO - Response: 307 | Duration: 0.002s
-2025-12-17 12:23:56,770 - audit - INFO - Request: OPTIONS /users/ | Client: 127.0.0.1
-2025-12-17 12:23:56,772 - audit - INFO - Response: 200 | Duration: 0.001s
-2025-12-17 12:23:56,775 - audit - INFO - Request: OPTIONS /users/ | Client: 127.0.0.1
-2025-12-17 12:23:56,776 - audit - INFO - Request: GET /users/ | Client: 127.0.0.1
-2025-12-17 12:23:56,779 - audit - INFO - Response: 200 | Duration: 0.005s
-2025-12-17 12:23:56,862 - audit - INFO - Response: 200 | Duration: 0.086s
-2025-12-17 12:23:56,865 - audit - INFO - Request: GET /users/ | Client: 127.0.0.1
-2025-12-17 12:23:56,957 - audit - INFO - Response: 200 | Duration: 0.092s
-2025-12-17 12:23:59,922 - audit - INFO - Request: OPTIONS /api/transactions | Client: 127.0.0.1
-2025-12-17 12:23:59,924 - audit - INFO - Response: 200 | Duration: 0.002s
-2025-12-17 12:23:59,933 - audit - INFO - Request: OPTIONS /api/transactions/stats/summary | Client: 127.0.0.1
-2025-12-17 12:23:59,935 - audit - INFO - Request: GET /api/transactions | Client: 127.0.0.1
-2025-12-17 12:23:59,937 - audit - INFO - Request: OPTIONS /api/transactions | Client: 127.0.0.1
-2025-12-17 12:23:59,938 - audit - INFO - Request: OPTIONS /api/transactions/stats/summary | Client: 127.0.0.1
-2025-12-17 12:23:59,950 - audit - INFO - Response: 200 | Duration: 0.018s
-2025-12-17 12:23:59,951 - audit - INFO - Response: 200 | Duration: 0.015s
-2025-12-17 12:23:59,952 - audit - INFO - Response: 200 | Duration: 0.015s
-2025-12-17 12:23:59,958 - audit - INFO - Request: GET /api/transactions/stats/summary | Client: 127.0.0.1
-2025-12-17 12:23:59,988 - audit - INFO - Response: 200 | Duration: 0.031s
-2025-12-17 12:23:59,992 - audit - INFO - Request: GET /api/transactions/stats/summary | Client: 127.0.0.1
-2025-12-17 12:24:00,031 - audit - INFO - Response: 200 | Duration: 0.095s
-2025-12-17 12:24:00,033 - audit - INFO - Request: GET /api/transactions | Client: 127.0.0.1
-2025-12-17 12:24:00,180 - audit - INFO - Response: 200 | Duration: 0.148s
-2025-12-17 12:24:00,223 - audit - INFO - Response: 200 | Duration: 0.231s
-2025-12-17 12:24:11,540 - audit - INFO - Request: OPTIONS /api/analysis/categories | Client: 127.0.0.1
-2025-12-17 12:24:11,542 - audit - INFO - Request: OPTIONS /api/analysis/categories | Client: 127.0.0.1
-2025-12-17 12:24:11,546 - audit - INFO - Response: 200 | Duration: 0.007s
-2025-12-17 12:24:11,549 - audit - INFO - Response: 200 | Duration: 0.007s
-2025-12-17 12:24:11,555 - audit - INFO - Request: GET /api/analysis/categories | Client: 127.0.0.1
-2025-12-17 12:24:11,593 - audit - INFO - Response: 200 | Duration: 0.038s
-2025-12-17 12:24:11,597 - audit - INFO - Request: GET /api/analysis/categories | Client: 127.0.0.1
-2025-12-17 12:24:11,625 - audit - INFO - Response: 200 | Duration: 0.028s
-2025-12-17 12:24:24,299 - app.services.scheduler - INFO - Scheduler stopped
-2025-12-17 12:24:24,299 - app.main - INFO - Caffeine API stopped
-2025-12-17 12:24:24,300 - app.main - INFO - ============================================================
-2025-12-17 12:24:24,300 - apscheduler.scheduler - INFO - Scheduler has been shut down
+2025-12-17 12:36:35,652 - audit - INFO - Response: 200 | Duration: 0.571s
+2025-12-17 12:36:35,661 - audit - INFO - Request: OPTIONS /users/me | Client: 127.0.0.1
+2025-12-17 12:36:35,663 - audit - INFO - Response: 200 | Duration: 0.002s
+2025-12-17 12:36:35,667 - audit - INFO - Request: GET /users/me | Client: 127.0.0.1
+2025-12-17 12:36:35,726 - audit - INFO - Response: 200 | Duration: 0.059s
+2025-12-17 12:36:35,817 - audit - INFO - Request: OPTIONS /api/analysis/full | Client: 127.0.0.1
+2025-12-17 12:36:35,818 - audit - INFO - Request: OPTIONS /api/analysis/full | Client: 127.0.0.1
+2025-12-17 12:36:35,819 - audit - INFO - Response: 200 | Duration: 0.003s
+2025-12-17 12:36:35,821 - audit - INFO - Response: 200 | Duration: 0.003s
+2025-12-17 12:36:35,825 - audit - INFO - Request: GET /api/analysis/full | Client: 127.0.0.1
+2025-12-17 12:36:35,902 - audit - INFO - Response: 200 | Duration: 0.077s
+2025-12-17 12:36:35,905 - audit - INFO - Request: GET /api/analysis/full | Client: 127.0.0.1
+2025-12-17 12:36:35,978 - audit - INFO - Response: 200 | Duration: 0.072s
+2025-12-17 12:36:38,600 - audit - INFO - Request: OPTIONS /api/admin/settings | Client: 127.0.0.1
+2025-12-17 12:36:38,600 - audit - INFO - Response: 200 | Duration: 0.000s
+2025-12-17 12:36:38,603 - audit - INFO - Request: OPTIONS /api/admin/settings | Client: 127.0.0.1
+2025-12-17 12:36:38,605 - audit - INFO - Response: 200 | Duration: 0.002s
+2025-12-17 12:36:38,608 - audit - INFO - Request: GET /api/admin/settings | Client: 127.0.0.1
+2025-12-17 12:36:38,697 - audit - INFO - Response: 200 | Duration: 0.089s
+2025-12-17 12:36:38,701 - audit - INFO - Request: GET /api/admin/settings | Client: 127.0.0.1
+2025-12-17 12:36:38,794 - audit - INFO - Response: 200 | Duration: 0.093s
+2025-12-17 12:36:47,416 - app.services.scheduler - INFO - Scheduler stopped
+2025-12-17 12:36:47,416 - app.main - INFO - Caffeine API stopped
+2025-12-17 12:36:47,416 - app.main - INFO - ============================================================
+2025-12-17 12:36:47,416 - apscheduler.scheduler - INFO - Scheduler has been shut down
