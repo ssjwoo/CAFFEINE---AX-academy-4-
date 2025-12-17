@@ -12,9 +12,10 @@ from collections import defaultdict
 
 from app.db.database import get_db
 from app.db.model.user import User
-from app.db.model.transactions import Transaction
-from app.core.jwt import get_current_superuser
+from app.db.model.transaction import Transaction
+from app.routers.user import get_current_user
 from pydantic import BaseModel
+from fastapi import HTTPException, status
 
 router = APIRouter(prefix="/api/analytics/demographics", tags=["Admin - Demographics Analytics"])
 
@@ -44,6 +45,17 @@ class CategoryPreferenceByAge(BaseModel):
     top_category: str
     second_category: str
     third_category: str
+
+
+# Helper to check superuser
+async def verify_superuser(current_user: User) -> User:
+    """Verify that current user is a superuser"""
+    if not current_user.is_superuser:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Not enough permissions"
+        )
+    return current_user
 
 
 # Helper functions
@@ -84,13 +96,14 @@ def get_age_group(age: int) -> str:
 @router.get("/age-groups", response_model=List[AgeGroupData])
 async def get_age_distribution(
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_superuser)
+    current_user: User = Depends(get_current_user)
 ):
     """
     Get distribution of users by age group
     
     **Admin only endpoint**
     """
+    await verify_superuser(current_user)
     result = await db.execute(select(User))
     all_users = result.scalars().all()
     
@@ -114,7 +127,7 @@ async def get_age_distribution(
 @router.get("/consumption-by-age", response_model=List[ConsumptionByAge])
 async def get_consumption_by_age(
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_superuser)
+    current_user: User = Depends(get_current_user)
 ):
     """
     Get consumption statistics by age group
@@ -123,6 +136,7 @@ async def get_consumption_by_age(
     
     Returns total spending, average transaction amount, and top categories for each age group
     """
+    await verify_superuser(current_user)
     # Get all users with transactions
     result = await db.execute(
         select(User, Transaction)
@@ -186,13 +200,14 @@ async def get_consumption_by_age(
 @router.get("/category-preferences", response_model=List[CategoryPreferenceByAge])
 async def get_category_preferences_by_age(
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_superuser)
+    current_user: User = Depends(get_current_user)
 ):
     """
     Get top 3 spending categories for each age group
     
     **Admin only endpoint**
     """
+    await verify_superuser(current_user)
     # Get all users with transactions
     result = await db.execute(
         select(User, Transaction)

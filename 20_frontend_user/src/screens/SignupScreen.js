@@ -114,10 +114,10 @@ export default function SignupScreen({ navigation }) {
                                 style={styles.input}
                                 placeholder="생년월일 (YYYY-MM-DD)"
                                 placeholderTextColor="#9E9E9E"
-                                value={birth Date}
-                            onChangeText={setBirthDate}
-                            autoCapitalize="none"
-                            keyboardType="default"
+                                value={birthDate}
+                                onChangeText={setBirthDate}
+                                autoCapitalize="none"
+                                keyboardType="default"
                             />
                         </View>
 
@@ -200,7 +200,7 @@ export default function SignupScreen({ navigation }) {
                     </View>
                 </ScrollView>
             </KeyboardAvoidingView>
-        </LinearGradient>
+        </LinearGradient >
     );
 }
 

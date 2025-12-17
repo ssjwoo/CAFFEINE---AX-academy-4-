@@ -11,10 +11,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db.database import get_db
 from app.db.model.user import User
-from app.db.model.transactions import Transaction
+from app.db.model.transaction import Transaction
 from app.db.schema.user import UserResponse
-from app.core.jwt import get_current_superuser
+from app.routers.user import get_current_user
 from pydantic import BaseModel
+from fastapi import HTTPException, status
 
 router = APIRouter(prefix="/api/admin/users", tags=["Admin - User Analytics"])
 
@@ -29,6 +30,17 @@ class ChurnMetrics(BaseModel):
     total_users: int
 
 
+# Helper to check superuser
+async def verify_superuser(current_user: User) -> User:
+    """Verify that current user is a superuser"""
+    if not current_user.is_superuser:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Not enough permissions"
+        )
+    return current_user
+
+
 # Helper function to check if user is churned
 async def is_user_churned(db: AsyncSession, user_id: int, days: int = 30) -> bool:
     """Check if user has no transactions in the last N days"""
@@ -39,7 +51,7 @@ async def is_user_churned(db: AsyncSession, user_id: int, days: int = 30) -> boo
         .where(
             and_(
                 Transaction.user_id == user_id,
-                Transaction.transaction_date >= cutoff_date
+                Transaction.transaction_time >= cutoff_date
             )
         )
         .limit(1)
@@ -53,13 +65,14 @@ async def is_user_churned(db: AsyncSession, user_id: int, days: int = 30) -> boo
 async def get_new_signups(
     days: int = Query(30, ge=1, le=365, description="Number of days to look back"),
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_superuser)
+    current_user: User = Depends(get_current_user)
 ):
     """
     Get users who signed up in the last N days
     
     **Admin only endpoint**
     """
+    await verify_superuser(current_user)
     cutoff_date = datetime.now() - timedelta(days=days)
     
     result = await db.execute(
@@ -76,13 +89,14 @@ async def get_new_signups(
 async def get_churned_users(
     days: int = Query(30, ge=1, le=365, description="Days of inactivity to consider churned"),
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_superuser)
+    current_user: User = Depends(get_current_user)
 ):
     """
     Get users with no transactions in the last N days
     
     **Admin only endpoint**
     """
+    await verify_superuser(current_user)
     cutoff_date = datetime.now() - timedelta(days=days)
     
     # Get all users
@@ -103,7 +117,7 @@ async def get_churn_rate(
     churn_days: int = Query(30, ge=1, le=365, description="Days of inactivity for churn"),
     signup_days: int = Query(30, ge=1, le=365, description="Days to count new signups"),
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_superuser)
+    current_user: User = Depends(get_current_user)
 ):
     """
     Get churn rate and related metrics
@@ -116,6 +130,7 @@ async def get_churn_rate(
     - **new_signups**: New users in the specified period
     - **total_users**: Total registered users
     """
+    await verify_superuser(current_user)
     # Get total users
     total_result = await db.execute(select(func.count(User.id)))
     total_users = total_result.scalar() or 0

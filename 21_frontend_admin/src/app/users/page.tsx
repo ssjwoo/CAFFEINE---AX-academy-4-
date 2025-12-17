@@ -1,46 +1,66 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { Users as UsersIcon, Search, Mail, Calendar, CheckCircle2, XCircle } from 'lucide-react';
-import { UserData } from '@/types';
-import { getAllUsers } from '@/api/client';
+import { Users as UsersIcon, Search, Mail, Calendar, CheckCircle2, XCircle, TrendingUp, TrendingDown, UserPlus } from 'lucide-react';
+import { UserData, ChurnMetrics } from '@/types';
+import { getAllUsers, getNewSignups, getChurnedUsers, getChurnMetrics } from '@/api/client';
+
+type TabType = 'all' | 'new' | 'churned';
 
 export default function UsersPage() {
+    const [activeTab, setActiveTab] = useState<TabType>('all');
     const [users, setUsers] = useState<UserData[]>([]);
+    const [newUsers, setNewUsers] = useState<UserData[]>([]);
+    const [churnedUsers, setChurnedUsers] = useState<UserData[]>([]);
+    const [churnMetrics, setChurnMetrics] = useState<ChurnMetrics | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState('');
+    const [days, setDays] = useState(30);
 
     useEffect(() => {
-        fetchUsers();
-    }, []);
+        fetchAllData();
+    }, [days]);
 
-    /**
-     * Backend API에서 사용자 데이터를 가져오는 함수
-     */
-    const fetchUsers = async () => {
+    const fetchAllData = async () => {
         try {
             setIsLoading(true);
-            const data = await getAllUsers();
-            setUsers(data);
-            console.log('✅ 사용자 데이터 로드 완료:', data.length, '명');
+            const [allUsersData, newSignupsData, churnedData, metricsData] = await Promise.all([
+                getAllUsers(),
+                getNewSignups(days),
+                getChurnedUsers(days),
+                getChurnMetrics(days, days)
+            ]);
+
+            setUsers(allUsersData);
+            setNewUsers(newSignupsData);
+            setChurnedUsers(churnedData);
+            setChurnMetrics(metricsData);
+
+            console.log('✅ 사용자 데이터 로드 완료');
         } catch (error) {
-            console.error('❌ 사용자 데이터 로드 실패:', error);
-            setUsers([]);
+            console.error('❌ 데이터 로드 실패:', error);
         } finally {
             setIsLoading(false);
         }
     };
 
+    // 현재 탭에 따라 표시할 사용자 목록 결정
+    const getCurrentUsers = () => {
+        switch (activeTab) {
+            case 'new': return newUsers;
+            case 'churned': return churnedUsers;
+            default: return users;
+        }
+    };
+
     // 검색 필터
-    const filteredUsers = users.filter(user =>
+    const filteredUsers = getCurrentUsers().filter(user =>
         user.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
         user.email?.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
-    // 통계 계산
-    const totalUsers = users.length;
-    const activeUsers = users.filter(u => u.is_active).length;
-    const adminUsers = users.filter(u => u.is_superuser).length;
+    const totalUsers = churnMetrics?.total_users || users.length;
+    const activeUsers = churnMetrics?.active_users || users.filter(u => u.is_active).length;
 
     return (
         <div className="space-y-6">
@@ -48,12 +68,24 @@ export default function UsersPage() {
             <div className="flex justify-between items-center">
                 <div>
                     <h2 className="text-2xl font-bold text-gray-800">사용자 관리</h2>
-                    <p className="text-gray-500 mt-1">전체 사용자 목록을 조회하고 관리합니다</p>
+                    <p className="text-gray-500 mt-1">사용자 목록 및 이탈 분석</p>
+                </div>
+                <div className="flex items-center gap-2">
+                    <span className="text-sm text-gray-500">조회 기간:</span>
+                    <select
+                        value={days}
+                        onChange={(e) => setDays(Number(e.target.value))}
+                        className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                        <option value={7}>최근 7일</option>
+                        <option value={30}>최근 30일</option>
+                        <option value={90}>최근 90일</option>
+                    </select>
                 </div>
             </div>
 
             {/* 통계 카드 */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                 <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
                     <div className="flex items-center justify-between">
                         <div>
@@ -69,7 +101,20 @@ export default function UsersPage() {
                 <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
                     <div className="flex items-center justify-between">
                         <div>
-                            <p className="text-sm text-gray-500 mb-1">활성 사용자</p>
+                            <p className="text-sm text-gray-500 mb-1">신규 가입</p>
+                            <p className="text-2xl font-bold text-gray-800">{churnMetrics?.new_signups || 0}명</p>
+                            <p className="text-xs text-gray-400 mt-1">최근 {days}일</p>
+                        </div>
+                        <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+                            <UserPlus className="w-6 h-6 text-purple-600" />
+                        </div>
+                    </div>
+                </div>
+
+                <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+                    <div className="flex items-center justify-between">
+                        <div>
+                            <p className="text-sm text-gray-500 mb-1">Active</p>
                             <p className="text-2xl font-bold text-gray-800">{activeUsers}명</p>
                         </div>
                         <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
@@ -81,43 +126,77 @@ export default function UsersPage() {
                 <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
                     <div className="flex items-center justify-between">
                         <div>
-                            <p className="text-sm text-gray-500 mb-1">관리자</p>
-                            <p className="text-2xl font-bold text-gray-800">{adminUsers}명</p>
+                            <p className="text-sm text-gray-500 mb-1">Deactive</p>
+                            <p className="text-2xl font-bold text-gray-800">{churnMetrics?.churn_rate.toFixed(1) || 0}%</p>
+                            <p className="text-xs text-gray-400 mt-1">{churnMetrics?.total_churned || 0}명 이탈</p>
                         </div>
-                        <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
-                            <UsersIcon className="w-6 h-6 text-purple-600" />
+                        <div className="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center">
+                            <TrendingDown className="w-6 h-6 text-red-600" />
                         </div>
                     </div>
                 </div>
             </div>
 
-            {/* 검색바 */}
-            <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
-                <div className="relative max-w-md">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                    <input
-                        type="text"
-                        placeholder="이름 또는 이메일로 검색..."
-                        className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                    />
+            {/* 탭 네비게이션 */}
+            <div className="bg-white rounded-xl shadow-sm border border-gray-100">
+                <div className="border-b border-gray-200">
+                    <div className="flex">
+                        <button
+                            onClick={() => setActiveTab('all')}
+                            className={`px-6 py-3 text-sm font-medium border-b-2 transition-colors ${activeTab === 'all'
+                                ? 'border-blue-600 text-blue-600'
+                                : 'border-transparent text-gray-500 hover:text-gray-700'
+                                }`}
+                        >
+                            전체 사용자 ({users.length})
+                        </button>
+                        <button
+                            onClick={() => setActiveTab('new')}
+                            className={`px-6 py-3 text-sm font-medium border-b-2 transition-colors ${activeTab === 'new'
+                                ? 'border-purple-600 text-purple-600'
+                                : 'border-transparent text-gray-500 hover:text-gray-700'
+                                }`}
+                        >
+                            신규 가입 ({newUsers.length})
+                        </button>
+                        <button
+                            onClick={() => setActiveTab('churned')}
+                            className={`px-6 py-3 text-sm font-medium border-b-2 transition-colors ${activeTab === 'churned'
+                                ? 'border-red-600 text-red-600'
+                                : 'border-transparent text-gray-500 hover:text-gray-700'
+                                }`}
+                        >
+                            이탈 사용자 ({churnedUsers.length})
+                        </button>
+                    </div>
                 </div>
-            </div>
 
-            {/* 사용자 테이블 */}
-            {isLoading ? (
-                <div className="bg-white rounded-xl p-12 shadow-sm border border-gray-100 text-center">
-                    <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-                    <p className="mt-4 text-gray-500">사용자 정보를 불러오는 중...</p>
+                {/* 검색바 */}
+                <div className="p-4 border-b border-gray-100">
+                    <div className="relative max-w-md">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                        <input
+                            type="text"
+                            placeholder="이름 또는 이메일로 검색..."
+                            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                        />
+                    </div>
                 </div>
-            ) : filteredUsers.length === 0 ? (
-                <div className="bg-white rounded-xl p-12 shadow-sm border border-gray-100 text-center">
-                    <UsersIcon className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                    <p className="text-gray-500">검색 결과가 없습니다</p>
-                </div>
-            ) : (
-                <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+
+                {/* 사용자 테이블 */}
+                {isLoading ? (
+                    <div className="p-12 text-center">
+                        <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                        <p className="mt-4 text-gray-500">데이터를 불러오는 중...</p>
+                    </div>
+                ) : filteredUsers.length === 0 ? (
+                    <div className="p-12 text-center">
+                        <UsersIcon className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+                        <p className="text-gray-500">검색 결과가 없습니다</p>
+                    </div>
+                ) : (
                     <div className="overflow-x-auto">
                         <table className="w-full">
                             <thead className="bg-gray-50 border-b border-gray-200">
@@ -196,15 +275,15 @@ export default function UsersPage() {
                             </tbody>
                         </table>
                     </div>
-                </div>
-            )}
+                )}
 
-            {/* 결과 표시 */}
-            {!isLoading && filteredUsers.length > 0 && (
-                <div className="text-sm text-gray-500 text-center">
-                    전체 {users.length}명 중 {filteredUsers.length}명 표시
-                </div>
-            )}
+                {/* 결과 표시 */}
+                {!isLoading && filteredUsers.length > 0 && (
+                    <div className="p-4 text-sm text-gray-500 text-center border-t border-gray-100">
+                        전체 {getCurrentUsers().length}명 중 {filteredUsers.length}명 표시
+                    </div>
+                )}
+            </div>
         </div>
     );
 }

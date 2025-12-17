@@ -7,7 +7,7 @@ interface FetchOptions extends RequestInit {
 }
 
 async function fetchWithTimeout(url: string, options: FetchOptions = {}) {
-    const { timeout = 10000, headers = {}, ...fetchOptions } = options;
+    const { timeout = 30000, headers = {}, ...fetchOptions } = options;  // Increased to 30s for analytics APIs
 
     const controller = new AbortController();
     const id = setTimeout(() => controller.abort(), timeout);

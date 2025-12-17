@@ -1714,3 +1714,493 @@ TypeError: unsupported operand type(s) for /: 'decimal.Decimal' and 'float'
 2025-12-17 17:06:11,729 - app.main - INFO - Caffeine API started
 2025-12-17 17:06:11,729 - app.main - INFO - Environment: development
 2025-12-17 17:06:11,729 - app.main - INFO - CORS Allowed Origins: ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:8001', 'http://localhost:8082', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006', 'http://127.0.0.1:3000', 'http://127.0.0.1:3001', 'http://127.0.0.1:8001', 'http://127.0.0.1:8082', 'http://127.0.0.1:8080', 'http://127.0.0.1:19000', 'http://127.0.0.1:19006', 'https://d26uyg5darllja.cloudfront.net']
+2025-12-17 17:06:12,702 - app.routers.ml - INFO - XGBoost model loaded: model_xgboost_acc_73.47.joblib
+2025-12-17 17:06:12,768 - apscheduler.scheduler - INFO - Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2025-12-17 17:06:12,769 - apscheduler.scheduler - INFO - Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2025-12-17 17:06:12,770 - apscheduler.scheduler - INFO - Added job "Send Weekly Report" to job store "default"
+2025-12-17 17:06:12,770 - apscheduler.scheduler - INFO - Added job "Send Monthly Report" to job store "default"
+2025-12-17 17:06:12,770 - apscheduler.scheduler - INFO - Scheduler started
+2025-12-17 17:06:12,770 - app.services.scheduler - INFO - ============================================================
+2025-12-17 17:06:12,771 - app.services.scheduler - INFO - Scheduler started
+2025-12-17 17:06:12,771 - app.services.scheduler - INFO -   - Weekly Report: Every Monday 09:00
+2025-12-17 17:06:12,771 - app.services.scheduler - INFO -   - Monthly Report: Every 1st day of month 09:00
+2025-12-17 17:06:12,771 - app.services.scheduler - INFO - ============================================================
+2025-12-17 17:10:21,380 - audit - INFO - Request: OPTIONS /api/transactions | Client: 127.0.0.1
+2025-12-17 17:10:21,383 - audit - INFO - Response: 200 | Duration: 0.003s
+2025-12-17 17:10:21,386 - audit - INFO - Request: GET /api/transactions | Client: 127.0.0.1
+2025-12-17 17:10:21,386 - app.db.database - INFO - Connecting to AWS RDS: caffeine-database.c58og6ke6t36.ap-northeast-2.rds.amazonaws.com
+2025-12-17 17:10:21,390 - audit - INFO - Request: GET /users/me | Client: 127.0.0.1
+2025-12-17 17:10:21,390 - app.db.database - INFO - Connecting to AWS RDS: caffeine-database.c58og6ke6t36.ap-northeast-2.rds.amazonaws.com
+2025-12-17 17:10:21,631 - app.db.database - INFO - Connected to AWS RDS: caffeine-database.c58og6ke6t36.ap-northeast-2.rds.amazonaws.com
+2025-12-17 17:10:21,666 - app.db.database - INFO - Connected to AWS RDS: caffeine-database.c58og6ke6t36.ap-northeast-2.rds.amazonaws.com
+2025-12-17 17:10:21,692 - audit - INFO - Response: 200 | Duration: 0.302s
+2025-12-17 17:10:21,694 - audit - INFO - Request: GET /users/me | Client: 127.0.0.1
+2025-12-17 17:10:21,975 - audit - INFO - Response: 200 | Duration: 0.589s
+2025-12-17 17:10:21,978 - audit - INFO - Request: GET /api/transactions | Client: 127.0.0.1
+2025-12-17 17:10:22,107 - audit - INFO - Response: 200 | Duration: 0.412s
+2025-12-17 17:10:22,217 - audit - INFO - Response: 200 | Duration: 0.239s
+2025-12-17 17:10:22,219 - audit - INFO - Request: GET /api/transactions | Client: 127.0.0.1
+2025-12-17 17:10:22,498 - audit - INFO - Response: 200 | Duration: 0.279s
+2025-12-17 17:10:25,687 - audit - INFO - Request: OPTIONS /api/anomalies | Client: 127.0.0.1
+2025-12-17 17:10:25,688 - audit - INFO - Request: OPTIONS /api/anomalies | Client: 127.0.0.1
+2025-12-17 17:10:25,688 - audit - INFO - Response: 200 | Duration: 0.002s
+2025-12-17 17:10:25,689 - audit - INFO - Response: 200 | Duration: 0.001s
+2025-12-17 17:10:25,691 - audit - INFO - Request: GET /api/anomalies | Client: 127.0.0.1
+2025-12-17 17:10:25,714 - app.routers.anomalies - ERROR - Failed to fetch anomalies: unsupported operand type(s) for /: 'decimal.Decimal' and 'float'
+Traceback (most recent call last):
+  File "C:\caffeine\10_backend\app\routers\anomalies.py", line 147, in get_anomalies
+    risk_level_str, reason = determine_risk_level(row.amount, avg_amount)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\caffeine\10_backend\app\routers\anomalies.py", line 66, in determine_risk_level
+    ratio = amount / avg_amount
+            ~~~~~~~^~~~~~~~~~~~
+TypeError: unsupported operand type(s) for /: 'decimal.Decimal' and 'float'
+2025-12-17 17:10:25,722 - audit - INFO - Response: 200 | Duration: 0.031s
+2025-12-17 17:10:25,724 - audit - INFO - Request: GET /api/anomalies | Client: 127.0.0.1
+2025-12-17 17:10:25,745 - app.routers.anomalies - ERROR - Failed to fetch anomalies: unsupported operand type(s) for /: 'decimal.Decimal' and 'float'
+Traceback (most recent call last):
+  File "C:\caffeine\10_backend\app\routers\anomalies.py", line 147, in get_anomalies
+    risk_level_str, reason = determine_risk_level(row.amount, avg_amount)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\caffeine\10_backend\app\routers\anomalies.py", line 66, in determine_risk_level
+    ratio = amount / avg_amount
+            ~~~~~~~^~~~~~~~~~~~
+TypeError: unsupported operand type(s) for /: 'decimal.Decimal' and 'float'
+2025-12-17 17:10:25,751 - audit - INFO - Response: 200 | Duration: 0.026s
+2025-12-17 17:10:26,683 - audit - INFO - Request: GET /api/analysis/full | Client: 127.0.0.1
+2025-12-17 17:10:26,776 - audit - INFO - Response: 200 | Duration: 0.093s
+2025-12-17 17:10:26,778 - audit - INFO - Request: GET /api/analysis/full | Client: 127.0.0.1
+2025-12-17 17:10:26,859 - audit - INFO - Response: 200 | Duration: 0.081s
+2025-12-17 17:10:27,461 - audit - INFO - Request: GET /api/transactions | Client: 127.0.0.1
+2025-12-17 17:10:27,710 - audit - INFO - Response: 200 | Duration: 0.249s
+2025-12-17 17:10:27,713 - audit - INFO - Request: GET /api/transactions | Client: 127.0.0.1
+2025-12-17 17:10:27,962 - audit - INFO - Response: 200 | Duration: 0.249s
+2025-12-17 17:11:00,505 - audit - INFO - Request: GET /api/transactions | Client: 127.0.0.1
+2025-12-17 17:11:00,521 - audit - INFO - Request: GET /users/me | Client: 127.0.0.1
+2025-12-17 17:11:00,663 - audit - INFO - Response: 200 | Duration: 0.142s
+2025-12-17 17:11:00,665 - audit - INFO - Request: GET /users/me | Client: 127.0.0.1
+2025-12-17 17:11:00,821 - audit - INFO - Response: 200 | Duration: 0.156s
+2025-12-17 17:11:00,933 - audit - INFO - Response: 200 | Duration: 0.427s
+2025-12-17 17:11:00,935 - audit - INFO - Request: GET /api/transactions | Client: 127.0.0.1
+2025-12-17 17:11:01,180 - audit - INFO - Response: 200 | Duration: 0.245s
+2025-12-17 17:11:01,182 - audit - INFO - Request: GET /api/transactions | Client: 127.0.0.1
+2025-12-17 17:11:01,483 - audit - INFO - Response: 200 | Duration: 0.300s
+2025-12-17 17:12:11,112 - audit - INFO - Request: GET /api/anomalies | Client: 127.0.0.1
+2025-12-17 17:12:11,224 - app.routers.anomalies - ERROR - Failed to fetch anomalies: unsupported operand type(s) for /: 'decimal.Decimal' and 'float'
+Traceback (most recent call last):
+  File "C:\caffeine\10_backend\app\routers\anomalies.py", line 147, in get_anomalies
+    risk_level_str, reason = determine_risk_level(row.amount, avg_amount)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\caffeine\10_backend\app\routers\anomalies.py", line 66, in determine_risk_level
+    ratio = amount / avg_amount
+            ~~~~~~~^~~~~~~~~~~~
+TypeError: unsupported operand type(s) for /: 'decimal.Decimal' and 'float'
+2025-12-17 17:12:11,230 - audit - INFO - Response: 200 | Duration: 0.118s
+2025-12-17 17:12:11,232 - audit - INFO - Request: GET /api/anomalies | Client: 127.0.0.1
+2025-12-17 17:12:11,248 - app.routers.anomalies - ERROR - Failed to fetch anomalies: unsupported operand type(s) for /: 'decimal.Decimal' and 'float'
+Traceback (most recent call last):
+  File "C:\caffeine\10_backend\app\routers\anomalies.py", line 147, in get_anomalies
+    risk_level_str, reason = determine_risk_level(row.amount, avg_amount)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\caffeine\10_backend\app\routers\anomalies.py", line 66, in determine_risk_level
+    ratio = amount / avg_amount
+            ~~~~~~~^~~~~~~~~~~~
+TypeError: unsupported operand type(s) for /: 'decimal.Decimal' and 'float'
+2025-12-17 17:12:11,255 - audit - INFO - Response: 200 | Duration: 0.023s
+2025-12-17 17:12:12,946 - audit - INFO - Request: OPTIONS /users | Client: 127.0.0.1
+2025-12-17 17:12:12,946 - audit - INFO - Request: OPTIONS /users | Client: 127.0.0.1
+2025-12-17 17:12:12,947 - audit - INFO - Response: 200 | Duration: 0.002s
+2025-12-17 17:12:12,949 - audit - INFO - Response: 200 | Duration: 0.002s
+2025-12-17 17:12:12,951 - audit - INFO - Request: GET /users | Client: 127.0.0.1
+2025-12-17 17:12:12,952 - audit - INFO - Response: 307 | Duration: 0.001s
+2025-12-17 17:12:12,953 - audit - INFO - Request: GET /users | Client: 127.0.0.1
+2025-12-17 17:12:12,953 - audit - INFO - Response: 307 | Duration: 0.000s
+2025-12-17 17:12:12,954 - audit - INFO - Request: OPTIONS /users/ | Client: 127.0.0.1
+2025-12-17 17:12:12,955 - audit - INFO - Response: 200 | Duration: 0.001s
+2025-12-17 17:12:12,957 - audit - INFO - Request: GET /users/ | Client: 127.0.0.1
+2025-12-17 17:12:13,006 - audit - INFO - Response: 200 | Duration: 0.049s
+2025-12-17 17:12:13,007 - audit - INFO - Request: GET /users/ | Client: 127.0.0.1
+2025-12-17 17:12:13,064 - audit - INFO - Response: 200 | Duration: 0.057s
+2025-12-17 17:12:34,496 - audit - INFO - Request: OPTIONS /api/analysis/full | Client: 127.0.0.1
+2025-12-17 17:12:34,496 - audit - INFO - Request: OPTIONS /api/analysis/full | Client: 127.0.0.1
+2025-12-17 17:12:34,496 - audit - INFO - Response: 200 | Duration: 0.001s
+2025-12-17 17:12:34,497 - audit - INFO - Response: 200 | Duration: 0.001s
+2025-12-17 17:12:34,501 - audit - INFO - Request: GET /api/analysis/full | Client: 127.0.0.1
+2025-12-17 17:12:34,559 - audit - INFO - Response: 200 | Duration: 0.058s
+2025-12-17 17:12:34,561 - audit - INFO - Request: GET /api/analysis/full | Client: 127.0.0.1
+2025-12-17 17:12:34,620 - audit - INFO - Response: 200 | Duration: 0.059s
+2025-12-17 17:13:52,821 - audit - INFO - Request: GET /api/transactions | Client: 127.0.0.1
+2025-12-17 17:13:53,075 - audit - INFO - Response: 200 | Duration: 0.255s
+2025-12-17 17:13:53,078 - audit - INFO - Request: GET /api/transactions | Client: 127.0.0.1
+2025-12-17 17:13:53,333 - audit - INFO - Response: 200 | Duration: 0.255s
+2025-12-17 17:35:21,019 - app.services.scheduler - INFO - Scheduler stopped
+2025-12-17 17:35:21,020 - app.main - INFO - Caffeine API stopped
+2025-12-17 17:35:21,020 - app.main - INFO - ============================================================
+2025-12-17 17:35:21,020 - apscheduler.scheduler - INFO - Scheduler has been shut down
+2025-12-17 17:35:23,053 - app.main - INFO - ============================================================
+2025-12-17 17:35:23,053 - app.main - INFO - Caffeine API started
+2025-12-17 17:35:23,054 - app.main - INFO - Environment: development
+2025-12-17 17:35:23,054 - app.main - INFO - CORS Allowed Origins: ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:8001', 'http://localhost:8082', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006', 'http://127.0.0.1:3000', 'http://127.0.0.1:3001', 'http://127.0.0.1:8001', 'http://127.0.0.1:8082', 'http://127.0.0.1:8080', 'http://127.0.0.1:19000', 'http://127.0.0.1:19006', 'https://d26uyg5darllja.cloudfront.net']
+2025-12-17 17:35:24,001 - app.routers.ml - INFO - XGBoost model loaded: model_xgboost_acc_73.47.joblib
+2025-12-17 17:35:24,067 - apscheduler.scheduler - INFO - Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2025-12-17 17:35:24,068 - apscheduler.scheduler - INFO - Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2025-12-17 17:35:24,068 - apscheduler.scheduler - INFO - Added job "Send Weekly Report" to job store "default"
+2025-12-17 17:35:24,069 - apscheduler.scheduler - INFO - Added job "Send Monthly Report" to job store "default"
+2025-12-17 17:35:24,069 - apscheduler.scheduler - INFO - Scheduler started
+2025-12-17 17:35:24,069 - app.services.scheduler - INFO - ============================================================
+2025-12-17 17:35:24,069 - app.services.scheduler - INFO - Scheduler started
+2025-12-17 17:35:24,070 - app.services.scheduler - INFO -   - Weekly Report: Every Monday 09:00
+2025-12-17 17:35:24,070 - app.services.scheduler - INFO -   - Monthly Report: Every 1st day of month 09:00
+2025-12-17 17:35:24,070 - app.services.scheduler - INFO - ============================================================
+2025-12-17 17:35:28,126 - app.services.scheduler - INFO - Scheduler stopped
+2025-12-17 17:35:28,128 - app.main - INFO - Caffeine API stopped
+2025-12-17 17:35:28,128 - app.main - INFO - ============================================================
+2025-12-17 17:35:28,128 - apscheduler.scheduler - INFO - Scheduler has been shut down
+2025-12-17 17:35:30,029 - app.main - INFO - ============================================================
+2025-12-17 17:35:30,030 - app.main - INFO - Caffeine API started
+2025-12-17 17:35:30,030 - app.main - INFO - Environment: development
+2025-12-17 17:35:30,030 - app.main - INFO - CORS Allowed Origins: ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:8001', 'http://localhost:8082', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006', 'http://127.0.0.1:3000', 'http://127.0.0.1:3001', 'http://127.0.0.1:8001', 'http://127.0.0.1:8082', 'http://127.0.0.1:8080', 'http://127.0.0.1:19000', 'http://127.0.0.1:19006', 'https://d26uyg5darllja.cloudfront.net']
+2025-12-17 17:35:31,000 - app.routers.ml - INFO - XGBoost model loaded: model_xgboost_acc_73.47.joblib
+2025-12-17 17:35:31,068 - apscheduler.scheduler - INFO - Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2025-12-17 17:35:31,068 - apscheduler.scheduler - INFO - Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2025-12-17 17:35:31,069 - apscheduler.scheduler - INFO - Added job "Send Weekly Report" to job store "default"
+2025-12-17 17:35:31,069 - apscheduler.scheduler - INFO - Added job "Send Monthly Report" to job store "default"
+2025-12-17 17:35:31,069 - apscheduler.scheduler - INFO - Scheduler started
+2025-12-17 17:35:31,070 - app.services.scheduler - INFO - ============================================================
+2025-12-17 17:35:31,070 - app.services.scheduler - INFO - Scheduler started
+2025-12-17 17:35:31,070 - app.services.scheduler - INFO -   - Weekly Report: Every Monday 09:00
+2025-12-17 17:35:31,070 - app.services.scheduler - INFO -   - Monthly Report: Every 1st day of month 09:00
+2025-12-17 17:35:31,070 - app.services.scheduler - INFO - ============================================================
+2025-12-17 17:44:44,850 - audit - INFO - Request: OPTIONS /api/transactions | Client: 127.0.0.1
+2025-12-17 17:44:44,851 - audit - INFO - Response: 200 | Duration: 0.001s
+2025-12-17 17:44:44,853 - audit - INFO - Request: GET /api/transactions | Client: 127.0.0.1
+2025-12-17 17:44:44,855 - app.db.database - INFO - Connecting to AWS RDS: caffeine-database.c58og6ke6t36.ap-northeast-2.rds.amazonaws.com
+2025-12-17 17:44:44,865 - audit - INFO - Request: OPTIONS /users/me | Client: 127.0.0.1
+2025-12-17 17:44:44,865 - audit - INFO - Response: 200 | Duration: 0.000s
+2025-12-17 17:44:44,866 - audit - INFO - Request: OPTIONS /users/me | Client: 127.0.0.1
+2025-12-17 17:44:44,934 - audit - INFO - Request: GET /users/me | Client: 127.0.0.1
+2025-12-17 17:44:44,935 - app.db.database - INFO - Connecting to AWS RDS: caffeine-database.c58og6ke6t36.ap-northeast-2.rds.amazonaws.com
+2025-12-17 17:44:44,936 - audit - INFO - Response: 200 | Duration: 0.070s
+2025-12-17 17:44:45,092 - app.db.database - INFO - Connected to AWS RDS: caffeine-database.c58og6ke6t36.ap-northeast-2.rds.amazonaws.com
+2025-12-17 17:44:45,098 - app.db.database - INFO - Connected to AWS RDS: caffeine-database.c58og6ke6t36.ap-northeast-2.rds.amazonaws.com
+2025-12-17 17:44:45,109 - audit - INFO - Response: 401 | Duration: 0.175s
+2025-12-17 17:44:45,111 - audit - INFO - Request: GET /users/me | Client: 127.0.0.1
+2025-12-17 17:44:45,112 - audit - INFO - Response: 401 | Duration: 0.001s
+2025-12-17 17:44:45,395 - audit - INFO - Response: 200 | Duration: 0.542s
+2025-12-17 17:44:45,397 - audit - INFO - Request: GET /api/transactions | Client: 127.0.0.1
+2025-12-17 17:44:45,628 - audit - INFO - Response: 200 | Duration: 0.231s
+2025-12-17 17:44:45,631 - audit - INFO - Request: GET /api/transactions | Client: 127.0.0.1
+2025-12-17 17:44:45,868 - audit - INFO - Response: 200 | Duration: 0.237s
+2025-12-17 17:44:52,356 - audit - INFO - Request: POST /users/login | Client: 127.0.0.1
+2025-12-17 17:44:52,663 - audit - INFO - Response: 200 | Duration: 0.308s
+2025-12-17 17:44:52,667 - audit - INFO - Request: GET /users/me | Client: 127.0.0.1
+2025-12-17 17:44:52,699 - audit - INFO - Response: 200 | Duration: 0.033s
+2025-12-17 17:44:52,785 - audit - INFO - Request: OPTIONS /api/analysis/full | Client: 127.0.0.1
+2025-12-17 17:44:52,786 - audit - INFO - Request: OPTIONS /api/analysis/full | Client: 127.0.0.1
+2025-12-17 17:44:52,787 - audit - INFO - Response: 200 | Duration: 0.002s
+2025-12-17 17:44:52,788 - audit - INFO - Response: 200 | Duration: 0.002s
+2025-12-17 17:44:52,791 - audit - INFO - Request: GET /api/analysis/full | Client: 127.0.0.1
+2025-12-17 17:44:52,885 - audit - INFO - Response: 200 | Duration: 0.094s
+2025-12-17 17:44:52,886 - audit - INFO - Request: GET /api/analysis/full | Client: 127.0.0.1
+2025-12-17 17:44:52,942 - audit - INFO - Response: 200 | Duration: 0.056s
+2025-12-17 17:44:55,183 - audit - INFO - Request: OPTIONS /users | Client: 127.0.0.1
+2025-12-17 17:44:55,184 - audit - INFO - Request: OPTIONS /api/admin/users/new-signups | Client: 127.0.0.1
+2025-12-17 17:44:55,187 - audit - INFO - Request: OPTIONS /api/admin/users/churned | Client: 127.0.0.1
+2025-12-17 17:44:55,188 - audit - INFO - Request: OPTIONS /api/admin/users/new-signups | Client: 127.0.0.1
+2025-12-17 17:44:55,188 - audit - INFO - Request: OPTIONS /api/admin/users/stats/churn-rate | Client: 127.0.0.1
+2025-12-17 17:44:55,188 - audit - INFO - Request: OPTIONS /users | Client: 127.0.0.1
+2025-12-17 17:44:55,189 - audit - INFO - Response: 200 | Duration: 0.006s
+2025-12-17 17:44:55,189 - audit - INFO - Response: 200 | Duration: 0.005s
+2025-12-17 17:44:55,191 - audit - INFO - Response: 200 | Duration: 0.004s
+2025-12-17 17:44:55,192 - audit - INFO - Response: 200 | Duration: 0.004s
+2025-12-17 17:44:55,192 - audit - INFO - Response: 200 | Duration: 0.004s
+2025-12-17 17:44:55,193 - audit - INFO - Response: 200 | Duration: 0.005s
+2025-12-17 17:44:55,194 - audit - INFO - Request: OPTIONS /api/admin/users/churned | Client: 127.0.0.1
+2025-12-17 17:44:55,195 - audit - INFO - Request: OPTIONS /api/admin/users/stats/churn-rate | Client: 127.0.0.1
+2025-12-17 17:44:55,196 - audit - INFO - Request: GET /users | Client: 127.0.0.1
+2025-12-17 17:44:55,196 - audit - INFO - Request: GET /api/admin/users/new-signups | Client: 127.0.0.1
+2025-12-17 17:44:55,197 - audit - INFO - Response: 200 | Duration: 0.003s
+2025-12-17 17:44:55,198 - audit - INFO - Request: GET /api/admin/users/stats/churn-rate | Client: 127.0.0.1
+2025-12-17 17:44:55,199 - audit - INFO - Request: GET /api/admin/users/churned | Client: 127.0.0.1
+2025-12-17 17:44:55,200 - audit - INFO - Response: 200 | Duration: 0.005s
+2025-12-17 17:44:55,202 - audit - INFO - Response: 307 | Duration: 0.006s
+2025-12-17 17:44:55,202 - audit - INFO - Response: 404 | Duration: 0.006s
+2025-12-17 17:44:55,203 - audit - INFO - Response: 404 | Duration: 0.006s
+2025-12-17 17:44:55,204 - audit - INFO - Response: 404 | Duration: 0.006s
+2025-12-17 17:44:55,205 - audit - INFO - Request: GET /api/admin/users/new-signups | Client: 127.0.0.1
+2025-12-17 17:44:55,206 - audit - INFO - Request: OPTIONS /users/ | Client: 127.0.0.1
+2025-12-17 17:44:55,206 - audit - INFO - Request: GET /users | Client: 127.0.0.1
+2025-12-17 17:44:55,207 - audit - INFO - Request: GET /api/admin/users/churned | Client: 127.0.0.1
+2025-12-17 17:44:55,207 - audit - INFO - Request: GET /api/admin/users/stats/churn-rate | Client: 127.0.0.1
+2025-12-17 17:44:55,208 - audit - INFO - Response: 404 | Duration: 0.003s
+2025-12-17 17:44:55,210 - audit - INFO - Response: 200 | Duration: 0.004s
+2025-12-17 17:44:55,211 - audit - INFO - Response: 307 | Duration: 0.004s
+2025-12-17 17:44:55,212 - audit - INFO - Response: 404 | Duration: 0.005s
+2025-12-17 17:44:55,213 - audit - INFO - Response: 404 | Duration: 0.006s
+2025-12-17 17:44:55,215 - audit - INFO - Request: GET /users/ | Client: 127.0.0.1
+2025-12-17 17:44:55,262 - audit - INFO - Response: 200 | Duration: 0.047s
+2025-12-17 17:44:55,264 - audit - INFO - Request: GET /users/ | Client: 127.0.0.1
+2025-12-17 17:44:55,301 - audit - INFO - Response: 200 | Duration: 0.036s
+2025-12-17 17:46:03,548 - app.services.scheduler - INFO - Scheduler stopped
+2025-12-17 17:46:03,548 - app.main - INFO - Caffeine API stopped
+2025-12-17 17:46:03,548 - app.main - INFO - ============================================================
+2025-12-17 17:46:03,548 - apscheduler.scheduler - INFO - Scheduler has been shut down
+2025-12-17 18:00:20,019 - app.main - INFO - ============================================================
+2025-12-17 18:00:20,534 - app.main - INFO - Caffeine API started
+2025-12-17 18:00:20,534 - app.main - INFO - Environment: development
+2025-12-17 18:00:20,535 - app.main - INFO - CORS Allowed Origins: ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:8001', 'http://localhost:8082', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006', 'http://127.0.0.1:3000', 'http://127.0.0.1:3001', 'http://127.0.0.1:8001', 'http://127.0.0.1:8082', 'http://127.0.0.1:8080', 'http://127.0.0.1:19000', 'http://127.0.0.1:19006', 'https://d26uyg5darllja.cloudfront.net']
+2025-12-17 18:00:23,961 - app.routers.ml - INFO - XGBoost model loaded: model_xgboost_acc_73.47.joblib
+2025-12-17 18:00:24,051 - apscheduler.scheduler - INFO - Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2025-12-17 18:00:24,052 - apscheduler.scheduler - INFO - Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2025-12-17 18:00:24,053 - apscheduler.scheduler - INFO - Added job "Send Weekly Report" to job store "default"
+2025-12-17 18:00:24,053 - apscheduler.scheduler - INFO - Added job "Send Monthly Report" to job store "default"
+2025-12-17 18:00:24,053 - apscheduler.scheduler - INFO - Scheduler started
+2025-12-17 18:00:24,053 - app.services.scheduler - INFO - ============================================================
+2025-12-17 18:00:24,053 - app.services.scheduler - INFO - Scheduler started
+2025-12-17 18:00:24,053 - app.services.scheduler - INFO -   - Weekly Report: Every Monday 09:00
+2025-12-17 18:00:24,054 - app.services.scheduler - INFO -   - Monthly Report: Every 1st day of month 09:00
+2025-12-17 18:00:24,054 - app.services.scheduler - INFO - ============================================================
+2025-12-17 18:01:17,946 - app.services.scheduler - INFO - Scheduler stopped
+2025-12-17 18:01:17,946 - app.main - INFO - Caffeine API stopped
+2025-12-17 18:01:17,946 - app.main - INFO - ============================================================
+2025-12-17 18:01:17,947 - apscheduler.scheduler - INFO - Scheduler has been shut down
+2025-12-17 18:03:08,198 - app.main - INFO - ============================================================
+2025-12-17 18:03:08,198 - app.main - INFO - Caffeine API started
+2025-12-17 18:03:08,198 - app.main - INFO - Environment: development
+2025-12-17 18:03:08,199 - app.main - INFO - CORS Allowed Origins: ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:8001', 'http://localhost:8082', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006', 'http://127.0.0.1:3000', 'http://127.0.0.1:3001', 'http://127.0.0.1:8001', 'http://127.0.0.1:8082', 'http://127.0.0.1:8080', 'http://127.0.0.1:19000', 'http://127.0.0.1:19006', 'https://d26uyg5darllja.cloudfront.net']
+2025-12-17 18:03:09,122 - app.routers.ml - INFO - XGBoost model loaded: model_xgboost_acc_73.47.joblib
+2025-12-17 18:03:09,198 - apscheduler.scheduler - INFO - Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2025-12-17 18:03:09,198 - apscheduler.scheduler - INFO - Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2025-12-17 18:03:09,198 - apscheduler.scheduler - INFO - Added job "Send Weekly Report" to job store "default"
+2025-12-17 18:03:09,198 - apscheduler.scheduler - INFO - Added job "Send Monthly Report" to job store "default"
+2025-12-17 18:03:09,198 - apscheduler.scheduler - INFO - Scheduler started
+2025-12-17 18:03:09,198 - app.services.scheduler - INFO - ============================================================
+2025-12-17 18:03:09,200 - app.services.scheduler - INFO - Scheduler started
+2025-12-17 18:03:09,200 - app.services.scheduler - INFO -   - Weekly Report: Every Monday 09:00
+2025-12-17 18:03:09,200 - app.services.scheduler - INFO -   - Monthly Report: Every 1st day of month 09:00
+2025-12-17 18:03:09,200 - app.services.scheduler - INFO - ============================================================
+2025-12-17 18:03:23,006 - audit - INFO - Request: POST /users/login | Client: 127.0.0.1
+2025-12-17 18:03:23,257 - app.db.database - INFO - Connecting to AWS RDS: caffeine-database.c58og6ke6t36.ap-northeast-2.rds.amazonaws.com
+2025-12-17 18:03:23,454 - app.db.database - INFO - Connected to AWS RDS: caffeine-database.c58og6ke6t36.ap-northeast-2.rds.amazonaws.com
+2025-12-17 18:03:26,226 - audit - INFO - Response: 200 | Duration: 3.220s
+2025-12-17 18:03:26,230 - audit - INFO - Request: OPTIONS /users/me | Client: 127.0.0.1
+2025-12-17 18:03:26,230 - audit - INFO - Response: 200 | Duration: 0.000s
+2025-12-17 18:03:26,234 - audit - INFO - Request: GET /users/me | Client: 127.0.0.1
+2025-12-17 18:03:26,275 - audit - INFO - Response: 200 | Duration: 0.040s
+2025-12-17 18:03:26,417 - audit - INFO - Request: OPTIONS /api/analysis/full | Client: 127.0.0.1
+2025-12-17 18:03:26,420 - audit - INFO - Request: OPTIONS /api/analysis/full | Client: 127.0.0.1
+2025-12-17 18:03:26,420 - audit - INFO - Response: 200 | Duration: 0.003s
+2025-12-17 18:03:26,423 - audit - INFO - Response: 200 | Duration: 0.003s
+2025-12-17 18:03:26,430 - audit - INFO - Request: GET /api/analysis/full | Client: 127.0.0.1
+2025-12-17 18:03:26,542 - audit - INFO - Response: 200 | Duration: 0.112s
+2025-12-17 18:03:26,544 - audit - INFO - Request: GET /api/analysis/full | Client: 127.0.0.1
+2025-12-17 18:03:26,614 - audit - INFO - Response: 200 | Duration: 0.070s
+2025-12-17 18:03:33,398 - audit - INFO - Request: OPTIONS /api/transactions | Client: 127.0.0.1
+2025-12-17 18:03:33,399 - audit - INFO - Request: OPTIONS /api/transactions | Client: 127.0.0.1
+2025-12-17 18:03:33,401 - audit - INFO - Response: 200 | Duration: 0.003s
+2025-12-17 18:03:33,402 - audit - INFO - Response: 200 | Duration: 0.003s
+2025-12-17 18:03:33,406 - audit - INFO - Request: GET /api/transactions | Client: 127.0.0.1
+2025-12-17 18:03:33,691 - audit - INFO - Response: 200 | Duration: 0.285s
+2025-12-17 18:03:33,696 - audit - INFO - Request: GET /api/transactions | Client: 127.0.0.1
+2025-12-17 18:03:33,953 - audit - INFO - Response: 200 | Duration: 0.257s
+2025-12-17 18:03:35,591 - audit - INFO - Request: OPTIONS /users | Client: 127.0.0.1
+2025-12-17 18:03:35,593 - audit - INFO - Request: OPTIONS /api/admin/users/new-signups | Client: 127.0.0.1
+2025-12-17 18:03:35,595 - audit - INFO - Request: OPTIONS /api/admin/users/churned | Client: 127.0.0.1
+2025-12-17 18:03:35,595 - audit - INFO - Request: OPTIONS /users | Client: 127.0.0.1
+2025-12-17 18:03:35,595 - audit - INFO - Request: OPTIONS /api/admin/users/stats/churn-rate | Client: 127.0.0.1
+2025-12-17 18:03:35,596 - audit - INFO - Response: 200 | Duration: 0.005s
+2025-12-17 18:03:35,596 - audit - INFO - Response: 200 | Duration: 0.003s
+2025-12-17 18:03:35,598 - audit - INFO - Request: OPTIONS /api/admin/users/new-signups | Client: 127.0.0.1
+2025-12-17 18:03:35,598 - audit - INFO - Response: 200 | Duration: 0.003s
+2025-12-17 18:03:35,599 - audit - INFO - Response: 200 | Duration: 0.004s
+2025-12-17 18:03:35,599 - audit - INFO - Response: 200 | Duration: 0.004s
+2025-12-17 18:03:35,600 - audit - INFO - Request: OPTIONS /api/admin/users/churned | Client: 127.0.0.1
+2025-12-17 18:03:35,601 - audit - INFO - Request: OPTIONS /api/admin/users/stats/churn-rate | Client: 127.0.0.1
+2025-12-17 18:03:35,602 - audit - INFO - Response: 200 | Duration: 0.004s
+2025-12-17 18:03:35,604 - audit - INFO - Request: GET /api/admin/users/new-signups | Client: 127.0.0.1
+2025-12-17 18:03:35,604 - audit - INFO - Request: GET /users | Client: 127.0.0.1
+2025-12-17 18:03:35,605 - audit - INFO - Response: 200 | Duration: 0.005s
+2025-12-17 18:03:35,608 - audit - INFO - Request: GET /api/admin/users/churned | Client: 127.0.0.1
+2025-12-17 18:03:35,609 - audit - INFO - Response: 200 | Duration: 0.008s
+2025-12-17 18:03:35,612 - audit - INFO - Request: GET /api/admin/users/stats/churn-rate | Client: 127.0.0.1
+2025-12-17 18:03:35,612 - audit - INFO - Response: 307 | Duration: 0.008s
+2025-12-17 18:03:35,616 - audit - INFO - Request: OPTIONS /users/ | Client: 127.0.0.1
+2025-12-17 18:03:35,617 - audit - INFO - Request: GET /users | Client: 127.0.0.1
+2025-12-17 18:03:35,618 - audit - INFO - Response: 200 | Duration: 0.002s
+2025-12-17 18:03:35,622 - audit - INFO - Response: 307 | Duration: 0.005s
+2025-12-17 18:03:35,623 - audit - INFO - Request: GET /users/ | Client: 127.0.0.1
+2025-12-17 18:03:35,733 - audit - INFO - Response: 200 | Duration: 0.128s
+2025-12-17 18:03:35,735 - audit - INFO - Request: GET /api/admin/users/new-signups | Client: 127.0.0.1
+2025-12-17 18:03:35,771 - audit - INFO - Response: 200 | Duration: 0.036s
+2025-12-17 18:03:35,798 - audit - INFO - Response: 200 | Duration: 0.175s
+2025-12-17 18:03:35,800 - audit - INFO - Request: GET /users/ | Client: 127.0.0.1
+2025-12-17 18:03:36,351 - audit - INFO - Request: GET /api/admin/users/churned | Client: 127.0.0.1
+2025-12-17 18:03:36,365 - audit - INFO - Request: GET /api/admin/users/stats/churn-rate | Client: 127.0.0.1
+2025-12-17 18:03:36,388 - audit - INFO - Response: 200 | Duration: 0.588s
+2025-12-17 18:03:36,401 - audit - INFO - Request: GET /api/admin/users/churned | Client: 127.0.0.1
+2025-12-17 18:03:36,440 - audit - INFO - Request: GET /api/admin/users/stats/churn-rate | Client: 127.0.0.1
+2025-12-17 18:05:01,591 - audit - INFO - Request: GET /users | Client: 127.0.0.1
+2025-12-17 18:05:01,592 - audit - INFO - Request: GET /api/admin/users/churned | Client: 127.0.0.1
+2025-12-17 18:05:01,594 - audit - INFO - Request: GET /api/admin/users/stats/churn-rate | Client: 127.0.0.1
+2025-12-17 18:05:01,595 - audit - INFO - Request: GET /api/admin/users/new-signups | Client: 127.0.0.1
+2025-12-17 18:05:01,595 - audit - INFO - Response: 307 | Duration: 0.004s
+2025-12-17 18:05:01,613 - audit - INFO - Request: GET /users/ | Client: 127.0.0.1
+2025-12-17 18:05:01,618 - audit - INFO - Request: GET /users | Client: 127.0.0.1
+2025-12-17 18:05:01,618 - audit - INFO - Request: GET /users/me | Client: 127.0.0.1
+2025-12-17 18:05:01,624 - audit - INFO - Response: 307 | Duration: 0.006s
+2025-12-17 18:05:01,625 - audit - INFO - Request: GET /users | Client: 127.0.0.1
+2025-12-17 18:05:01,626 - audit - INFO - Response: 307 | Duration: 0.001s
+2025-12-17 18:05:01,652 - audit - INFO - Request: GET /api/admin/users/churned | Client: 127.0.0.1
+2025-12-17 18:05:01,659 - audit - INFO - Request: GET /api/admin/users/churned | Client: 127.0.0.1
+2025-12-17 18:05:01,662 - audit - INFO - Response: 200 | Duration: 0.067s
+2025-12-17 18:05:01,664 - audit - INFO - Request: GET /api/admin/users/new-signups | Client: 127.0.0.1
+2025-12-17 18:05:01,686 - audit - INFO - Request: GET /api/admin/users/stats/churn-rate | Client: 127.0.0.1
+2025-12-17 18:05:01,687 - audit - INFO - Response: 200 | Duration: 0.074s
+2025-12-17 18:05:01,691 - audit - INFO - Request: GET /api/admin/users/stats/churn-rate | Client: 127.0.0.1
+2025-12-17 18:05:01,744 - audit - INFO - Request: GET /users/ | Client: 127.0.0.1
+2025-12-17 18:05:01,837 - audit - INFO - Request: GET /api/admin/users/churned | Client: 127.0.0.1
+2025-12-17 18:05:01,890 - audit - INFO - Response: 200 | Duration: 0.146s
+2025-12-17 18:05:01,904 - audit - INFO - Request: GET /api/admin/users/stats/churn-rate | Client: 127.0.0.1
+2025-12-17 18:05:01,908 - audit - INFO - Request: GET /users/ | Client: 127.0.0.1
+2025-12-17 18:05:01,910 - audit - INFO - Response: 200 | Duration: 0.292s
+2025-12-17 18:05:01,918 - audit - INFO - Request: GET /users/me | Client: 127.0.0.1
+2025-12-17 18:05:01,946 - audit - INFO - Request: GET /api/admin/users/churned | Client: 127.0.0.1
+2025-12-17 18:05:01,966 - audit - INFO - Response: 200 | Duration: 0.058s
+2025-12-17 18:05:01,971 - audit - INFO - Response: 200 | Duration: 0.053s
+2025-12-17 18:05:01,974 - audit - INFO - Response: 200 | Duration: 0.309s
+2025-12-17 18:05:01,976 - audit - INFO - Request: GET /api/admin/users/new-signups | Client: 127.0.0.1
+2025-12-17 18:05:02,002 - audit - INFO - Request: GET /api/admin/users/stats/churn-rate | Client: 127.0.0.1
+2025-12-17 18:05:02,029 - audit - INFO - Response: 200 | Duration: 0.054s
+2025-12-17 18:05:03,904 - audit - INFO - Request: GET /api/analysis/full | Client: 127.0.0.1
+2025-12-17 18:05:03,999 - audit - INFO - Response: 200 | Duration: 0.094s
+2025-12-17 18:05:04,001 - audit - INFO - Request: GET /api/analysis/full | Client: 127.0.0.1
+2025-12-17 18:05:04,090 - audit - INFO - Response: 200 | Duration: 0.090s
+2025-12-17 18:05:05,222 - audit - INFO - Request: GET /api/analysis/full | Client: 127.0.0.1
+2025-12-17 18:05:05,225 - audit - INFO - Request: GET /api/analysis/full | Client: 127.0.0.1
+2025-12-17 18:05:05,286 - audit - INFO - Response: 200 | Duration: 0.065s
+2025-12-17 18:05:05,326 - audit - INFO - Response: 200 | Duration: 0.101s
+2025-12-17 18:05:05,435 - audit - INFO - Request: GET /api/analysis/full | Client: 127.0.0.1
+2025-12-17 18:05:05,453 - audit - INFO - Request: GET /users/me | Client: 127.0.0.1
+2025-12-17 18:05:05,476 - audit - INFO - Response: 200 | Duration: 0.023s
+2025-12-17 18:05:05,479 - audit - INFO - Request: GET /users/me | Client: 127.0.0.1
+2025-12-17 18:05:05,500 - audit - INFO - Response: 200 | Duration: 0.021s
+2025-12-17 18:05:05,527 - audit - INFO - Response: 200 | Duration: 0.092s
+2025-12-17 18:05:05,529 - audit - INFO - Request: GET /api/analysis/full | Client: 127.0.0.1
+2025-12-17 18:05:05,621 - audit - INFO - Response: 200 | Duration: 0.092s
+2025-12-17 18:05:05,625 - audit - INFO - Request: GET /api/analysis/full | Client: 127.0.0.1
+2025-12-17 18:05:05,708 - audit - INFO - Response: 200 | Duration: 0.084s
+2025-12-17 18:05:07,157 - audit - INFO - Request: GET /api/admin/users/churned | Client: 127.0.0.1
+2025-12-17 18:05:07,160 - audit - INFO - Request: GET /users | Client: 127.0.0.1
+2025-12-17 18:05:07,161 - audit - INFO - Request: GET /api/admin/users/stats/churn-rate | Client: 127.0.0.1
+2025-12-17 18:05:07,167 - audit - INFO - Request: GET /api/admin/users/new-signups | Client: 127.0.0.1
+2025-12-17 18:05:07,169 - audit - INFO - Response: 307 | Duration: 0.009s
+2025-12-17 18:05:07,170 - audit - INFO - Request: GET /users | Client: 127.0.0.1
+2025-12-17 18:05:07,171 - audit - INFO - Request: GET /users/ | Client: 127.0.0.1
+2025-12-17 18:05:07,171 - audit - INFO - Response: 307 | Duration: 0.001s
+2025-12-17 18:05:07,247 - audit - INFO - Request: GET /api/admin/users/churned | Client: 127.0.0.1
+2025-12-17 18:05:07,257 - audit - INFO - Response: 200 | Duration: 0.091s
+2025-12-17 18:05:07,258 - audit - INFO - Response: 200 | Duration: 0.087s
+2025-12-17 18:05:07,267 - audit - INFO - Request: GET /api/admin/users/new-signups | Client: 127.0.0.1
+2025-12-17 18:05:07,273 - audit - INFO - Request: GET /users/ | Client: 127.0.0.1
+2025-12-17 18:05:07,309 - audit - INFO - Request: GET /api/admin/users/stats/churn-rate | Client: 127.0.0.1
+2025-12-17 18:05:07,347 - audit - INFO - Response: 200 | Duration: 0.074s
+2025-12-17 18:05:07,370 - audit - INFO - Request: GET /api/admin/users/churned | Client: 127.0.0.1
+2025-12-17 18:05:07,374 - audit - INFO - Response: 200 | Duration: 0.107s
+2025-12-17 18:05:07,419 - audit - INFO - Request: GET /api/admin/users/stats/churn-rate | Client: 127.0.0.1
+2025-12-17 18:06:30,582 - app.services.scheduler - INFO - Scheduler stopped
+2025-12-17 18:06:30,582 - app.main - INFO - Caffeine API stopped
+2025-12-17 18:06:30,582 - app.main - INFO - ============================================================
+2025-12-17 18:06:30,582 - apscheduler.scheduler - INFO - Scheduler has been shut down
+2025-12-17 18:06:33,106 - app.main - INFO - ============================================================
+2025-12-17 18:06:33,106 - app.main - INFO - Caffeine API started
+2025-12-17 18:06:33,107 - app.main - INFO - Environment: development
+2025-12-17 18:06:33,107 - app.main - INFO - CORS Allowed Origins: ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:8001', 'http://localhost:8082', 'http://localhost:8080', 'http://localhost:19000', 'http://localhost:19006', 'http://127.0.0.1:3000', 'http://127.0.0.1:3001', 'http://127.0.0.1:8001', 'http://127.0.0.1:8082', 'http://127.0.0.1:8080', 'http://127.0.0.1:19000', 'http://127.0.0.1:19006', 'https://d26uyg5darllja.cloudfront.net']
+2025-12-17 18:06:34,159 - app.routers.ml - INFO - XGBoost model loaded: model_xgboost_acc_73.47.joblib
+2025-12-17 18:06:34,232 - apscheduler.scheduler - INFO - Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2025-12-17 18:06:34,233 - apscheduler.scheduler - INFO - Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2025-12-17 18:06:34,234 - apscheduler.scheduler - INFO - Added job "Send Weekly Report" to job store "default"
+2025-12-17 18:06:34,234 - apscheduler.scheduler - INFO - Added job "Send Monthly Report" to job store "default"
+2025-12-17 18:06:34,234 - apscheduler.scheduler - INFO - Scheduler started
+2025-12-17 18:06:34,234 - app.services.scheduler - INFO - ============================================================
+2025-12-17 18:06:34,234 - app.services.scheduler - INFO - Scheduler started
+2025-12-17 18:06:34,234 - app.services.scheduler - INFO -   - Weekly Report: Every Monday 09:00
+2025-12-17 18:06:34,235 - app.services.scheduler - INFO -   - Monthly Report: Every 1st day of month 09:00
+2025-12-17 18:06:34,235 - app.services.scheduler - INFO - ============================================================
+2025-12-17 18:06:54,506 - audit - INFO - Request: GET /api/admin/users/churned | Client: 127.0.0.1
+2025-12-17 18:06:54,507 - audit - INFO - Request: GET /users | Client: 127.0.0.1
+2025-12-17 18:06:54,507 - audit - INFO - Request: GET /api/admin/users/stats/churn-rate | Client: 127.0.0.1
+2025-12-17 18:06:54,508 - audit - INFO - Request: GET /api/admin/users/new-signups | Client: 127.0.0.1
+2025-12-17 18:06:54,508 - app.db.database - INFO - Connecting to AWS RDS: caffeine-database.c58og6ke6t36.ap-northeast-2.rds.amazonaws.com
+2025-12-17 18:06:54,510 - app.db.database - INFO - Connecting to AWS RDS: caffeine-database.c58og6ke6t36.ap-northeast-2.rds.amazonaws.com
+2025-12-17 18:06:54,514 - app.db.database - INFO - Connecting to AWS RDS: caffeine-database.c58og6ke6t36.ap-northeast-2.rds.amazonaws.com
+2025-12-17 18:06:54,519 - audit - INFO - Response: 307 | Duration: 0.012s
+2025-12-17 18:06:54,524 - audit - INFO - Request: GET /users | Client: 127.0.0.1
+2025-12-17 18:06:54,525 - audit - INFO - Request: GET /users/me | Client: 127.0.0.1
+2025-12-17 18:06:54,526 - audit - INFO - Response: 307 | Duration: 0.003s
+2025-12-17 18:06:54,528 - app.db.database - INFO - Connecting to AWS RDS: caffeine-database.c58og6ke6t36.ap-northeast-2.rds.amazonaws.com
+2025-12-17 18:06:54,531 - audit - INFO - Request: GET /users | Client: 127.0.0.1
+2025-12-17 18:06:54,534 - audit - INFO - Request: GET /users/ | Client: 127.0.0.1
+2025-12-17 18:06:54,535 - app.db.database - INFO - Connecting to AWS RDS: caffeine-database.c58og6ke6t36.ap-northeast-2.rds.amazonaws.com
+2025-12-17 18:06:54,540 - audit - INFO - Response: 307 | Duration: 0.008s
+2025-12-17 18:06:54,749 - app.db.database - INFO - Connected to AWS RDS: caffeine-database.c58og6ke6t36.ap-northeast-2.rds.amazonaws.com
+2025-12-17 18:06:54,771 - app.db.database - INFO - Connected to AWS RDS: caffeine-database.c58og6ke6t36.ap-northeast-2.rds.amazonaws.com
+2025-12-17 18:06:54,778 - app.db.database - INFO - Connected to AWS RDS: caffeine-database.c58og6ke6t36.ap-northeast-2.rds.amazonaws.com
+2025-12-17 18:06:54,779 - app.db.database - INFO - Connected to AWS RDS: caffeine-database.c58og6ke6t36.ap-northeast-2.rds.amazonaws.com
+2025-12-17 18:06:54,780 - app.db.database - INFO - Connected to AWS RDS: caffeine-database.c58og6ke6t36.ap-northeast-2.rds.amazonaws.com
+2025-12-17 18:06:54,815 - audit - INFO - Response: 200 | Duration: 0.290s
+2025-12-17 18:06:54,817 - audit - INFO - Request: GET /users/me | Client: 127.0.0.1
+2025-12-17 18:06:54,836 - audit - INFO - Response: 200 | Duration: 0.019s
+2025-12-17 18:06:54,841 - audit - INFO - Response: 200 | Duration: 0.308s
+2025-12-17 18:06:54,843 - audit - INFO - Request: GET /users/ | Client: 127.0.0.1
+2025-12-17 18:06:54,845 - audit - INFO - Response: 200 | Duration: 0.337s
+2025-12-17 18:06:54,847 - audit - INFO - Request: GET /api/admin/users/new-signups | Client: 127.0.0.1
+2025-12-17 18:06:54,880 - audit - INFO - Response: 200 | Duration: 0.375s
+2025-12-17 18:06:54,880 - audit - INFO - Request: GET /api/admin/users/churned | Client: 127.0.0.1
+2025-12-17 18:06:54,884 - audit - INFO - Response: 200 | Duration: 0.040s
+2025-12-17 18:06:54,885 - audit - INFO - Request: GET /users/ | Client: 127.0.0.1
+2025-12-17 18:06:54,913 - audit - INFO - Response: 200 | Duration: 0.407s
+2025-12-17 18:06:54,915 - audit - INFO - Request: GET /api/admin/users/stats/churn-rate | Client: 127.0.0.1
+2025-12-17 18:06:55,035 - audit - INFO - Response: 200 | Duration: 0.155s
+2025-12-17 18:06:55,038 - audit - INFO - Request: GET /api/admin/users/churned | Client: 127.0.0.1
+2025-12-17 18:06:55,039 - audit - INFO - Response: 200 | Duration: 0.192s
+2025-12-17 18:06:55,040 - audit - INFO - Request: GET /api/admin/users/new-signups | Client: 127.0.0.1
+2025-12-17 18:06:55,052 - audit - INFO - Response: 200 | Duration: 0.167s
+2025-12-17 18:06:55,079 - audit - INFO - Response: 200 | Duration: 0.039s
+2025-12-17 18:06:55,110 - audit - INFO - Response: 200 | Duration: 0.074s
+2025-12-17 18:06:55,152 - audit - INFO - Response: 200 | Duration: 0.237s
+2025-12-17 18:06:55,153 - audit - INFO - Request: GET /api/admin/users/stats/churn-rate | Client: 127.0.0.1
+2025-12-17 18:06:55,251 - audit - INFO - Response: 200 | Duration: 0.098s
+2025-12-17 18:08:43,201 - audit - INFO - Request: GET /users | Client: 127.0.0.1
+2025-12-17 18:08:43,201 - audit - INFO - Request: GET /api/admin/users/new-signups | Client: 127.0.0.1
+2025-12-17 18:08:43,201 - audit - INFO - Request: GET /api/admin/users/churned | Client: 127.0.0.1
+2025-12-17 18:08:43,203 - audit - INFO - Request: GET /api/admin/users/stats/churn-rate | Client: 127.0.0.1
+2025-12-17 18:08:43,203 - audit - INFO - Response: 307 | Duration: 0.003s
+2025-12-17 18:08:43,214 - audit - INFO - Request: GET /users/ | Client: 127.0.0.1
+2025-12-17 18:08:43,219 - audit - INFO - Request: GET /users | Client: 127.0.0.1
+2025-12-17 18:08:43,219 - audit - INFO - Request: GET /users/me | Client: 127.0.0.1
+2025-12-17 18:08:43,230 - audit - INFO - Response: 307 | Duration: 0.011s
+2025-12-17 18:08:43,230 - audit - INFO - Request: GET /users | Client: 127.0.0.1
+2025-12-17 18:08:43,230 - audit - INFO - Response: 307 | Duration: 0.000s
+2025-12-17 18:08:43,250 - audit - INFO - Response: 200 | Duration: 0.049s
+2025-12-17 18:08:43,252 - audit - INFO - Request: GET /api/admin/users/new-signups | Client: 127.0.0.1
+2025-12-17 18:08:43,253 - audit - INFO - Response: 200 | Duration: 0.039s
+2025-12-17 18:08:43,253 - audit - INFO - Request: GET /users/ | Client: 127.0.0.1
+2025-12-17 18:08:43,307 - audit - INFO - Response: 200 | Duration: 0.054s
+2025-12-17 18:08:43,309 - audit - INFO - Request: GET /users/ | Client: 127.0.0.1
+2025-12-17 18:08:43,311 - audit - INFO - Response: 200 | Duration: 0.059s
+2025-12-17 18:08:43,312 - audit - INFO - Request: GET /api/admin/users/new-signups | Client: 127.0.0.1
+2025-12-17 18:08:43,320 - audit - INFO - Response: 200 | Duration: 0.118s
+2025-12-17 18:08:43,321 - audit - INFO - Request: GET /api/admin/users/churned | Client: 127.0.0.1
+2025-12-17 18:08:43,335 - audit - INFO - Response: 200 | Duration: 0.132s
+2025-12-17 18:08:43,335 - audit - INFO - Request: GET /api/admin/users/stats/churn-rate | Client: 127.0.0.1
+2025-12-17 18:08:43,338 - audit - INFO - Response: 200 | Duration: 0.119s
+2025-12-17 18:08:43,338 - audit - INFO - Response: 200 | Duration: 0.030s
+2025-12-17 18:08:43,340 - audit - INFO - Request: GET /users/me | Client: 127.0.0.1
+2025-12-17 18:08:43,353 - audit - INFO - Response: 200 | Duration: 0.041s
+2025-12-17 18:08:43,362 - audit - INFO - Response: 200 | Duration: 0.022s
+2025-12-17 18:08:43,394 - audit - INFO - Response: 200 | Duration: 0.073s
+2025-12-17 18:08:43,396 - audit - INFO - Request: GET /api/admin/users/churned | Client: 127.0.0.1
+2025-12-17 18:08:43,428 - audit - INFO - Response: 200 | Duration: 0.093s
+2025-12-17 18:08:43,429 - audit - INFO - Request: GET /api/admin/users/stats/churn-rate | Client: 127.0.0.1
+2025-12-17 18:08:43,465 - audit - INFO - Response: 200 | Duration: 0.069s
+2025-12-17 18:08:43,553 - audit - INFO - Response: 200 | Duration: 0.124s

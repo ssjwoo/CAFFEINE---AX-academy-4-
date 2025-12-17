@@ -214,7 +214,7 @@ async def health(request: Request):
 # ============================================================
 # 라우터 등록
 # ============================================================
-from app.routers import ml, analysis, transactions, user, settings, reports, anomalies
+from app.routers import ml, analysis, transactions, user, settings, reports, anomalies, user_analytics, analytics_demographics
 
 # ML 예측 API (/ml/*)
 app.include_router(ml.router)
@@ -227,6 +227,12 @@ app.include_router(transactions.router)
 
 # 사용자/인증 API (/users/*)
 app.include_router(user.router)
+
+# 관리자 사용자 분석 API (/api/admin/users/*)
+app.include_router(user_analytics.router)
+
+# 인구통계 분석 API (/api/analytics/demographics/*)
+app.include_router(analytics_demographics.router)
 
 # 관리자 설정 API (/api/admin/settings/*)
 app.include_router(settings.router)
