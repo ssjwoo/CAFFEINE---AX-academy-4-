@@ -11,6 +11,7 @@ import FadeInView from '../components/FadeInView';
 import AnimatedButton from '../components/AnimatedButton';
 import EmptyState from '../components/EmptyState';
 import { SkeletonStats, SkeletonChart } from '../components/SkeletonCard';
+import AddTransactionModal from '../components/AddTransactionModal';
 import { formatCurrency } from '../utils/currency';
 import { CHART_COLORS, ANIMATION_DELAY } from '../constants';
 
@@ -55,6 +56,7 @@ export default function DashboardScreen({ navigation }) {
     const [tooltip, setTooltip] = useState(null);
     const [predictedTransaction, setPredictedTransaction] = useState(null);
     const [couponReceived, setCouponReceived] = useState(false);
+    const [showAddModal, setShowAddModal] = useState(false);
 
     const scrollViewRef = useRef(null);
 
@@ -64,7 +66,7 @@ export default function DashboardScreen({ navigation }) {
 
         const totalSpending = txns.reduce((sum, t) => sum + Math.abs(t.amount), 0);
         const avgTransaction = totalSpending / txns.length;
-        
+
         // 카테고리별 집계
         const categoryMap = {};
         txns.forEach(t => {
@@ -80,7 +82,7 @@ export default function DashboardScreen({ navigation }) {
         const mostUsedCategoryPercent = Math.round((mostUsedCategoryAmount / totalSpending) * 100);
 
         // 가장 비싼 거래 찾기
-        const maxTransaction = txns.reduce((max, t) => 
+        const maxTransaction = txns.reduce((max, t) =>
             Math.abs(t.amount) > Math.abs(max.amount) ? t : max, txns[0]);
 
         // 자주 가는 가맹점 찾기
@@ -115,7 +117,7 @@ export default function DashboardScreen({ navigation }) {
 
         const categoryMap = {};
         let total = 0;
-        
+
         txns.forEach(t => {
             const cat = t.category || '기타';
             if (!categoryMap[cat]) categoryMap[cat] = 0;
@@ -141,10 +143,10 @@ export default function DashboardScreen({ navigation }) {
         const monthlyMap = {};
         txns.forEach(t => {
             let date = t.date?.split(' ')[0] || t.date || '';
-            
+
             // 다양한 날짜 형식 처리
             let month = null;
-            
+
             // YYYY-MM-DD 형식
             if (date.match(/^\d{4}-\d{2}/)) {
                 month = date.substring(0, 7);
@@ -163,7 +165,7 @@ export default function DashboardScreen({ navigation }) {
                     }
                 }
             }
-            
+
             if (month && month.length >= 7) {
                 if (!monthlyMap[month]) monthlyMap[month] = 0;
                 monthlyMap[month] += Math.abs(t.amount);
@@ -264,8 +266,8 @@ export default function DashboardScreen({ navigation }) {
             colors={colors.screenGradient}
             style={styles.gradientContainer}
         >
-            <ScrollView 
-                ref={scrollViewRef} 
+            <ScrollView
+                ref={scrollViewRef}
                 style={styles.container}
                 showsVerticalScrollIndicator={false}
                 refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.tabBarActive} />}
@@ -276,7 +278,7 @@ export default function DashboardScreen({ navigation }) {
                         <Text style={[styles.userName, { color: colors.text }]}>{user?.name || '사용자'}님의 소비현황</Text>
                     </View>
                     <View style={styles.headerButtons}>
-                        <TouchableOpacity 
+                        <TouchableOpacity
                             style={styles.profileButton}
                             onPress={() => navigation?.navigate('프로필')}
                         >
@@ -287,7 +289,7 @@ export default function DashboardScreen({ navigation }) {
                                 <Feather name="user" size={20} color="#FFFFFF" />
                             </LinearGradient>
                         </TouchableOpacity>
-                        <TouchableOpacity 
+                        <TouchableOpacity
                             style={styles.settingsButton}
                             onPress={() => navigation?.navigate('설정')}
                         >
@@ -374,7 +376,7 @@ export default function DashboardScreen({ navigation }) {
                 {/* AI Prediction Banner */}
                 {predictedTransaction && (
                     <FadeInView style={styles.predictionBanner} delay={200}>
-                        <TouchableOpacity 
+                        <TouchableOpacity
                             style={styles.predictionCard}
                             activeOpacity={0.8}
                             onPress={handleGetCoupon}
@@ -399,7 +401,7 @@ export default function DashboardScreen({ navigation }) {
 
                 {/* Quick Actions */}
                 <FadeInView style={styles.quickActions} delay={300}>
-                    <TouchableOpacity 
+                    <TouchableOpacity
                         style={styles.quickActionItem}
                         onPress={() => navigation?.navigate('거래내역')}
                     >
@@ -408,7 +410,7 @@ export default function DashboardScreen({ navigation }) {
                         </View>
                         <Text style={[styles.quickActionLabel, { color: colors.text }]}>거래내역</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity 
+                    <TouchableOpacity
                         style={styles.quickActionItem}
                         onPress={() => navigation?.navigate('쿠폰함')}
                     >
@@ -417,7 +419,7 @@ export default function DashboardScreen({ navigation }) {
                         </View>
                         <Text style={[styles.quickActionLabel, { color: colors.text }]}>쿠폰함</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity 
+                    <TouchableOpacity
                         style={styles.quickActionItem}
                         onPress={() => navigation?.navigate('분석')}
                     >
@@ -426,7 +428,7 @@ export default function DashboardScreen({ navigation }) {
                         </View>
                         <Text style={[styles.quickActionLabel, { color: colors.text }]}>분석</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity 
+                    <TouchableOpacity
                         style={styles.quickActionItem}
                         onPress={() => navigation?.navigate('더보기', { openChat: true })}
                     >
@@ -439,7 +441,7 @@ export default function DashboardScreen({ navigation }) {
 
                 {/* Anomaly Alert - 의심스러운 거래 발견 */}
                 <FadeInView style={styles.alertContainer} delay={350}>
-                    <TouchableOpacity 
+                    <TouchableOpacity
                         style={styles.alertCard}
                         onPress={() => navigation?.navigate('거래내역')}
                         activeOpacity={0.8}
@@ -548,6 +550,31 @@ export default function DashboardScreen({ navigation }) {
 
                 <View style={{ height: 100 }} />
             </ScrollView>
+
+            {/* Floating Action Button - 소비 추가 */}
+            <TouchableOpacity
+                style={styles.fab}
+                onPress={() => setShowAddModal(true)}
+                activeOpacity={0.85}
+            >
+                <LinearGradient
+                    colors={['#10B981', '#059669']}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 1 }}
+                    style={styles.fabGradient}
+                >
+                    <Feather name="plus" size={28} color="#FFFFFF" />
+                </LinearGradient>
+            </TouchableOpacity>
+
+            {/* 소비 추가 모달 */}
+            <AddTransactionModal
+                visible={showAddModal}
+                onClose={() => setShowAddModal(false)}
+                onSuccess={() => {
+                    refresh();  // 데이터 새로고침
+                }}
+            />
         </LinearGradient>
     );
 }
@@ -559,7 +586,7 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
     },
-    
+
     // Header
     header: {
         flexDirection: 'row',
@@ -1016,5 +1043,27 @@ const styles = StyleSheet.create({
     insightHighlight: {
         fontWeight: '700',
         color: '#2563EB',
+    },
+
+    // Floating Action Button
+    fab: {
+        position: 'absolute',
+        right: 24,
+        bottom: 100,
+        width: 60,
+        height: 60,
+        borderRadius: 30,
+        shadowColor: '#10B981',
+        shadowOffset: { width: 0, height: 6 },
+        shadowOpacity: 0.4,
+        shadowRadius: 12,
+        elevation: 8,
+    },
+    fabGradient: {
+        width: '100%',
+        height: '100%',
+        borderRadius: 30,
+        justifyContent: 'center',
+        alignItems: 'center',
     },
 });

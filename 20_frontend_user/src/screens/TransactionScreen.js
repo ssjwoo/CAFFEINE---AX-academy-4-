@@ -24,15 +24,14 @@ export default function TransactionScreen({ navigation }) {
 
     const fetchPrediction = async () => {
         try {
-            // 가장 최근 거래 데이터를 기반으로 다음 소비 패턴 예측 (시뮬레이션)
-            // 실제로는 사용자의 최근 소비 패턴 전체를 분석해야 함
+            // 가장 최근 거래 데이터를 기반으로 다음 소비 패턴 예측
             const recentTransaction = transactions[0];
             const requestData = {
                 날짜: recentTransaction.date.split(' ')[0],
                 시간: recentTransaction.date.split(' ')[1],
                 타입: '지출',
                 대분류: recentTransaction.category,
-                소분류: '기타', // 상세 분류가 없으므로 기타로 처리
+                소분류: '기타',
                 내용: recentTransaction.merchant,
                 금액: String(-recentTransaction.amount),
                 화폐: 'KRW',
@@ -40,11 +39,33 @@ export default function TransactionScreen({ navigation }) {
                 메모: recentTransaction.notes || ''
             };
 
-            // 백엔드 API 호출
+            // 1. ML 예측
             const response = await apiClient.post('/ml/predict', {
                 features: requestData
             });
-            setPrediction(response.data.prediction);
+            const predictedCategory = response.data.prediction;
+            setPrediction(predictedCategory);
+
+            // 2. 쿠폰 자동 생성
+            try {
+                const couponResponse = await apiClient.post('/api/coupons/generate-from-prediction', {
+                    predicted_category: predictedCategory,
+                    confidence: response.data.confidence || 0.8
+                });
+
+                // 쿠폰 발급 성공 알림
+                alert(
+                    `🎉 다음 소비 예측: ${predictedCategory}\n\n` +
+                    `🎁 쿠폰 발급 완료!\n` +
+                    `${couponResponse.data.merchant_name}에서 사용 가능한\n` +
+                    `${formatCurrency(couponResponse.data.discount_amount)} 할인 쿠폰이 발급되었습니다!\n\n` +
+                    `만료일: ${couponResponse.data.expiry_date}`
+                );
+            } catch (couponError) {
+                console.error('Coupon generation failed:', couponError);
+                // 예측은 성공했지만 쿠폰 발급 실패 시
+                alert(`다음 소비 예측: ${predictedCategory}\n\n쿠폰 발급 중 오류가 발생했습니다.`);
+            }
         } catch (error) {
             console.error('Prediction failed:', error);
             alert('예측 실패: ' + (error.response?.data?.detail || error.message));
@@ -446,7 +467,7 @@ export default function TransactionScreen({ navigation }) {
 
 const styles = (colors) => StyleSheet.create({
     container: { flex: 1 },
-    header: { 
+    header: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
@@ -466,11 +487,11 @@ const styles = (colors) => StyleSheet.create({
     title: { fontSize: 28, fontWeight: '700', color: colors.text, fontFamily: 'Inter_700Bold' },
     subtitle: { fontSize: 16, color: '#2563EB', marginTop: 6, fontWeight: '600' },
     list: { padding: 16 },
-    transactionCard: { 
-        backgroundColor: colors.cardBackground, 
-        borderRadius: 16, 
-        padding: 16, 
-        marginBottom: 12, 
+    transactionCard: {
+        backgroundColor: colors.cardBackground,
+        borderRadius: 16,
+        padding: 16,
+        marginBottom: 12,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.06,

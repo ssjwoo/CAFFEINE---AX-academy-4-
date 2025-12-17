@@ -25,7 +25,7 @@ services:
   # FastAPI 백엔드
   # ============================================================
   backend:
-    # build: ./10_backend
+    build: ./10_backend
     image: caffeine-backend:latest
     container_name: caf_backend
     depends_on:
@@ -47,6 +47,8 @@ services:
       LOCAL_DB_PASSWORD: caffeineapprds
       # App
       SECRET_KEY: your-super-secret-key-change-in-production
+    env_file:
+      - ./10_backend/.env
     ports:
       - "8001:8000"
     volumes:

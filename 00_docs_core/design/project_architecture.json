@@ -1,0 +1,241 @@
+{
+    "project": {
+        "name": "Caffeine",
+        "description": "AI 기반 스마트 가계부 서비스",
+        "version": "1.0.0",
+        "last_updated": "2025-12-11"
+    },
+    "architecture": {
+        "frontend": {
+            "user_app": {
+                "name": "User App",
+                "description": "사용자용 모바일 가계부 앱",
+                "framework": "Expo (React Native)",
+                "language": "JavaScript",
+                "directory": "20_frontend_user",
+                "port": 8081,
+                "docker": false,
+                "features": [
+                    "거래 내역 조회",
+                    "CSV 업로드",
+                    "ML 카테고리 예측",
+                    "소비 분석 리포트"
+                ]
+            },
+            "admin_app": {
+                "name": "Admin Dashboard",
+                "description": "관리자용 데이터 분석 대시보드",
+                "framework": "Next.js 16",
+                "language": "TypeScript",
+                "styling": "TailwindCSS 4",
+                "directory": "21_frontend_admin",
+                "port": 3001,
+                "docker": true,
+                "features": [
+                    "대시보드 통계",
+                    "카테고리별 소비 차트",
+                    "월별 추이 분석",
+                    "이상거래 모니터링"
+                ]
+            },
+            "nginx": {
+                "name": "Nginx",
+                "description": "리버스 프록시 서버",
+                "directory": "30_nginx",
+                "port": 80,
+                "docker": true
+            }
+        },
+        "backend": {
+            "api_server": {
+                "name": "FastAPI Backend",
+                "description": "RESTful API 서버",
+                "framework": "FastAPI",
+                "language": "Python 3.10",
+                "directory": "10_backend",
+                "port": 8001,
+                "docker": true,
+                "endpoints": {
+                    "health": "GET /health",
+                    "analysis": {
+                        "full": "GET /api/analysis/full",
+                        "summary": "GET /api/analysis/summary",
+                        "categories": "GET /api/analysis/categories",
+                        "monthly_trend": "GET /api/analysis/monthly-trend",
+                        "insights": "GET /api/analysis/insights"
+                    },
+                    "transactions": {
+                        "list": "GET /api/transactions",
+                        "detail": "GET /api/transactions/{id}",
+                        "stats": "GET /api/transactions/stats/summary"
+                    },
+                    "ml": {
+                        "predict": "POST /ml/predict",
+                        "upload": "POST /ml/upload",
+                        "predict_next": "POST /ml/predict-next"
+                    }
+                }
+            }
+        },
+        "database": {
+            "primary": {
+                "name": "AWS RDS",
+                "type": "PostgreSQL",
+                "host": "caffeine-database.c58og6ke6t36.ap-northeast-2.rds.amazonaws.com",
+                "port": 5432,
+                "database": "postgres",
+                "region": "ap-northeast-2"
+            },
+            "fallback": {
+                "name": "Docker PostgreSQL",
+                "type": "PostgreSQL",
+                "container": "caf_db",
+                "port": 5432,
+                "database": "caffeine_db"
+            }
+        },
+        "ml_services": {
+            "ml_next": {
+                "name": "ML Next",
+                "description": "카테고리 예측 모델",
+                "model": "XGBoost",
+                "accuracy": "73.47%",
+                "directory": "40_ml_next",
+                "port": 9001,
+                "docker": true,
+                "features": [
+                    "소비 카테고리 자동 분류",
+                    "로컬 모델 로딩 지원"
+                ]
+            },
+            "ml_fraud": {
+                "name": "ML Fraud",
+                "description": "이상거래 탐지 모델",
+                "model": "Anomaly Detection",
+                "directory": "41_ml_fraud",
+                "port": 9002,
+                "docker": true,
+                "features": [
+                    "이상 거래 탐지",
+                    "실시간 알림"
+                ]
+            }
+        },
+        "llm_services": {
+            "llm_category": {
+                "name": "LLM Category",
+                "description": "LLM 기반 카테고리 분류",
+                "directory": "50_llm_category",
+                "port": 9100,
+                "docker": true
+            },
+            "llm_analysis": {
+                "name": "LLM Analysis",
+                "description": "Gemini 기반 소비 분석 및 절약 가이드",
+                "model": "gemini-2.0-flash",
+                "directory": "51_llm_analysis",
+                "port": 9102,
+                "docker": true,
+                "endpoints": {
+                    "health": "GET /",
+                    "analyze": "POST /analyze",
+                    "chat": "POST /chat",
+                    "saving_tips": "POST /saving-tips"
+                },
+                "features": [
+                    "소비 패턴 분석",
+                    "맞춤형 절약 가이드",
+                    "채팅형 비서"
+                ]
+            }
+        }
+    },
+    "docker": {
+        "compose_file": "docker-compose.yml",
+        "services": [
+            {
+                "name": "db",
+                "container": "caf_db",
+                "port": "5432:5432"
+            },
+            {
+                "name": "backend",
+                "container": "caf_backend",
+                "port": "8001:8000"
+            },
+            {
+                "name": "admin_front",
+                "container": "caf_front_admin",
+                "port": "3001:3000"
+            },
+            {
+                "name": "nginx",
+                "container": "caf_nginx",
+                "port": "80:80"
+            },
+            {
+                "name": "ml_next",
+                "container": "caf_ml_next",
+                "port": "9001:9001"
+            },
+            {
+                "name": "ml_fraud",
+                "container": "caf_ml_fraud",
+                "port": "9002:9002"
+            },
+            {
+                "name": "llm_category",
+                "container": "caf_llm_category",
+                "port": "9100:9100"
+            },
+            {
+                "name": "llm_analysis",
+                "container": "caf_llm_analysis",
+                "port": "9102:9102"
+            }
+        ]
+    },
+    "tech_stack": {
+        "frontend": [
+            "React Native",
+            "Expo",
+            "Next.js",
+            "TypeScript",
+            "TailwindCSS"
+        ],
+        "backend": [
+            "Python",
+            "FastAPI",
+            "SQLAlchemy",
+            "Pydantic"
+        ],
+        "database": [
+            "PostgreSQL",
+            "AWS RDS"
+        ],
+        "ml": [
+            "XGBoost",
+            "scikit-learn",
+            "joblib"
+        ],
+        "llm": [
+            "Google Gemini API"
+        ],
+        "devops": [
+            "Docker",
+            "Docker Compose",
+            "Nginx"
+        ]
+    },
+    "ports_summary": {
+        "80": "Nginx (Reverse Proxy)",
+        "3001": "Admin Dashboard (Next.js)",
+        "5432": "PostgreSQL Database",
+        "8001": "FastAPI Backend",
+        "8081": "User App (Expo)",
+        "9001": "ML Next (XGBoost)",
+        "9002": "ML Fraud (Anomaly)",
+        "9100": "LLM Category",
+        "9102": "LLM Analysis (Gemini)"
+    }
+}

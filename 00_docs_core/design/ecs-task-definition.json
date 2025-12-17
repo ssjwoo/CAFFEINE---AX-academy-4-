@@ -1,0 +1,31 @@
+{
+  "family": "caffeine_ecs_task_family",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": ["FARGATE"],
+  "cpu": "1024",
+  "memory": "2048",
+  "executionRoleArn": "arn:aws:iam::864785582947:role/caffeine-ecs-task-role",
+  "taskRoleArn": "arn:aws:iam::864785582947:role/caffeine-ecs-task-role",
+  "containerDefinitions": [
+    {
+      "name": "10_backend",
+      "image": "REPLACE_ME",
+      "essential": true,
+      "portMappings": [
+        {
+          "containerPort": 8000,
+          "hostPort": 8000,
+          "protocol": "tcp"
+        }
+      ],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-region": "ap-northeast-2",
+          "awslogs-group": "/ecs/caffeine-backend",
+          "awslogs-stream-prefix": "ecs"
+        }
+      }
+    }
+  ]
+}

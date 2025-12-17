@@ -60,6 +60,15 @@ class TransactionUpdate(BaseModel):
     description: Optional[str] = None
 
 
+class TransactionCreate(BaseModel):
+    """거래 추가 요청"""
+    amount: float
+    category: str
+    merchant_name: str
+    description: Optional[str] = None
+    transaction_date: Optional[str] = None  # ISO format: 2025-12-16T10:30:00
+
+
 class AnomalyReport(BaseModel):
     """이상거래 신고 요청"""
     reason: str
@@ -185,6 +194,75 @@ async def get_transactions(
             transactions=mock_data,
             data_source="[MOCK] DB 연결 필요"
         )
+
+
+@router.post("", response_model=TransactionBase)
+async def create_transaction(
+    data: TransactionCreate,
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    새 거래 추가
+    
+    - amount: 금액 (필수)
+    - category: 카테고리명 (쇼핑, 식비, 공과금, 여가, 교통, 기타 등)
+    - merchant_name: 가맹점명 (필수)
+    - description: 설명/메모 (선택)
+    - transaction_date: 거래 시각 ISO format (선택, 기본값: 현재 시각)
+    """
+    try:
+        # 카테고리 조회
+        cat_query = select(Category).where(Category.name == data.category)
+        cat_result = await db.execute(cat_query)
+        category = cat_result.scalar_one_or_none()
+        
+        # 카테고리가 없으면 "기타"로 검색
+        if not category:
+            cat_query = select(Category).where(Category.name == "기타")
+            cat_result = await db.execute(cat_query)
+            category = cat_result.scalar_one_or_none()
+        
+        # 거래 시각 파싱
+        if data.transaction_date:
+            try:
+                tx_time = datetime.fromisoformat(data.transaction_date.replace('Z', '+00:00'))
+            except:
+                tx_time = datetime.now()
+        else:
+            tx_time = datetime.now()
+        
+        # 새 거래 생성
+        new_tx = Transaction(
+            user_id=1,  # 기본 사용자 (추후 인증 연동 시 변경)
+            amount=data.amount,
+            merchant_name=data.merchant_name,
+            description=data.description,
+            transaction_time=tx_time,
+            category_id=category.id if category else None,
+            status="completed",
+            currency="KRW"
+        )
+        
+        db.add(new_tx)
+        await db.commit()
+        await db.refresh(new_tx)
+        
+        logger.info(f"새 거래 추가됨: ID={new_tx.id}, 금액={data.amount}, 가맹점={data.merchant_name}")
+        
+        return TransactionBase(
+            id=new_tx.id,
+            merchant=new_tx.merchant_name or "알 수 없음",
+            amount=float(new_tx.amount),
+            category=data.category,
+            transaction_date=new_tx.transaction_time.strftime("%Y-%m-%d %H:%M:%S") if new_tx.transaction_time else "",
+            description=new_tx.description,
+            status=new_tx.status,
+            currency=new_tx.currency
+        )
+        
+    except Exception as e:
+        logger.error(f"거래 추가 실패: {e}")
+        raise HTTPException(status_code=500, detail=f"거래 추가 실패: {str(e)}")
 
 
 @router.get("/{transaction_id}", response_model=TransactionBase)

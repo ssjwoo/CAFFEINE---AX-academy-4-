@@ -10,10 +10,11 @@ export default function MoreScreen({ navigation, route }) {
     const [chatStarted, setChatStarted] = useState(false);
     const [messages, setMessages] = useState([]);
     const [inputText, setInputText] = useState('');
+    const [isTyping, setIsTyping] = useState(false); // Typing Indicator State
     const scrollViewRef = useRef();
     // 잠깐만AI 난이도 상태 (상/중/하)
     const [naggingLevel, setNaggingLevel] = useState('중');
-    
+
     // 대시보드에서 "잠깐만" 버튼 누르면 바로 챗봇 시작
     useEffect(() => {
         if (route?.params?.openChat) {
@@ -22,40 +23,9 @@ export default function MoreScreen({ navigation, route }) {
             navigation?.setParams({ openChat: false });
         }
     }, [route?.params?.openChat]);
-    
-    // 난이도별 챗봇 응답 (잠깐만AI 스타일)
-    const getChatbotResponse = (userMessage) => {
-        const responses = {
-            '상': [
-                "🔥 또 배달 시켰어요?! 한 달에 배달비만 10만원이에요! 당장 그만두세요!",
-                "😤 카페 지출 보세요! 이러다 집 한 채 값 다 써요! 텀블러 들고 다니세요!",
-                "⚡ 충동구매 그만해요! 장바구니에 24시간 두고 다시 생각하세요! 지금 당장!",
-                "🚨 저축 비율이 뭐예요?! 급여의 30%는 무조건 저축! 오늘부터 시작!",
-                "💢 쇼핑 중독이에요?! 이번 달 쇼핑 예산 다 썼어요! 손 떼세요!",
-                "😡 외식비가 월급의 절반이에요! 도시락 싸세요! 변명 듣기 싫어요!",
-            ],
-            '중': [
-                "이번 달 카페 지출이 너무 많아요! 커피 한 잔 줄이면 한 달에 5만원 절약할 수 있어요 ☕",
-                "배달앱 사용이 잦네요. 직접 요리하면 건강도 챙기고 돈도 아낄 수 있어요! 🍳",
-                "쇼핑 지출이 평균보다 30% 높아요. 정말 필요한 건지 다시 생각해보세요 🛍️",
-                "저축 비율이 낮아요! 급여의 20%는 먼저 저축하는 습관을 들여보세요 💰",
-                "외식비가 많이 나가고 있어요. 도시락 싸가면 한 달에 20만원은 절약됩니다! 🍱",
-                "구독 서비스가 많네요. 안 쓰는 구독은 과감히 해지하세요! 📺",
-            ],
-            '하': [
-                "혹시 커피 지출을 조금 줄여보시는 건 어떨까요? 작은 변화도 도움이 돼요 😊",
-                "배달 대신 가끔 직접 요리해보시는 것도 좋을 것 같아요~ 🍳",
-                "쇼핑 전에 한 번 더 생각해보시면 좋겠어요. 천천히 결정하셔도 돼요! 💭",
-                "저축을 조금씩 시작해보시는 건 어떨까요? 부담 없이 시작해보세요 🌱",
-                "외식도 좋지만, 가끔은 집밥도 좋답니다~ 건강에도 좋아요! 🏠",
-                "지출 패턴을 한 번 돌아보시는 것도 좋을 것 같아요. 화이팅! 💪",
-            ]
-        };
-        
-        const levelResponses = responses[naggingLevel] || responses['중'];
-        return levelResponses[Math.floor(Math.random() * levelResponses.length)];
-    };
-    
+
+    // Old mock function removed
+
     const startChat = () => {
         setChatStarted(true);
         setMessages([
@@ -67,30 +37,59 @@ export default function MoreScreen({ navigation, route }) {
             }
         ]);
     };
-    
-    const sendMessage = () => {
+
+    const sendMessage = async () => {
         if (!inputText.trim()) return;
-        
+
         const userMessage = {
             id: messages.length + 1,
             type: 'user',
             text: inputText,
             time: new Date().toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })
         };
-        
+
         setMessages(prev => [...prev, userMessage]);
         setInputText('');
-        
-        // 봇 응답 (1초 후)
-        setTimeout(() => {
-            const botMessage = {
+        setIsTyping(true); // Show typing indicator
+
+        try {
+            // Call Backend API
+            const response = await fetch('http://localhost:8001/api/chat', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    message: userMessage.text,
+                    naggingLevel: naggingLevel
+                }),
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                const botMessage = {
+                    id: messages.length + 2,
+                    type: 'bot',
+                    text: data.reply,
+                    time: new Date().toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })
+                };
+                setMessages(prev => [...prev, botMessage]);
+            } else {
+                throw new Error('API Error');
+            }
+        } catch (error) {
+            console.error('Chat Error:', error);
+            const errorMessage = {
                 id: messages.length + 2,
                 type: 'bot',
-                text: getChatbotResponse(inputText),
+                text: "죄송해요, 잠시 연결이 불안정하네요. 다시 말씀해주시겠어요? 😥",
                 time: new Date().toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })
             };
-            setMessages(prev => [...prev, botMessage]);
-        }, 1000);
+            setMessages(prev => [...prev, errorMessage]);
+        } finally {
+            setIsTyping(false); // Hide typing indicator
+        }
     };
     // 예산 설정 모달 상태
     const [budgetModalVisible, setBudgetModalVisible] = useState(false);
@@ -102,11 +101,11 @@ export default function MoreScreen({ navigation, route }) {
         '여가': '0',
         '기타': '0'
     });
-    
+
     // 고객센터 Q&A 모달 상태
     const [qnaModalVisible, setQnaModalVisible] = useState(false);
     const [expandedQna, setExpandedQna] = useState(null);
-    
+
     // Q&A 데이터
     const qnaData = [
         {
@@ -145,14 +144,14 @@ export default function MoreScreen({ navigation, route }) {
             answer: '더보기 → 프로필 → 거래 데이터 초기화에서 모든 데이터를 삭제할 수 있습니다. 이 작업은 되돌릴 수 없으니 신중하게 결정해주세요.'
         }
     ];
-    
+
     // 예산 저장 핸들러
     const handleSaveBudget = () => {
         // TODO: 백엔드 연결 시 저장 API 호출
         alert(`✅ 예산이 저장되었습니다!\n\n월 예산: ${Number(monthlyBudget).toLocaleString()}원`);
         setBudgetModalVisible(false);
     };
-    
+
     // 예산 초기화 핸들러
     const handleResetBudget = () => {
         setMonthlyBudget('0');
@@ -164,7 +163,7 @@ export default function MoreScreen({ navigation, route }) {
             '기타': '0'
         });
     };
-    
+
     const menuItems = [
         {
             title: '지출 분석',
@@ -203,7 +202,7 @@ export default function MoreScreen({ navigation, route }) {
             onPress: () => navigation?.navigate('프로필')
         },
     ];
-    
+
     const settingsItems = [
         {
             title: '앱 설정',
@@ -234,7 +233,7 @@ export default function MoreScreen({ navigation, route }) {
                         </View>
                     </View>
                 </View>
-                
+
                 {/* 난이도 선택 UI */}
                 <View style={[styles.levelSelector, { backgroundColor: colors.cardBackground }]}>
                     <Text style={[styles.levelLabel, { color: colors.textSecondary }]}>잠깐만 강도:</Text>
@@ -260,20 +259,20 @@ export default function MoreScreen({ navigation, route }) {
                         ))}
                     </View>
                 </View>
-                
+
                 {/* 메시지 리스트 */}
-                <ScrollView 
+                <ScrollView
                     ref={scrollViewRef}
                     style={styles.messageList}
                     onContentSizeChange={() => scrollViewRef.current?.scrollToEnd({ animated: true })}
                 >
                     {messages.map((message) => (
-                        <View 
-                            key={message.id} 
+                        <View
+                            key={message.id}
                             style={[
                                 styles.messageBubble,
                                 message.type === 'user' ? styles.userBubble : styles.botBubble,
-                                message.type === 'user' 
+                                message.type === 'user'
                                     ? { backgroundColor: '#6366F1' }
                                     : { backgroundColor: colors.cardBackground }
                             ]}
@@ -292,11 +291,19 @@ export default function MoreScreen({ navigation, route }) {
                             </Text>
                         </View>
                     ))}
+                    {/* Typing Indicator */}
+                    {isTyping && (
+                        <View style={[styles.messageBubble, styles.botBubble, { backgroundColor: colors.cardBackground }]}>
+                            <Text style={[styles.messageText, { color: colors.textSecondary, fontStyle: 'italic' }]}>
+                                AI가 생각 중... 💬
+                            </Text>
+                        </View>
+                    )}
                     <View style={{ height: 20 }} />
                 </ScrollView>
-                
+
                 {/* 입력창 */}
-                <KeyboardAvoidingView 
+                <KeyboardAvoidingView
                     behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
                     style={[styles.inputContainer, { backgroundColor: colors.cardBackground }]}
                 >
@@ -308,7 +315,7 @@ export default function MoreScreen({ navigation, route }) {
                         onChangeText={setInputText}
                         onSubmitEditing={sendMessage}
                     />
-                    <TouchableOpacity 
+                    <TouchableOpacity
                         style={styles.sendButton}
                         onPress={sendMessage}
                     >
@@ -335,7 +342,7 @@ export default function MoreScreen({ navigation, route }) {
 
                 {/* 잠깐만 AI 시작 버튼 */}
                 <FadeInView style={styles.chatSection} delay={50}>
-                    <TouchableOpacity 
+                    <TouchableOpacity
                         style={styles.startChatButton}
                         onPress={startChat}
                         activeOpacity={0.8}
@@ -360,8 +367,8 @@ export default function MoreScreen({ navigation, route }) {
 
                 <FadeInView style={styles.menuSection} delay={100}>
                     {menuItems.map((item, index) => (
-                        <TouchableOpacity 
-                            key={index} 
+                        <TouchableOpacity
+                            key={index}
                             style={[styles.menuItem, { backgroundColor: colors.cardBackground }]}
                             onPress={item.onPress}
                             activeOpacity={0.7}
@@ -382,8 +389,8 @@ export default function MoreScreen({ navigation, route }) {
                 <FadeInView style={styles.menuSection} delay={150}>
                     <Text style={[styles.sectionTitle, { color: colors.textSecondary }]}>프로필</Text>
                     {profileItems.map((item, index) => (
-                        <TouchableOpacity 
-                            key={index} 
+                        <TouchableOpacity
+                            key={index}
                             style={[styles.menuItem, { backgroundColor: colors.cardBackground }]}
                             onPress={item.onPress}
                             activeOpacity={0.7}
@@ -404,8 +411,8 @@ export default function MoreScreen({ navigation, route }) {
                 <FadeInView style={styles.menuSection} delay={200}>
                     <Text style={[styles.sectionTitle, { color: colors.textSecondary }]}>설정</Text>
                     {settingsItems.map((item, index) => (
-                        <TouchableOpacity 
-                            key={index} 
+                        <TouchableOpacity
+                            key={index}
                             style={[styles.menuItem, { backgroundColor: colors.cardBackground }]}
                             onPress={item.onPress}
                             activeOpacity={0.7}
@@ -428,7 +435,7 @@ export default function MoreScreen({ navigation, route }) {
 
                 <View style={{ height: 100 }} />
             </ScrollView>
-            
+
             {/* 예산 설정 모달 */}
             <Modal
                 animationType="slide"
@@ -440,7 +447,7 @@ export default function MoreScreen({ navigation, route }) {
                     <View style={[styles.modalContent, { backgroundColor: colors.cardBackground }]}>
                         <View style={styles.modalHandle} />
                         <Text style={[styles.modalTitle, { color: colors.text }]}>💰 예산 설정</Text>
-                        
+
                         {/* 월 예산 */}
                         <View style={styles.budgetSection}>
                             <Text style={[styles.budgetLabel, { color: colors.text }]}>월 총 예산</Text>
@@ -460,7 +467,7 @@ export default function MoreScreen({ navigation, route }) {
                                 <Text style={[styles.budgetUnit, { color: colors.textSecondary }]}>원</Text>
                             </View>
                         </View>
-                        
+
                         {/* 카테고리별 예산 */}
                         <Text style={[styles.budgetSubtitle, { color: colors.textSecondary }]}>카테고리별 예산</Text>
                         <ScrollView style={styles.categoryBudgetList} showsVerticalScrollIndicator={false}>
@@ -474,7 +481,7 @@ export default function MoreScreen({ navigation, route }) {
                                             onChangeText={(value) => {
                                                 // 앞의 0 제거 (빈 값이면 0으로)
                                                 const cleaned = value.replace(/^0+/, '') || '0';
-                                                setCategoryBudgets(prev => ({...prev, [category]: cleaned}));
+                                                setCategoryBudgets(prev => ({ ...prev, [category]: cleaned }));
                                             }}
                                             keyboardType="numeric"
                                         />
@@ -483,23 +490,23 @@ export default function MoreScreen({ navigation, route }) {
                                 </View>
                             ))}
                         </ScrollView>
-                        
+
                         {/* 초기화 버튼 */}
-                        <TouchableOpacity 
+                        <TouchableOpacity
                             style={styles.resetBudgetButton}
                             onPress={handleResetBudget}
                         >
                             <Text style={styles.resetBudgetButtonText}>🔄 전체 초기화</Text>
                         </TouchableOpacity>
-                        
+
                         <View style={styles.modalButtons}>
-                            <TouchableOpacity 
+                            <TouchableOpacity
                                 style={styles.cancelButton}
                                 onPress={() => setBudgetModalVisible(false)}
                             >
                                 <Text style={styles.cancelButtonText}>취소</Text>
                             </TouchableOpacity>
-                            <TouchableOpacity 
+                            <TouchableOpacity
                                 style={styles.saveButton}
                                 onPress={handleSaveBudget}
                             >
@@ -511,7 +518,7 @@ export default function MoreScreen({ navigation, route }) {
                     </View>
                 </View>
             </Modal>
-            
+
             {/* Q&A 모달 */}
             <Modal
                 animationType="slide"
@@ -523,7 +530,7 @@ export default function MoreScreen({ navigation, route }) {
                     <View style={[styles.modalContent, { backgroundColor: colors.cardBackground, maxHeight: '85%' }]}>
                         <View style={styles.modalHandle} />
                         <Text style={[styles.modalTitle, { color: colors.text }]}>❓ 자주 묻는 질문</Text>
-                        
+
                         <ScrollView style={styles.qnaList} showsVerticalScrollIndicator={false}>
                             {qnaData.map((item) => (
                                 <TouchableOpacity
@@ -543,10 +550,10 @@ export default function MoreScreen({ navigation, route }) {
                                                 {item.question}
                                             </Text>
                                         </View>
-                                        <Feather 
-                                            name={expandedQna === item.id ? "chevron-up" : "chevron-down"} 
-                                            size={20} 
-                                            color={colors.textSecondary} 
+                                        <Feather
+                                            name={expandedQna === item.id ? "chevron-up" : "chevron-down"}
+                                            size={20}
+                                            color={colors.textSecondary}
                                         />
                                     </View>
                                     {expandedQna === item.id && (
@@ -560,8 +567,8 @@ export default function MoreScreen({ navigation, route }) {
                                 </TouchableOpacity>
                             ))}
                         </ScrollView>
-                        
-                        <TouchableOpacity 
+
+                        <TouchableOpacity
                             style={styles.closeQnaButton}
                             onPress={() => setQnaModalVisible(false)}
                         >
@@ -603,7 +610,7 @@ const styles = StyleSheet.create({
         textTransform: 'uppercase',
         letterSpacing: 0.5,
     },
-    
+
     // 챗봇 시작 버튼
     chatSection: {
         paddingHorizontal: 16,
@@ -645,7 +652,7 @@ const styles = StyleSheet.create({
         fontSize: 13,
         color: 'rgba(255,255,255,0.8)',
     },
-    
+
     // 메뉴
     menuSection: {
         paddingHorizontal: 16,
@@ -692,7 +699,7 @@ const styles = StyleSheet.create({
         fontSize: 12,
         color: '#9CA3AF',
     },
-    
+
     // 챗봇 화면
     chatHeader: {
         flexDirection: 'row',

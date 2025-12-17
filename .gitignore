@@ -1,5 +1,3 @@
-# Learn more https://docs.github.com/en/get-started/getting-started-with-git/ignoring-files
-
 # dependencies
 node_modules/
 
@@ -32,29 +30,57 @@ yarn-error.*
 
 # local env files
 .env*.local
-.env*
 
 # typescript
 *.tsbuildinfo
 
 # generated native folders
 /ios
-/androidpostgres_data/
+/android
 
+# =====================
+# 협업용 설정
+# =====================
+
+# 환경 변수
+.env
+.env.local
+.env.*.local
+*.env
+
+# Python
 __pycache__/
-*.pyc
-*.pyo
-*.DS_Store
+*.py[cod]
+*.class
+*.so
+.Python
+venv/
+.venv/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# 로그
+*.log
+logs/
+
+# 테스트
+.coverage
+htmlcov/
+.pytest_cache/
+
+# Docker
 postgres_data/
+
+# 빌드
+dist/
+build/
+*.egg-info/
+
+# 기타
+*.zip
 production_models/*.joblib
 production_models/*.json
-.vscode/
-<<<<<<< HEAD
-.env
-
-.zip
-.log
-        
-=======
-.env
->>>>>>> c4c46161d7c5cfecb7b2fbcc45ce96b4be578e45

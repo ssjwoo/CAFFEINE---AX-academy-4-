@@ -3,8 +3,8 @@
     "name": "caffeine-app",
     "slug": "caffeine-app",
     "version": "1.0.0",
-    "plugins": [
-      "expo-font"
-    ]
+    "web": {
+      "bundler": "metro"
+    }
   }
 }

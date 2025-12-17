@@ -1,5 +1,5 @@
 
-FROM --platform=$TARGETPLATFORM python:3.10.18-slim
+FROM python:3.10.18-slim
 #$TARGETPLATFORM << Docker가 자동으로 주입하는 환경 변수
 
 WORKDIR /app
