@@ -436,3 +436,89 @@ async def get_transaction_stats(
                 "average_amount": 25000
             }
         }
+
+
+# ==========================================================================
+# 거래 삭제 API
+# ==========================================================================
+
+@router.delete("/{transaction_id}")
+async def delete_transaction(
+    transaction_id: int,
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    거래 삭제
+    
+    - transaction_id: 삭제할 거래 ID
+    """
+    try:
+        # 거래 조회
+        query = select(Transaction).where(Transaction.id == transaction_id)
+        result = await db.execute(query)
+        transaction = result.scalar_one_or_none()
+        
+        if not transaction:
+            raise HTTPException(status_code=404, detail="거래를 찾을 수 없습니다")
+        
+        # 거래 삭제
+        await db.delete(transaction)
+        await db.commit()
+        
+        logger.info(f"Transaction deleted: id={transaction_id}")
+        
+        return {
+            "status": "success",
+            "message": f"거래 ID {transaction_id}가 삭제되었습니다",
+            "deleted_id": transaction_id
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"거래 삭제 실패: {e}")
+        await db.rollback()
+        raise HTTPException(status_code=500, detail=f"거래 삭제 실패: {str(e)}")
+
+
+# ==========================================================================
+# 거래 삭제 API
+# ==========================================================================
+
+@router.delete("/{transaction_id}")
+async def delete_transaction(
+    transaction_id: int,
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    거래 삭제
+    
+    - transaction_id: 삭제할 거래 ID
+    """
+    try:
+        # 거래 조회
+        query = select(Transaction).where(Transaction.id == transaction_id)
+        result = await db.execute(query)
+        transaction = result.scalar_one_or_none()
+        
+        if not transaction:
+            raise HTTPException(status_code=404, detail="거래를 찾을 수 없습니다")
+        
+        # 거래 삭제
+        await db.delete(transaction)
+        await db.commit()
+        
+        logger.info(f"Transaction deleted: id={transaction_id}")
+        
+        return {
+            "status": "success",
+            "message": f"거래 ID {transaction_id}가 삭제되었습니다",
+            "deleted_id": transaction_id
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"거래 삭제 실패: {e}")
+        await db.rollback()
+        raise HTTPException(status_code=500, detail=f"거래 삭제 실패: {str(e)}")

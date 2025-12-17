@@ -1,6 +1,7 @@
+
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { getTransactions, updateTransactionNote as apiUpdateNote } from '../api';
+import { getTransactions, updateTransactionNote as apiUpdateNote, createTransaction, deleteTransaction } from '../api';
 import { predictNextTransaction } from '../api/ml';
 
 const TransactionContext = createContext();
@@ -13,7 +14,7 @@ export const TransactionProvider = ({ children }) => {
     // 앱 시작 시 캐시 로드
     useEffect(() => {
         loadCachedTransactions();
-        // 자동으로 서버에서 최신 데이터 가져오기
+        // 자동으로 서버에서 최신 데이터 가져오기 
         loadTransactionsFromServer();
     }, []);
 
@@ -35,7 +36,7 @@ export const TransactionProvider = ({ children }) => {
     /**
      * 서버에서 거래 데이터 가져오기 (실시간 API 호출)
      */
-    const loadTransactionsFromServer = async (userId = null) => {
+    const loadTransactionsFromServer = async (userId = 1) => {
         setLoading(true);
         try {
             const response = await getTransactions({ user_id: userId, page_size: 100 });
@@ -98,6 +99,55 @@ export const TransactionProvider = ({ children }) => {
             return { success: true };
         } catch (error) {
             console.error('거래 저장 실패:', error);
+            return { success: false, error };
+        }
+    };
+
+    const addTransaction = async (data) => {
+        try {
+            // API 호출
+            const newTx = await createTransaction(data);
+
+            // 앱 형식으로 변환
+            const formattedTx = {
+                id: String(newTx.id),
+                merchant: newTx.merchant,
+                businessName: newTx.merchant,
+                amount: newTx.amount,
+                category: newTx.category,
+                originalCategory: newTx.category,
+                date: newTx.transaction_date || new Date().toISOString().replace('T', ' ').substring(0, 19),
+                cardType: newTx.currency === 'KRW' ? '신용' : '체크',
+                cardName: newTx.payment_method || '카드',
+                notes: newTx.description || '',
+                status: newTx.status,
+            };
+
+            // 로컬 상태 업데이트 (최신 거래가 위로 오도록)
+            const updated = [formattedTx, ...transactions];
+            setTransactions(updated);
+            await saveTransactionsToCache(updated);
+
+            return { success: true, transaction: formattedTx };
+        } catch (error) {
+            console.error('거래 추가 실패:', error);
+            return { success: false, error };
+        }
+    };
+
+    const removeTransaction = async (id) => {
+        try {
+            // API 호출
+            await deleteTransaction(id);
+
+            // 로컬 상태 업데이트
+            const updated = transactions.filter(t => t.id !== String(id));
+            setTransactions(updated);
+            await saveTransactionsToCache(updated);
+
+            return { success: true };
+        } catch (error) {
+            console.error('거래 삭제 실패:', error);
             return { success: false, error };
         }
     };
@@ -186,7 +236,7 @@ export const TransactionProvider = ({ children }) => {
     };
 
     // 새로고침 함수
-    const refresh = async (userId = null) => {
+    const refresh = async (userId = 1) => {
         return await loadTransactionsFromServer(userId);
     };
 
@@ -197,6 +247,8 @@ export const TransactionProvider = ({ children }) => {
             lastSyncTime,
             saveTransactions,
             updateTransactionNote: updateNote,
+            addTransaction,
+            removeTransaction,
             clearTransactions,
             predictNextPurchase,
             loadTransactionsFromServer,

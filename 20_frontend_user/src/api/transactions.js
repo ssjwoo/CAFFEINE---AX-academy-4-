@@ -72,3 +72,29 @@ export const getTransactionStats = async (userId = null) => {
         throw error;
     }
 };
+
+/**
+ * 거래 추가
+ */
+export const createTransaction = async (data) => {
+    try {
+        const response = await apiClient.post('/api/transactions', data);
+        return response.data;
+    } catch (error) {
+        console.error('거래 추가 실패:', error);
+        throw error;
+    }
+};
+
+/**
+ * 거래 삭제
+ */
+export const deleteTransaction = async (id) => {
+    try {
+        const response = await apiClient.delete(`/api/transactions/${id}`);
+        return response.data;
+    } catch (error) {
+        console.error('거래 삭제 실패:', error);
+        throw error;
+    }
+};
