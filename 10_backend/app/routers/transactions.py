@@ -6,7 +6,7 @@
 RDS 스키마:
 - transactions.category_id → categories.id (FK 관계)
 - transactions.merchant_name (가맹점명)
-- transactions.description (메모)
+- transactions.description (메모)1
 """
 
 from fastapi import APIRouter, HTTPException, Depends, Query
