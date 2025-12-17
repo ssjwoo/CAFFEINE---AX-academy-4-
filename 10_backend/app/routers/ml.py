@@ -1,11 +1,14 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, UploadFile, File
 from pydantic import BaseModel
 import joblib
 import pandas as pd
+import numpy as np
 import os
+import io
 import logging
 from typing import Dict, Any
 from datetime import datetime
+from app.services.preprocessing import get_preprocessor
 
 # 로깅 설정
 logger = logging.getLogger(__name__)
@@ -95,9 +98,6 @@ async def predict(request: PredictionRequest):
         logger.error(f"Prediction Error: {str(e)}")
         raise HTTPException(status_code=400, detail=f"Prediction Error: {str(e)}")
 
-from fastapi import UploadFile, File
-import io
-from app.services.preprocessing import get_preprocessor
 
 @router.post("/upload")
 async def upload_file(file: UploadFile = File(...)):
@@ -219,7 +219,6 @@ async def upload_file(file: UploadFile = File(...)):
         logger.error(f"File upload failed: {e}")
         raise HTTPException(status_code=400, detail=f"파일 처리 실패: {str(e)}")
 
-import numpy as np
 
 def calculate_confidence_metrics(probabilities: np.ndarray) -> dict:
     """
