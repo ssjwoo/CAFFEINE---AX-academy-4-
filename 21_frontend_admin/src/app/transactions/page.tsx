@@ -341,30 +341,52 @@ export default function TransactionsPage() {
                     </div>
 
                     {/* 페이지네이션 */}
-                    <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
-                        <div className="flex items-center justify-between">
-                            <div className="text-sm text-gray-500">
-                                전체 {pagination.total.toLocaleString()}건 중 {((pagination.page - 1) * pagination.pageSize) + 1}-{Math.min(pagination.page * pagination.pageSize, pagination.total)}건 표시
-                            </div>
-                            <div className="flex items-center gap-2">
-                                <button
-                                    onClick={() => setPagination(prev => ({ ...prev, page: Math.max(1, prev.page - 1) }))}
-                                    disabled={pagination.page === 1}
-                                    className="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                                >
-                                    이전
-                                </button>
-                                <span className="px-4 py-2 text-sm text-gray-700">
-                                    {pagination.page} / {totalPages}
-                                </span>
-                                <button
-                                    onClick={() => setPagination(prev => ({ ...prev, page: Math.min(totalPages, prev.page + 1) }))}
-                                    disabled={pagination.page === totalPages}
-                                    className="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                                >
-                                    다음
-                                </button>
-                            </div>
+                    <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100 flex items-center justify-between">
+                        <div className="text-sm text-gray-500">
+                            전체 {pagination.total.toLocaleString()}건 중 {((pagination.page - 1) * pagination.pageSize) + 1}-{Math.min(pagination.page * pagination.pageSize, pagination.total)}건 표시
+                        </div>
+
+                        <div className="flex items-center gap-1">
+                            {/* 이전 페이지 그룹 */}
+                            <button
+                                onClick={() => setPagination(prev => ({ ...prev, page: Math.max(1, prev.page - 1) }))}
+                                disabled={pagination.page === 1}
+                                className="px-3 py-1 border border-gray-300 rounded hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed text-sm text-gray-600"
+                            >
+                                이전
+                            </button>
+
+                            {/* 페이지 번호 (최대 5개 표시) */}
+                            {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                                // 현재 페이지를 중심으로 표시하되, 범위를 벗어나지 않도록 조정
+                                let startPage = Math.max(1, pagination.page - 2);
+                                if (startPage + 4 > totalPages) {
+                                    startPage = Math.max(1, totalPages - 4);
+                                }
+                                const pageNum = startPage + i;
+
+                                return (
+                                    <button
+                                        key={pageNum}
+                                        onClick={() => setPagination(prev => ({ ...prev, page: pageNum }))}
+                                        className={`px-3 py-1 rounded text-sm font-medium ${pagination.page === pageNum
+                                                ? 'bg-blue-600 text-white'
+                                                : 'border border-gray-300 text-gray-600 hover:bg-gray-50'
+                                            }`}
+                                    >
+                                        {pageNum}
+                                    </button>
+                                );
+                            })}
+
+                            {/* 다음 페이지 그룹 */}
+                            <button
+                                onClick={() => setPagination(prev => ({ ...prev, page: Math.min(totalPages, prev.page + 1) }))}
+                                disabled={pagination.page === totalPages}
+                                className="px-3 py-1 border border-gray-300 rounded hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed text-sm text-gray-600"
+                            >
+                                다음
+                            </button>
                         </div>
                     </div>
                 </>

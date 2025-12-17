@@ -89,7 +89,15 @@ LOCAL_ORIGINS = [
     "http://localhost:8082",
     "http://localhost:8080",
     "http://localhost:19000",
-    "http://localhost:19006"
+    "http://localhost:19006",
+    # 127.0.0.1 variants (same as localhost but treated as different origin by browsers)
+    "http://127.0.0.1:3000",
+    "http://127.0.0.1:3001",
+    "http://127.0.0.1:8001",
+    "http://127.0.0.1:8082",
+    "http://127.0.0.1:8080",
+    "http://127.0.0.1:19000",
+    "http://127.0.0.1:19006"
 ]
 
 allowed_origins = LOCAL_ORIGINS + [CLOUDFRONT_URL]

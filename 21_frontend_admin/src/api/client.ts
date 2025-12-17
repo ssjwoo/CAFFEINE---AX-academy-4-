@@ -227,3 +227,31 @@ export async function deleteUser() {
     return apiClient.delete('/users/me');
 }
 
+// ========================================
+// User Analytics & Demographics APIs
+// ========================================
+
+export async function getNewSignups(days: number = 30) {
+    return apiClient.get(`/api/admin/users/new-signups?days=${days}`);
+}
+
+export async function getChurnedUsers(days: number = 30) {
+    return apiClient.get(`/api/admin/users/churned?days=${days}`);
+}
+
+export async function getChurnMetrics(churnDays: number = 30, signupDays: number = 30) {
+    return apiClient.get(`/api/admin/users/stats/churn-rate?churn_days=${churnDays}&signup_days=${signupDays}`);
+}
+
+export async function getAgeDistribution() {
+    return apiClient.get('/api/analytics/demographics/age-groups');
+}
+
+export async function getConsumptionByAge() {
+    return apiClient.get('/api/analytics/demographics/consumption-by-age');
+}
+
+export async function getCategoryPreferencesByAge() {
+    return apiClient.get('/api/analytics/demographics/category-preferences');
+}
+

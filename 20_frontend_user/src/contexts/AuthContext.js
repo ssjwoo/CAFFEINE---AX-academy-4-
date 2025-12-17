@@ -248,16 +248,17 @@ export const AuthProvider = ({ children }) => {
      * }
      * ```
      */
-    const signup = async (name, email, password) => {
+    const signup = async (name, email, password, birthDate) => {
         // ⚠️ 현재는 Mock (가짜) 회원가입
         // 🔴 백엔드 연결 시 이 부분을 API 호출로 교체하세요!
 
-        if (name && email && password) {
+        if (name && email && password && birthDate) {
             // 가짜 사용자 정보 생성
             const userData = {
                 id: Date.now(), // 현재 시간을 ID로 사용 (임시)
                 name: name,
                 email: email,
+                birth_date: birthDate, // NEW: Include birth_date
                 createdAt: new Date().toISOString()
             };
 

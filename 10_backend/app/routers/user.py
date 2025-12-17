@@ -97,10 +97,22 @@ async def get_authenticated_user(current_user: Auth_Dependency):
     return current_user
 
 
+# Admin: Get all users (requires superuser)
 @router.get("/", response_model=List[UserResponse])
-async def read_all_users_route(db: DB_Dependency, current_user: Auth_Dependency):
+async def read_all_users_route(
+    db: DB_Dependency, 
+    current_user: Auth_Dependency,
+    skip: int = 0,
+    limit: int = 100
+):
+    """Get all users (Admin only - requires authentication)"""
+    # Note: This endpoint is for admin purposes
+    # For production, consider adding superuser check:
+    # if not current_user.is_superuser:
+    #     raise HTTPException(status_code=403, detail="Not authorized")
+    
     users = await get_all_users(db)
-    return users
+    return users[skip:skip + limit]
 
 
 #유저 삭제

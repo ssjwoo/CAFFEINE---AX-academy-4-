@@ -15,6 +15,7 @@ export interface UserData {
     id: number;
     email: string;
     name: string;
+    birth_date?: string; // ISO date string (YYYY-MM-DD)
     created_at: string;
     is_active: boolean;
     is_superuser: boolean;
@@ -50,4 +51,41 @@ export interface TransactionFilters {
     search?: string;
     page?: number;
     page_size?: number;
+}
+
+// ============================================
+// Demographics & Churn Analysis Types
+// ============================================
+
+export interface ChurnMetrics {
+    churn_rate: number;
+    total_churned: number;
+    active_users: number;
+    new_signups: number;
+    total_users: number;
+}
+
+export interface AgeGroupData {
+    age_group: string;
+    count: number;
+}
+
+export interface CategoryAmount {
+    category: string;
+    amount: number;
+}
+
+export interface ConsumptionByAge {
+    age_group: string;
+    user_count: number;
+    total_spending: number;
+    avg_transaction_amount: number;
+    top_categories: CategoryAmount[];
+}
+
+export interface CategoryPreferenceByAge {
+    age_group: string;
+    top_category: string;
+    second_category: string;
+    third_category: string;
 }

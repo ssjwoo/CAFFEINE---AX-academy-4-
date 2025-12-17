@@ -9,6 +9,8 @@ class UserBase(BaseModel):
     name: str = Field(..., max_length=100, description="이름")
     nickname: Optional[str] = Field(None, max_length=50, description="닉네임")
     phone: Optional[str] = Field(None, max_length=20, description="전화번호")
+    # TODO: Uncomment after migration
+    # birth_date: Optional[datetime] = Field(None, description="생년월일")
     last_login_at: Optional[datetime]
 
     class Config:
@@ -28,6 +30,7 @@ class UserUpdate(BaseModel):
     name: Optional[str] = None
     nickname: Optional[str] = None
     phone: Optional[str] = None
+    # birth_date: Optional[datetime] = None
     password: Optional[str] = None  # 평문 입력, 서버에서 해싱 처리
     is_active: Optional[bool] = None
 
@@ -39,6 +42,7 @@ class UserResponse(UserBase):
     is_superuser: bool
     social_provider: Optional[str]
     social_id: Optional[str]
+    # birth_date: Optional[datetime]
     created_at: datetime
     updated_at: datetime
     last_login_at: Optional[datetime]
