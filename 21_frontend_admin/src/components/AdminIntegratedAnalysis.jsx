@@ -30,11 +30,14 @@ const CATEGORY_COLORS = {
 };
 
 const AdminIntegratedAnalysis = () => {
+    const [activeTab, setActiveTab] = useState('transactions'); // 'transactions' | 'demographics'
     const [selectedMonth, setSelectedMonth] = useState(''); // 빈 값 = 전체 데이터
     const [searchQuery, setSearchQuery] = useState('');
+    const [searchType, setSearchType] = useState('merchant'); // 검색 타입: 날짜/가맹점명/카테고리
     const [selectedCategory, setSelectedCategory] = useState(null);
     const [selectedDate, setSelectedDate] = useState(null);
     const [transactions, setTransactions] = useState([]);
+    const [ageData, setAgeData] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
@@ -107,13 +110,60 @@ const AdminIntegratedAnalysis = () => {
         fetchTransactions();
     }, [selectedMonth]);
 
+    // 연령대별 데이터 페칭
+    useEffect(() => {
+        if (activeTab === 'demographics') {
+            fetchAgeData();
+        }
+    }, [activeTab]);
+
+    const fetchAgeData = async () => {
+        setLoading(true);
+        setError(null);
+        try {
+            const token = typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null;
+            const headers = {
+                'Content-Type': 'application/json'
+            };
+            if (token) {
+                headers['Authorization'] = `Bearer ${token}`;
+            }
+
+            const response = await fetch(`${API_BASE_URL}/api/analytics/demographics/consumption-by-age`, {
+                headers
+            });
+            if (!response.ok) throw new Error('Failed to fetch age data');
+            const data = await response.json();
+            setAgeData(data);
+        } catch (err) {
+            console.error('Failed to fetch age data:', err);
+            setError(err.message);
+        } finally {
+            setLoading(false);
+        }
+    };
+
     const filteredTransactions = useMemo(() => {
         let filtered = transactions;
-        if (searchQuery) filtered = filtered.filter(tx => tx.merchant.toLowerCase().includes(searchQuery.toLowerCase()));
+
+        // searchType에 따라 다른 필터 적용
+        if (searchQuery) {
+            if (searchType === 'date') {
+                // 날짜 검색 (YYYY-MM-DD 형식)
+                filtered = filtered.filter(tx => tx.date.includes(searchQuery));
+            } else if (searchType === 'merchant') {
+                // 가맹점명 검색
+                filtered = filtered.filter(tx => tx.merchant.toLowerCase().includes(searchQuery.toLowerCase()));
+            } else if (searchType === 'category') {
+                // 카테고리 검색
+                filtered = filtered.filter(tx => tx.category.toLowerCase().includes(searchQuery.toLowerCase()));
+            }
+        }
+
         if (selectedCategory) filtered = filtered.filter(tx => tx.category === selectedCategory);
         if (selectedDate) filtered = filtered.filter(tx => tx.date === selectedDate);
         return filtered;
-    }, [transactions, searchQuery, selectedCategory, selectedDate]);
+    }, [transactions, searchQuery, searchType, selectedCategory, selectedDate]);
 
     const paginatedTransactions = useMemo(() => {
         const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
@@ -134,17 +184,33 @@ const AdminIntegratedAnalysis = () => {
     }, [filteredTransactions]);
 
     const dailyData = useMemo(() => {
-        const dailyMap = {};
+        const dataMap = {};
+
+        // 월이 선택되지 않았을 때: 월별 데이터
+        if (!selectedMonth) {
+            filteredTransactions.forEach(tx => {
+                const yearMonth = tx.date.substring(0, 7); // YYYY-MM
+                if (!dataMap[yearMonth]) dataMap[yearMonth] = 0;
+                dataMap[yearMonth] += tx.amount;
+            });
+            return Object.keys(dataMap).sort().map(yearMonth => ({
+                date: yearMonth.substring(5) + '월', // MM월
+                fullDate: yearMonth,
+                amount: dataMap[yearMonth]
+            }));
+        }
+
+        // 월이 선택되었을 때: 일별 데이터
         filteredTransactions.forEach(tx => {
-            if (!dailyMap[tx.date]) dailyMap[tx.date] = 0;
-            dailyMap[tx.date] += tx.amount;
+            if (!dataMap[tx.date]) dataMap[tx.date] = 0;
+            dataMap[tx.date] += tx.amount;
         });
-        return Object.keys(dailyMap).sort().map(date => ({
+        return Object.keys(dataMap).sort().map(date => ({
             date: date.split('-')[2] + '일',
             fullDate: date,
-            amount: dailyMap[date]
+            amount: dataMap[date]
         }));
-    }, [filteredTransactions]);
+    }, [filteredTransactions, selectedMonth]);
 
     const handlePieClick = (data) => setSelectedCategory(prev => prev === data.name ? null : data.name);
     const handleBarClick = (data) => setSelectedDate(prev => prev === data.fullDate ? null : data.fullDate);
@@ -197,189 +263,331 @@ const AdminIntegratedAnalysis = () => {
         <div className="min-h-screen bg-gray-50 p-6">
             <div className="max-w-[1600px] mx-auto">
 
-                <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
-                    <div className="flex items-center justify-between gap-4">
-                        <div className="flex items-center gap-3">
-                            <Calendar className="w-5 h-5 text-gray-500" />
-                            <input type="month" value={selectedMonth} onChange={(e) => setSelectedMonth(e.target.value)} className="border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" />
-                        </div>
-                        <div className="flex-1 max-w-md relative">
-                            <Search className="w-5 h-5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
-                            <input type="text" placeholder="가맹점명 검색..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="w-full border border-gray-300 rounded-md pl-10 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" />
-                        </div>
-                        <button onClick={handleExport} className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-md">
-                            <Download className="w-4 h-4" />엑셀 다운로드
-                        </button>
-                    </div>
+                {/* 탭 버튼 */}
+                <div className="flex gap-2 mb-6">
+                    <button
+                        onClick={() => setActiveTab('transactions')}
+                        className={`px-6 py-3 font-medium rounded-t-lg transition-colors ${activeTab === 'transactions'
+                            ? 'bg-blue-600 text-white'
+                            : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                            }`}
+                    >
+                        거래 내역
+                    </button>
+                    <button
+                        onClick={() => setActiveTab('demographics')}
+                        className={`px-6 py-3 font-medium rounded-t-lg transition-colors ${activeTab === 'demographics'
+                            ? 'bg-purple-600 text-white'
+                            : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                            }`}
+                    >
+                        연령대별 분석
+                    </button>
                 </div>
 
-                <div className="grid grid-cols-2 gap-6 mb-6">
-                    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                        <h3 className="text-lg font-semibold text-gray-800 mb-4">카테고리별 거래 비중</h3>
-                        <ResponsiveContainer width="100%" height={300}>
-                            <PieChart>
-                                <Pie
-                                    data={categoryData}
-                                    cx="50%"
-                                    cy="50%"
-                                    innerRadius={60}
-                                    outerRadius={80}
-                                    paddingAngle={5}
-                                    dataKey="value"
-                                    onClick={handlePieClick}
-                                    style={{ cursor: 'pointer' }}
-                                >
-                                    {categoryData.map((entry, index) => (
-                                        <Cell key={`cell-${index}`} fill={entry.color} stroke="none" opacity={selectedCategory && selectedCategory !== entry.name ? 0.3 : 1} />
-                                    ))}
-                                </Pie>
-                                <Tooltip
-                                    formatter={(value) => `₩${value.toLocaleString()}`}
-                                    contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
-                                />
-                                <Legend verticalAlign="bottom" height={36} iconType="circle" />
-                            </PieChart>
-                        </ResponsiveContainer>
-                        {selectedCategory && (
-                            <div className="mt-4 text-center">
-                                <button
-                                    onClick={() => setSelectedCategory(null)}
-                                    className="inline-flex items-center gap-1 bg-blue-50 text-blue-600 px-3 py-1 rounded-full text-sm font-medium hover:bg-blue-100 transition-colors"
-                                >
-                                    {selectedCategory} <span className="text-blue-400">✕</span>
+                {/* 거래 내역 탭 */}
+                {activeTab === 'transactions' && (
+                    <>
+                        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
+                            <div className="flex items-center gap-2">
+                                <div className="flex items-center gap-2">
+                                    <Calendar className="w-5 h-5 text-gray-500" />
+                                    <input type="month" value={selectedMonth} onChange={(e) => setSelectedMonth(e.target.value)} className="border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                                </div>
+                                <div className="flex items-center gap-2 ml-6">
+                                    <select
+                                        className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                                        value={searchType}
+                                        onChange={(e) => setSearchType(e.target.value)}
+                                    >
+                                        <option value="date">날짜</option>
+                                        <option value="merchant">가맹점명</option>
+                                        <option value="category">카테고리</option>
+                                    </select>
+                                    <div className="relative" style={{ width: '400px' }}>
+                                        <Search className="w-5 h-5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                                        <input
+                                            type="text"
+                                            placeholder={
+                                                searchType === 'date' ? '날짜 검색 (YYYY-MM-DD)...' :
+                                                    searchType === 'merchant' ? '가맹점명 검색...' :
+                                                        '카테고리 검색...'
+                                            }
+                                            value={searchQuery}
+                                            onChange={(e) => setSearchQuery(e.target.value)}
+                                            className="w-full border border-gray-300 rounded-md pl-10 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        />
+                                    </div>
+                                </div>
+                                <button onClick={handleExport} className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-md ml-auto">
+                                    <Download className="w-4 h-4" />엑셀 다운로드
                                 </button>
                             </div>
-                        )}
-                    </div>
+                        </div>
 
-                    {/* Bar Chart Section */}
-                    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                        <h3 className="text-lg font-semibold text-gray-800 mb-4">일별 거래액 추이</h3>
-                        <ResponsiveContainer width="100%" height={300}>
-                            <BarChart data={dailyData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
-                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" />
-                                <XAxis
-                                    dataKey="date"
-                                    axisLine={false}
-                                    tickLine={false}
-                                    tick={{ fill: '#6B7280', fontSize: 12 }}
-                                    dy={10}
-                                />
-                                <YAxis
-                                    axisLine={false}
-                                    tickLine={false}
-                                    tick={{ fill: '#6B7280', fontSize: 12 }}
-                                    tickFormatter={(value) => `₩${(value / 10000).toLocaleString()}만`}
-                                />
-                                <Tooltip
-                                    cursor={{ fill: '#F9FAFB' }}
-                                    formatter={(value) => [`₩${value.toLocaleString()}`, '거래액']}
-                                    contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
-                                />
-                                <Bar
-                                    dataKey="amount"
-                                    fill="#6366F1"
-                                    radius={[4, 4, 0, 0]}
-                                    barSize={32}
-                                    onClick={handleBarClick}
-                                    style={{ cursor: 'pointer' }}
-                                />
-                            </BarChart>
-                        </ResponsiveContainer>
-                        {selectedDate && (
-                            <div className="mt-4 text-center">
-                                <button
-                                    onClick={() => setSelectedDate(null)}
-                                    className="inline-flex items-center gap-1 bg-blue-50 text-blue-600 px-3 py-1 rounded-full text-sm font-medium hover:bg-blue-100 transition-colors"
-                                >
-                                    {selectedDate} <span className="text-blue-400">✕</span>
-                                </button>
-                            </div>
-                        )}
-                    </div>
-                </div>
-
-                <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-                    <div className="border-b border-gray-200 px-6 py-4 bg-gray-50">
-                        <h3 className="text-lg font-semibold text-gray-800">{getFilterText()}</h3>
-                        <p className="text-sm text-gray-500 mt-1">총 {filteredTransactions.length}건 / 합계: ₩{filteredTransactions.reduce((sum, tx) => sum + tx.amount, 0).toLocaleString()}</p>
-                    </div>
-                    <div className="overflow-x-auto">
-                        <table className="w-full">
-                            <thead className="bg-gray-50 border-b border-gray-200">
-                                <tr>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">No</th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Transaction ID</th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">User ID</th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date/Time</th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Merchant</th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Category</th>
-                                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Amount</th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">IP Address</th>
-                                </tr>
-                            </thead>
-                            <tbody className="bg-white divide-y divide-gray-200">
-                                {paginatedTransactions.map((tx, index) => (
-                                    <tr key={tx.id} className="hover:bg-gray-50">
-                                        <td className="px-6 py-4 text-sm text-gray-900">{(currentPage - 1) * ITEMS_PER_PAGE + index + 1}</td>
-                                        <td className="px-6 py-4 text-sm font-mono text-gray-700">{tx.id}</td>
-                                        <td className="px-6 py-4 text-sm font-mono text-gray-500">{tx.userId}</td>
-                                        <td className="px-6 py-4 text-sm text-gray-900">{tx.date} {tx.time}</td>
-                                        <td className="px-6 py-4 text-sm text-gray-900">{tx.merchant}</td>
-                                        <td className="px-6 py-4">
-                                            <span className="inline-block px-3 py-1 text-xs font-semibold rounded-full" style={{ backgroundColor: (CATEGORY_COLORS[tx.category] || CATEGORY_COLORS['기타']) + '20', color: CATEGORY_COLORS[tx.category] || CATEGORY_COLORS['기타'] }}>{tx.category}</span>
-                                        </td>
-                                        <td className="px-6 py-4 text-sm text-right font-medium text-gray-900">₩{tx.amount.toLocaleString()}</td>
-                                        <td className="px-6 py-4 text-sm font-mono text-gray-500">{tx.ipAddress}</td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
-                    {filteredTransactions.length === 0 && (<div className="text-center py-12"><p className="text-gray-500">조건에 맞는 거래 내역이 없습니다.</p></div>)}
-
-                    {/* 페이지네이션 UI */}
-                    {filteredTransactions.length > 0 && (
-                        <div className="border-t border-gray-200 px-6 py-4 bg-gray-50 flex items-center justify-between">
-                            <div className="text-sm text-gray-500">
-                                전체 {filteredTransactions.length.toLocaleString()}건 중 {((currentPage - 1) * ITEMS_PER_PAGE) + 1}-{Math.min(currentPage * ITEMS_PER_PAGE, filteredTransactions.length)}건 표시
-                            </div>
-                            <div className="flex items-center gap-1">
-                                <button
-                                    onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
-                                    disabled={currentPage === 1}
-                                    className="px-3 py-1 border border-gray-300 rounded hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed text-sm text-gray-600 bg-white"
-                                >
-                                    이전
-                                </button>
-                                {Array.from({ length: Math.min(5, Math.ceil(filteredTransactions.length / ITEMS_PER_PAGE)) }, (_, i) => {
-                                    const totalPages = Math.ceil(filteredTransactions.length / ITEMS_PER_PAGE);
-                                    let startPage = Math.max(1, currentPage - 2);
-                                    if (startPage + 4 > totalPages) {
-                                        startPage = Math.max(1, totalPages - 4);
-                                    }
-                                    const pageNum = startPage + i;
-                                    return (
-                                        <button
-                                            key={pageNum}
-                                            onClick={() => setCurrentPage(pageNum)}
-                                            className={`px-3 py-1 rounded text-sm font-medium ${currentPage === pageNum ? 'bg-blue-600 text-white' : 'border border-gray-300 text-gray-600 bg-white hover:bg-gray-100'}`}
+                        <div className="grid grid-cols-2 gap-6 mb-6">
+                            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                                <h3 className="text-lg font-semibold text-gray-800 mb-4">카테고리별 거래 비중</h3>
+                                <ResponsiveContainer width="100%" height={300}>
+                                    <PieChart>
+                                        <Pie
+                                            data={categoryData}
+                                            cx="50%"
+                                            cy="50%"
+                                            innerRadius={60}
+                                            outerRadius={80}
+                                            paddingAngle={5}
+                                            dataKey="value"
+                                            onClick={handlePieClick}
+                                            style={{ cursor: 'pointer' }}
                                         >
-                                            {pageNum}
+                                            {categoryData.map((entry, index) => (
+                                                <Cell key={`cell-${index}`} fill={entry.color} stroke="none" opacity={selectedCategory && selectedCategory !== entry.name ? 0.3 : 1} />
+                                            ))}
+                                        </Pie>
+                                        <Tooltip
+                                            formatter={(value) => `₩${value.toLocaleString()}`}
+                                            contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                                        />
+                                        <Legend verticalAlign="bottom" height={36} iconType="circle" />
+                                    </PieChart>
+                                </ResponsiveContainer>
+                                {selectedCategory && (
+                                    <div className="mt-4 text-center">
+                                        <button
+                                            onClick={() => setSelectedCategory(null)}
+                                            className="inline-flex items-center gap-1 bg-blue-50 text-blue-600 px-3 py-1 rounded-full text-sm font-medium hover:bg-blue-100 transition-colors"
+                                        >
+                                            {selectedCategory} <span className="text-blue-400">✕</span>
                                         </button>
-                                    );
-                                })}
-                                <button
-                                    onClick={() => setCurrentPage(prev => Math.min(Math.ceil(filteredTransactions.length / ITEMS_PER_PAGE), prev + 1))}
-                                    disabled={currentPage === Math.ceil(filteredTransactions.length / ITEMS_PER_PAGE)}
-                                    className="px-3 py-1 border border-gray-300 rounded hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed text-sm text-gray-600 bg-white"
-                                >
-                                    다음
-                                </button>
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Bar Chart Section */}
+                            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                                <h3 className="text-lg font-semibold text-gray-800 mb-4">
+                                    {selectedMonth ? '일별 거래액 추이' : '월별 거래액 추이'}
+                                </h3>
+                                <ResponsiveContainer width="100%" height={300}>
+                                    <BarChart data={dailyData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+                                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" />
+                                        <XAxis
+                                            dataKey="date"
+                                            axisLine={false}
+                                            tickLine={false}
+                                            tick={{ fill: '#6B7280', fontSize: 12 }}
+                                            dy={10}
+                                        />
+                                        <YAxis
+                                            axisLine={false}
+                                            tickLine={false}
+                                            tick={{ fill: '#6B7280', fontSize: 12 }}
+                                            tickFormatter={(value) => `₩${(value / 10000).toLocaleString()}만`}
+                                        />
+                                        <Tooltip
+                                            cursor={{ fill: '#F9FAFB' }}
+                                            formatter={(value) => [`₩${value.toLocaleString()}`, '거래액']}
+                                            contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                                        />
+                                        <Bar
+                                            dataKey="amount"
+                                            fill="#6366F1"
+                                            radius={[4, 4, 0, 0]}
+                                            barSize={32}
+                                            onClick={handleBarClick}
+                                            style={{ cursor: 'pointer' }}
+                                        />
+                                    </BarChart>
+                                </ResponsiveContainer>
+                                {selectedDate && (
+                                    <div className="mt-4 text-center">
+                                        <button
+                                            onClick={() => setSelectedDate(null)}
+                                            className="inline-flex items-center gap-1 bg-blue-50 text-blue-600 px-3 py-1 rounded-full text-sm font-medium hover:bg-blue-100 transition-colors"
+                                        >
+                                            {selectedDate} <span className="text-blue-400">✕</span>
+                                        </button>
+                                    </div>
+                                )}
                             </div>
                         </div>
-                    )}
-                </div>
+
+                        <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+                            <div className="border-b border-gray-200 px-6 py-4 bg-gray-50">
+                                <h3 className="text-lg font-semibold text-gray-800">{getFilterText()}</h3>
+                                <p className="text-sm text-gray-500 mt-1">총 {filteredTransactions.length}건 / 합계: ₩{filteredTransactions.reduce((sum, tx) => sum + tx.amount, 0).toLocaleString()}</p>
+                            </div>
+                            <div className="overflow-x-auto">
+                                <table className="w-full">
+                                    <thead className="bg-gray-50 border-b border-gray-200">
+                                        <tr>
+                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">No</th>
+                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Transaction ID</th>
+                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">User ID</th>
+                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date/Time</th>
+                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Merchant</th>
+                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Category</th>
+                                            <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Amount</th>
+                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">IP Address</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="bg-white divide-y divide-gray-200">
+                                        {paginatedTransactions.map((tx, index) => (
+                                            <tr key={tx.id} className="hover:bg-gray-50">
+                                                <td className="px-6 py-4 text-sm text-gray-900">{(currentPage - 1) * ITEMS_PER_PAGE + index + 1}</td>
+                                                <td className="px-6 py-4 text-sm font-mono text-gray-700">{tx.id}</td>
+                                                <td className="px-6 py-4 text-sm font-mono text-gray-500">{tx.userId}</td>
+                                                <td className="px-6 py-4 text-sm text-gray-900">{tx.date} {tx.time}</td>
+                                                <td className="px-6 py-4 text-sm text-gray-900">{tx.merchant}</td>
+                                                <td className="px-6 py-4">
+                                                    <span className="inline-block px-3 py-1 text-xs font-semibold rounded-full" style={{ backgroundColor: (CATEGORY_COLORS[tx.category] || CATEGORY_COLORS['기타']) + '20', color: CATEGORY_COLORS[tx.category] || CATEGORY_COLORS['기타'] }}>{tx.category}</span>
+                                                </td>
+                                                <td className="px-6 py-4 text-sm text-right font-medium text-gray-900">₩{tx.amount.toLocaleString()}</td>
+                                                <td className="px-6 py-4 text-sm font-mono text-gray-500">{tx.ipAddress}</td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                            {filteredTransactions.length === 0 && (<div className="text-center py-12"><p className="text-gray-500">조건에 맞는 거래 내역이 없습니다.</p></div>)}
+
+                            {/* 페이지네이션 UI */}
+                            {filteredTransactions.length > 0 && (
+                                <div className="border-t border-gray-200 px-6 py-4 bg-gray-50 flex items-center justify-between">
+                                    <div className="text-sm text-gray-500">
+                                        전체 {filteredTransactions.length.toLocaleString()}건 중 {((currentPage - 1) * ITEMS_PER_PAGE) + 1}-{Math.min(currentPage * ITEMS_PER_PAGE, filteredTransactions.length)}건 표시
+                                    </div>
+                                    <div className="flex items-center gap-1">
+                                        <button
+                                            onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                                            disabled={currentPage === 1}
+                                            className="px-3 py-1 border border-gray-300 rounded hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed text-sm text-gray-600 bg-white"
+                                        >
+                                            이전
+                                        </button>
+                                        {Array.from({ length: Math.min(5, Math.ceil(filteredTransactions.length / ITEMS_PER_PAGE)) }, (_, i) => {
+                                            const totalPages = Math.ceil(filteredTransactions.length / ITEMS_PER_PAGE);
+                                            let startPage = Math.max(1, currentPage - 2);
+                                            if (startPage + 4 > totalPages) {
+                                                startPage = Math.max(1, totalPages - 4);
+                                            }
+                                            const pageNum = startPage + i;
+                                            return (
+                                                <button
+                                                    key={pageNum}
+                                                    onClick={() => setCurrentPage(pageNum)}
+                                                    className={`px-3 py-1 rounded text-sm font-medium ${currentPage === pageNum ? 'bg-blue-600 text-white' : 'border border-gray-300 text-gray-600 bg-white hover:bg-gray-100'}`}
+                                                >
+                                                    {pageNum}
+                                                </button>
+                                            );
+                                        })}
+                                        <button
+                                            onClick={() => setCurrentPage(prev => Math.min(Math.ceil(filteredTransactions.length / ITEMS_PER_PAGE), prev + 1))}
+                                            disabled={currentPage === Math.ceil(filteredTransactions.length / ITEMS_PER_PAGE)}
+                                            className="px-3 py-1 border border-gray-300 rounded hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed text-sm text-gray-600 bg-white"
+                                        >
+                                            다음
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    </>
+                )}
+
+                {/* 연령대별 분석 탭 */}
+                {activeTab === 'demographics' && (
+                    <div className="space-y-6">
+                        {/* 스택 바 차트 */}
+                        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                            <h3 className="text-lg font-semibold text-gray-800 mb-4">연령대별 총 지출 비교</h3>
+                            <ResponsiveContainer width="100%" height={400}>
+                                <BarChart data={ageData}>
+                                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" />
+                                    <XAxis
+                                        dataKey="age_group"
+                                        axisLine={false}
+                                        tickLine={false}
+                                        tick={{ fill: '#6B7280', fontSize: 12 }}
+                                    />
+                                    <YAxis
+                                        axisLine={false}
+                                        tickLine={false}
+                                        tick={{ fill: '#6B7280', fontSize: 12 }}
+                                        tickFormatter={(value) => `₩${(value / 10000).toLocaleString()}만`}
+                                    />
+                                    <Tooltip
+                                        formatter={(value) => [`₩${value.toLocaleString()}`, '총 지출']}
+                                        contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                                    />
+                                    <Bar dataKey="total_spending" fill="#6366F1" radius={[4, 4, 0, 0]} barSize={48} />
+                                </BarChart>
+                            </ResponsiveContainer>
+                        </div>
+
+                        {/* 상세 테이블 */}
+                        <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+                            <div className="border-b border-gray-200 px-6 py-4 bg-gray-50">
+                                <h3 className="text-lg font-semibold text-gray-800">연령대별 상세 분석</h3>
+                                <p className="text-sm text-gray-500 mt-1">각 연령대의 사용자 수, 총 지출, 상위 카테고리를 확인하세요</p>
+                            </div>
+                            <div className="overflow-x-auto">
+                                <table className="w-full">
+                                    <thead className="bg-gray-50 border-b border-gray-200">
+                                        <tr>
+                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">연령대</th>
+                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">사용자 수</th>
+                                            <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">총 지출</th>
+                                            <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">평균 거래액</th>
+                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">상위 카테고리</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="bg-white divide-y divide-gray-200">
+                                        {ageData.map((group, index) => (
+                                            <tr key={index} className="hover:bg-gray-50">
+                                                <td className="px-6 py-4 whitespace-nowrap">
+                                                    <span className="text-sm font-medium text-gray-900">{group.age_group}</span>
+                                                </td>
+                                                <td className="px-6 py-4 whitespace-nowrap">
+                                                    <span className="text-sm text-gray-900">{group.user_count}명</span>
+                                                </td>
+                                                <td className="px-6 py-4 whitespace-nowrap text-right">
+                                                    <span className="text-sm font-medium text-gray-900">₩{group.total_spending.toLocaleString()}</span>
+                                                </td>
+                                                <td className="px-6 py-4 whitespace-nowrap text-right">
+                                                    <span className="text-sm text-gray-600">₩{Math.round(group.avg_transaction_amount).toLocaleString()}</span>
+                                                </td>
+                                                <td className="px-6 py-4">
+                                                    <div className="flex flex-wrap gap-2">
+                                                        {group.top_categories.map((cat, catIndex) => (
+                                                            <span
+                                                                key={catIndex}
+                                                                className="inline-block px-3 py-1 text-xs font-semibold rounded-full"
+                                                                style={{
+                                                                    backgroundColor: (CATEGORY_COLORS[cat.category] || CATEGORY_COLORS['기타']) + '20',
+                                                                    color: CATEGORY_COLORS[cat.category] || CATEGORY_COLORS['기타']
+                                                                }}
+                                                            >
+                                                                {cat.category}: ₩{(cat.amount / 10000).toFixed(0)}만
+                                                            </span>
+                                                        ))}
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                            {ageData.length === 0 && (
+                                <div className="text-center py-12">
+                                    <p className="text-gray-500">연령대별 데이터가 없습니다.</p>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                )}
             </div>
         </div>
     );

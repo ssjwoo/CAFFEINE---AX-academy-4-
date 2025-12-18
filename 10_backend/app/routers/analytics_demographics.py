@@ -137,42 +137,46 @@ async def get_consumption_by_age(
     Returns total spending, average transaction amount, and top categories for each age group
     """
     await verify_superuser(current_user)
-    # Get all users with transactions
-    result = await db.execute(
-        select(User, Transaction)
-        .join(Transaction, User.id == Transaction.user_id, isouter=True)
-    )
     
-    user_transactions = result.all()
+    # Import Category model
+    from app.db.model.transaction import Category
+    
+    # Get all transactions with user and category info (explicit joins)
+    result = await db.execute(
+        select(User.id, User.birth_date, Transaction.amount, Category.name.label('category_name'))
+        .join(Transaction, User.id == Transaction.user_id)
+        .join(Category, Transaction.category_id == Category.id)
+    )
+    rows = result.all()
     
     # Group by age group
     age_data = defaultdict(lambda: {
         'users': set(),
-        'transactions': [],
+        'transaction_count': 0,
+        'total_amount': 0.0,
         'category_totals': defaultdict(float)
     })
     
-    for user, transaction in user_transactions:
-        age = calculate_age(user.birth_date) if user.birth_date else None
+    for user_id, birth_date, amount, category_name in rows:
+        age = calculate_age(birth_date) if birth_date else None
         age_group = get_age_group(age)
         
-        age_data[age_group]['users'].add(user.id)
-        
-        if transaction:
-            age_data[age_group]['transactions'].append(transaction)
-            age_data[age_group]['category_totals'][transaction.category] += transaction.amount
+        age_data[age_group]['users'].add(user_id)
+        age_data[age_group]['transaction_count'] += 1
+        age_data[age_group]['total_amount'] += float(amount)
+        age_data[age_group]['category_totals'][category_name] += float(amount)
     
     # Calculate statistics
     consumption_data = []
     order = ["18세 미만", "18-24세", "25-34세", "35-44세", "45-54세", "55세 이상", "알 수 없음"]
     
     for age_group in order:
-        data = age_data.get(age_group, {'users': set(), 'transactions': [], 'category_totals': {}})
+        data = age_data.get(age_group, {'users': set(), 'transaction_count': 0, 'total_amount': 0.0, 'category_totals': {}})
         
         user_count = len(data['users'])
-        transactions = data['transactions']
-        total_spending = sum(t.amount for t in transactions)
-        avg_amount = total_spending / len(transactions) if transactions else 0.0
+        transaction_count = data['transaction_count']
+        total_spending = data['total_amount']
+        avg_amount = total_spending / transaction_count if transaction_count > 0 else 0.0
         
         # Get top 3 categories
         sorted_categories = sorted(
@@ -208,24 +212,25 @@ async def get_category_preferences_by_age(
     **Admin only endpoint**
     """
     await verify_superuser(current_user)
-    # Get all users with transactions
-    result = await db.execute(
-        select(User, Transaction)
-        .join(Transaction, User.id == Transaction.user_id, isouter=True)
-    )
     
-    user_transactions = result.all()
+    # Import Category model
+    from app.db.model.transaction import Category
+    
+    # Get all transactions with user and category info (explicit joins)
+    result = await db.execute(
+        select(User.birth_date, Transaction.amount, Category.name.label('category_name'))
+        .join(Transaction, User.id == Transaction.user_id)
+        .join(Category, Transaction.category_id == Category.id)
+    )
+    rows = result.all()
     
     # Group by age group
     age_data = defaultdict(lambda: defaultdict(float))
     
-    for user, transaction in user_transactions:
-        if not transaction:
-            continue
-            
-        age = calculate_age(user.birth_date) if user.birth_date else None
+    for birth_date, amount, category_name in rows:
+        age = calculate_age(birth_date) if birth_date else None
         age_group = get_age_group(age)
-        age_data[age_group][transaction.category] += transaction.amount
+        age_data[age_group][category_name] += float(amount)
     
     # Get top 3 for each age group
     preferences = []

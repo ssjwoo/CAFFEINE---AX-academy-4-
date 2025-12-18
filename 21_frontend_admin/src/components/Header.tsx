@@ -34,12 +34,13 @@ import { usePathname } from 'next/navigation';
  * ============================================================
  */
 const pageTitles: { [key: string]: string } = {
-    '/': '대시보드',                          // 메인 대시보드
-    '/age-analysis': '연령대별 소비 분석',    // 연령대 분석 페이지
-    '/consumption': '소비 분석',              // 소비 분석 메인
-    '/consumption/anomalies': '이상 거래 탐지',  // 이상 거래 탐지 (서브 페이지)
-    '/summary': '분석 요약',                  // 요약 리포트
-    '/settings': '설정',                      // 설정 페이지
+    '/': '대시보드',                              // 대시보드
+    '/analysis': '소비 분석',                     // 분석 페이지
+    '/reports': '보고서',                         // 보고서
+    '/consumption/anomalies': '이상 거래 탐지',  // 이상 거래 탐지
+    '/users': '사용자 관리',                      // 사용자 리스트
+    '/transactions': '거래 관리',                 // 거래 내역
+    '/settings': '설정',                          // 설정 페이지
 };
 
 /**

@@ -45,6 +45,7 @@ class UserResponse(UserBase):
     created_at: datetime
     updated_at: datetime
     last_login_at: Optional[datetime]
+    has_recent_activity: Optional[bool] = Field(None, description="최근 30일 내 거래 여부 (동적 계산)")
 
     class Config:
         from_attributes = True
