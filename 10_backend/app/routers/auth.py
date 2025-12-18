@@ -40,6 +40,7 @@ class KakaoUserResponse(BaseModel):
     email: str | None = None
     profile_image: str | None = None
     provider: str = "kakao"
+    birth_date: str | None = None
 
 
 class KakaoLoginResponse(BaseModel):
@@ -169,7 +170,8 @@ async def kakao_login(payload: KakaoLoginRequest, db: DB_Dependency):
                     nickname=db_user.nickname or db_user.name,
                     email=db_user.email,
                     profile_image=profile_image,
-                    provider="kakao"
+                    provider="kakao",
+                    birth_date=db_user.birth_date.strftime("%Y-%m-%d") if db_user.birth_date else None
                 )
             )
             
@@ -283,7 +285,8 @@ async def kakao_signup(payload: KakaoLoginRequest, db: DB_Dependency):
                     nickname=new_user.nickname or new_user.name,
                     email=new_user.email,
                     profile_image=profile_image,
-                    provider="kakao"
+                    provider="kakao",
+                    birth_date=new_user.birth_date.strftime("%Y-%m-%d") if new_user.birth_date else None
                 )
             )
             

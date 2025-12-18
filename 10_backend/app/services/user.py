@@ -88,6 +88,7 @@ async def update_user(db: AsyncSession, user_id: int, user_data: UserUpdate):
         push_token=user_data.push_token,
         budget_limit=user_data.budget_limit,
         budget_alert_enabled=user_data.budget_alert_enabled,
+        birth_date=user_data.birth_date,
     )
 
     if not updated_user:

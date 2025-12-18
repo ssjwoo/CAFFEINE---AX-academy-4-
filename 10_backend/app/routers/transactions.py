@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import List, Optional
 import logging
 from fastapi import APIRouter, Depends, HTTPException, Query
@@ -72,7 +72,7 @@ class AnomalyReport(BaseModel):
 # 거래 내역 조회 API
 @router.get("", response_model=TransactionList)
 async def get_transactions(
-    user_id: Optional[int] = None,
+    user_id: int = Query(..., description="사용자 ID (필수)"),
     category: Optional[str] = None,
     start_date: Optional[str] = None,
     end_date: Optional[str] = None,
@@ -80,7 +80,7 @@ async def get_transactions(
     max_amount: Optional[float] = None,
     search: Optional[str] = None,
     page: int = Query(1, ge=1),
-    page_size: int = Query(20, ge=1, le=2000),
+    page_size: int = Query(20, ge=1, le=10000),
     db: AsyncSession = Depends(get_db)
 ):
     try:
@@ -88,11 +88,8 @@ async def get_transactions(
         query = select(Transaction).options(selectinload(Transaction.category))
         count_query = select(func.count(Transaction.id))
         
-        conditions = []
-        
-        # 필터 조건 추가
-        if user_id:
-            conditions.append(Transaction.user_id == user_id)
+        # user_id는 필수 조건
+        conditions = [Transaction.user_id == user_id]
         
         if start_date:
             start_dt = datetime.strptime(start_date, "%Y-%m-%d")
@@ -191,13 +188,16 @@ async def create_transactions_bulk(
                     category_id = categories.get('기타') or (list(categories.values())[0] if categories else None)
                 
                 # 날짜 파싱
+                import random
                 try:
                     tx_time = datetime.strptime(tx.transaction_date, "%Y-%m-%d %H:%M:%S")
                 except ValueError:
                     try:
                         tx_time = datetime.strptime(tx.transaction_date, "%Y-%m-%d")
                     except ValueError:
-                        tx_time = datetime.now()
+                        # 날짜 파싱 실패 시 최근 1년 내 랜덤 날짜 생성
+                        days_ago = random.randint(0, 365)
+                        tx_time = datetime.now() - timedelta(days=days_ago)
                 
                 # INSERT 실행
                 insert_stmt = insert(Transaction).values(

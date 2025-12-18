@@ -78,12 +78,17 @@ export const AuthProvider = ({ children }) => {
         }
     };
     // 회원가입
-    const signup = async (name, email, password) => {
+    const signup = async (name, email, password, birthDate = null) => {
         try {
+            const body = { name, email, password };
+            if (birthDate) {
+                body.birth_date = birthDate;
+            }
+            
             const response = await fetch(`${API_BASE_URL}/users/signup`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ name, email, password }),
+                body: JSON.stringify(body),
             });
 
             if (response.ok) {
@@ -99,9 +104,23 @@ export const AuthProvider = ({ children }) => {
     };
     // 로그아웃
     const logout = async () => {
+        // 사용자별 캐시 삭제를 위해 먼저 user 정보 가져오기
+        const userJson = await AsyncStorage.getItem('user');
+        const user = userJson ? JSON.parse(userJson) : null;
+        
         await AsyncStorage.removeItem('user');
         await AsyncStorage.removeItem('authToken');
         await AsyncStorage.removeItem('refreshToken');
+        
+        // 사용자별 거래 캐시 삭제
+        if (user?.id) {
+            await AsyncStorage.removeItem(`transactions_cache_${user.id}`);
+            await AsyncStorage.removeItem(`last_sync_time_${user.id}`);
+        }
+        // 레거시 캐시도 삭제 (이전 버전 호환)
+        await AsyncStorage.removeItem('transactions_cache');
+        await AsyncStorage.removeItem('last_sync_time');
+        
         setUser(null);
     };
     // 카카오 로그인
@@ -121,6 +140,7 @@ export const AuthProvider = ({ children }) => {
                     email: data.user?.email || 'kakao@user.com',
                     avatar: data.user?.profile_image || 'https://via.placeholder.com/100?text=K',
                     provider: 'kakao',
+                    birth_date: data.user?.birth_date || null,
                 };
                 // 로컬 스토리지에 사용자 정보 저장
                 await AsyncStorage.setItem('user', JSON.stringify(userData));

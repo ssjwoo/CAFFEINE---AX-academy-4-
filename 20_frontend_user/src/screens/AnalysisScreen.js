@@ -10,18 +10,32 @@ import FadeInView from '../components/FadeInView';
 
 const { width } = Dimensions.get('window');
 
-// 카테고리별 색상
+// 카테고리별 색상 (모든 카테고리에 구분 가능한 색상)
 const CATEGORY_COLORS = {
-    '쇼핑': '#EC4899',
-    '식비': '#F59E0B',
-    '공과금': '#8B5CF6',
-    '여가': '#10B981',
-    '교통': '#3B82F6',
-    '기타': '#6B7280',
-    '카페': '#92400E',
-    '편의점': '#059669',
-    '마트': '#DC2626',
-    '의료': '#EF4444',
+    // 식사 관련
+    '외식': '#F97316',    // 오렌지
+    '식비': '#F59E0B',    // 황금색
+    '식료품': '#84CC16',  // 라임
+    '카페': '#92400E',    // 브라운
+    
+    // 생활 관련
+    '생활': '#8B5CF6',    // 보라색
+    '주유': '#06B6D4',    // 시안
+    '교통': '#3B82F6',    // 파랑
+    '공과금': '#6366F1',  // 인디고
+    
+    // 쇼핑 관련
+    '쇼핑': '#EC4899',    // 핑크
+    '마트': '#EF4444',    // 빨강
+    '편의점': '#10B981',  // 에메랄드
+    
+    // 여가/기타
+    '여가': '#14B8A6',    // 틸
+    '의료': '#F43F5E',    // 로즈
+    '문화': '#A855F7',    // 퍼플
+    '교육': '#0EA5E9',    // 스카이
+    '통신': '#6B7280',    // 그레이
+    '기타': '#9CA3AF',    // 연한 그레이
 };
 
 // 분석 화면 컴포넌트
@@ -44,8 +58,11 @@ export default function AnalysisScreen({ navigation }) {
     // 월별 데이터 계산
     const calculateMonthlyData = (txns) => {
         const monthlyMap = {};
+        
         txns.forEach(t => {
-            let date = t.date?.split(' ')[0] || t.date || '';
+            // transaction_date 또는 date 필드 사용
+            let rawDate = t.transaction_date || t.date || '';
+            let date = rawDate?.split(' ')[0] || rawDate || '';
             let month = null;
             
             if (date.match(/^\d{4}-\d{2}/)) {
@@ -62,7 +79,7 @@ export default function AnalysisScreen({ navigation }) {
                 monthlyMap[month] += Math.abs(t.amount);
             }
         });
-
+        
         const sorted = Object.entries(monthlyMap)
             .sort((a, b) => a[0].localeCompare(b[0]))
             .slice(-6);
@@ -109,7 +126,7 @@ export default function AnalysisScreen({ navigation }) {
         const dayMap = { 0: '일', 1: '월', 2: '화', 3: '수', 4: '목', 5: '금', 6: '토' };
         const daySpending = {};
         txns.forEach(t => {
-            const date = new Date(t.date);
+            const date = new Date(t.transaction_date || t.date);
             const day = dayMap[date.getDay()] || '기타';
             if (!daySpending[day]) daySpending[day] = 0;
             daySpending[day] += Math.abs(t.amount);
@@ -209,19 +226,30 @@ export default function AnalysisScreen({ navigation }) {
                 <FadeInView style={styles.section} delay={200}>
                     <Text style={[styles.sectionTitle, { color: colors.text }]}>월별 지출 추이</Text>
                     <View style={[styles.chartCard, { backgroundColor: colors.cardBackground }]}>
-                        {monthlyData.length > 0 && (
-                            <LineChart
-                                data={{
-                                    labels: monthlyData.map(d => d.month),
-                                    datasets: [{ data: monthlyData.map(d => d.amount) }]
-                                }}
-                                width={width - 64}
-                                height={200}
-                                chartConfig={chartConfig}
-                                bezier
-                                style={styles.chart}
-                            />
-                        )}
+                        {monthlyData.length > 0 && (() => {
+                            // 데이터가 1개일 때 차트가 깨지므로 최소 2개 이상 필요
+                            let chartData = [...monthlyData];
+                            if (chartData.length === 1) {
+                                // 이전 달 더미 데이터 추가
+                                const currentMonth = parseInt(chartData[0].month.replace('월', ''));
+                                const prevMonth = currentMonth === 1 ? 12 : currentMonth - 1;
+                                chartData = [{ month: `${prevMonth}월`, amount: 0 }, ...chartData];
+                            }
+                            return (
+                                <LineChart
+                                    data={{
+                                        labels: chartData.map(d => d.month),
+                                        datasets: [{ data: chartData.map(d => d.amount || 0) }]
+                                    }}
+                                    width={width - 64}
+                                    height={200}
+                                    chartConfig={chartConfig}
+                                    bezier
+                                    style={styles.chart}
+                                    fromZero
+                                />
+                            );
+                        })()}
                     </View>
                 </FadeInView>
 

@@ -1,6 +1,6 @@
 from datetime import datetime
 from typing import Optional
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, EmailStr, Field, field_validator
 
 
 # 사용자 기본 스키마
@@ -9,7 +9,7 @@ class UserBase(BaseModel):
     name: str = Field(..., max_length=100, description="이름")
     nickname: Optional[str] = Field(None, max_length=50, description="닉네임")
     phone: Optional[str] = Field(None, max_length=20, description="전화번호")
-    birth_date: Optional[datetime] = Field(None, description="생년월일")
+    birth_date: Optional[str] = Field(None, description="생년월일 (YYYY-MM-DD)")
     last_login_at: Optional[datetime] = None
 
 # 생성
@@ -32,6 +32,7 @@ class UserUpdate(BaseModel):
     push_token: Optional[str] = None
     budget_limit: Optional[int] = None
     budget_alert_enabled: Optional[bool] = None
+    birth_date: Optional[str] = None  # YYYY-MM-DD 형식
 
 # 응답
 class UserResponse(UserBase):
@@ -47,9 +48,19 @@ class UserResponse(UserBase):
     push_token: Optional[str]
     budget_limit: Optional[int]
     budget_alert_enabled: bool
+    birth_date: Optional[str] = None
 
     class Config:
         from_attributes = True
+    
+    @field_validator('birth_date', mode='before')
+    @classmethod
+    def convert_birth_date(cls, value):
+        if value is None:
+            return None
+        if hasattr(value, 'strftime'):
+            return value.strftime('%Y-%m-%d')
+        return str(value) if value else None
 
 
 # 로그인 이력 스키마

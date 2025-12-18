@@ -153,7 +153,7 @@ export default function ProfileScreen({ navigation }) {
     // 캐시 초기화
     const handleClearCache = async () => {
         // 확인 다이얼로그
-        const confirmed = confirm('정말 모든 거래 데이터를 삭제하시겠습니까?\n\n이 작업은 되돌릴 수 없습니다.');
+        const confirmed = confirm('정말 모든 거래 데이터를 삭제하시겠습니까?\n\n이 작업은 되돌릴 수 없습니다.\n(거래 내역 및 쿠폰이 삭제됩니다)');
         
         if (!confirmed) return;
 
@@ -161,11 +161,24 @@ export default function ProfileScreen({ navigation }) {
             // TransactionContext의 clearTransactions 호출
             await clearTransactions();
             
-            // AsyncStorage에서도 삭제 (이중 보장)
+            // 쿠폰 삭제 API 호출
+            try {
+                const { deleteAllCoupons } = await import('../api/coupons');
+                await deleteAllCoupons();
+            } catch (couponError) {
+                console.warn('쿠폰 삭제 실패 (무시):', couponError);
+            }
+            
+            // AsyncStorage에서도 삭제 (user-specific 캐시 키 사용)
+            if (user?.id) {
+                await AsyncStorage.removeItem(`transactions_cache_${user.id}`);
+                await AsyncStorage.removeItem(`last_sync_time_${user.id}`);
+            }
+            // 일반 키도 삭제 (호환성)
             await AsyncStorage.removeItem('transactions_cache');
             await AsyncStorage.removeItem('last_sync_time');
             
-            alert('캐시가 삭제되었습니다!\n\n모든 거래 데이터가 초기화되었습니다.\n다시 동기화해주세요.');
+            alert('캐시가 삭제되었습니다!\n\n모든 거래 데이터와 쿠폰이 초기화되었습니다.\n다시 동기화해주세요.');
             
             // 페이지 새로고침 효과
             if (typeof window !== 'undefined') {
@@ -196,7 +209,7 @@ export default function ProfileScreen({ navigation }) {
     const handlePrivacyPolicy = () => {
         setInfoContent({
             title: '🔒 개인정보 처리방침',
-            content: `Caffeine 개인정보 처리방침\n\n1. 수집하는 개인정보\n• 이름, 이메일 주소\n• 거래 내역 정보\n• 서비스 이용 기록\n\n2. 개인정보의 이용 목적\n• 서비스 제공 및 개선\n• 소비 패턴 분석\n• 이상 거래 탐지\n• 고객 지원\n\n3. 개인정보의 보관 기간\n• 회원 탈퇴 시까지\n• 법령에 따른 보관 의무 기간\n\n4. 개인정보의 안전성 확보\n• 암호화 저장\n• 접근 권한 관리\n• 정기적인 보안 점검`
+            content: `Caffeine 개인정보 처리방침\n\n1. 수집하는 개인정보\n• 이름, 이메일 주소, 생년월일\n• 거래 내역 정보\n• 서비스 이용 기록\n\n2. 개인정보의 이용 목적\n• 서비스 제공 및 개선\n• 소비 패턴 분석\n• 이상 거래 탐지\n• 고객 지원\n\n3. 개인정보의 보관 기간\n• 회원 탈퇴 시까지\n• 법령에 따른 보관 의무 기간\n\n4. 개인정보의 안전성 확보\n• 암호화 저장\n• 접근 권한 관리\n• 정기적인 보안 점검`
         });
         setInfoModalVisible(true);
     };

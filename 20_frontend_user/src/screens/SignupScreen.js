@@ -17,6 +17,9 @@ export default function SignupScreen({ navigation }) {
     const [loading, setLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+    
+    // 생년월일 입력 state (6자리 YYMMDD)
+    const [birthDateInput, setBirthDateInput] = useState('');
 
     // 회원가입 버튼
     const handleSignup = async () => {
@@ -47,8 +50,18 @@ export default function SignupScreen({ navigation }) {
             return;
         }
 
+        // 생년월일 변환 (선택 입력)
+        let birthDate = null;
+        if (birthDateInput && birthDateInput.length === 6) {
+            const yy = birthDateInput.substring(0, 2);
+            const mm = birthDateInput.substring(2, 4);
+            const dd = birthDateInput.substring(4, 6);
+            const year = parseInt(yy) > 50 ? `19${yy}` : `20${yy}`;
+            birthDate = `${year}-${mm}-${dd}`;
+        }
+
         setLoading(true);
-        const result = await signup(name, email, password);
+        const result = await signup(name, email, password, birthDate);
         setLoading(false);
 
         if (result.success) {
@@ -176,6 +189,24 @@ export default function SignupScreen({ navigation }) {
                                     </Text>
                                 </TouchableOpacity>
                             </View>
+                        </View>
+
+                        {/* 생년월일 입력 (선택사항) */}
+                        <View style={styles.inputContainer}>
+                            <Text style={[styles.label, { color: colors.textSecondary }]}>생년월일 (선택)</Text>
+                            <TextInput
+                                style={styles.birthInput}
+                                placeholder="000212"
+                                placeholderTextColor="#9E9E9E"
+                                value={birthDateInput}
+                                onChangeText={(text) => {
+                                    const numOnly = text.replace(/[^0-9]/g, '').slice(0, 6);
+                                    setBirthDateInput(numOnly);
+                                }}
+                                keyboardType="number-pad"
+                                maxLength={6}
+                            />
+                            <Text style={styles.birthHint}>예: 000212 (2000년 2월 12일)</Text>
                         </View>
 
                         {/* Signup Button */}
@@ -438,5 +469,29 @@ const styles = StyleSheet.create({
         fontSize: 15,
         fontWeight: '600',
         color: '#3C1E1E',
+    },
+    
+    // 생년월일 입력 스타일
+    label: {
+        fontSize: 13,
+        marginBottom: 6,
+    },
+    birthInput: {
+        backgroundColor: 'white',
+        borderWidth: 1,
+        borderColor: '#E5E7EB',
+        borderRadius: 10,
+        paddingHorizontal: 16,
+        paddingVertical: 14,
+        fontSize: 18,
+        fontWeight: '600',
+        textAlign: 'center',
+        letterSpacing: 3,
+        color: '#1F2937',
+    },
+    birthHint: {
+        marginTop: 6,
+        fontSize: 12,
+        color: '#9CA3AF',
     },
 });

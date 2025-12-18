@@ -387,7 +387,7 @@ export default function CouponScreen({ route }) {
                 {/* Empty State */}
                 {filteredCoupons.length === 0 && (
                     <EmptyState
-                        icon="" // TODO: 빈 상태 아이콘
+                        icon="🎁"
                         title="쿠폰이 없습니다"
                         message="AI가 예측한 쿠폰을 받아보세요!"
                     />

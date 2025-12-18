@@ -21,3 +21,9 @@ export const useCoupon = async (couponId) => {
     const response = await apiClient.post(`/coupons/${couponId}/use`);
     return response.data;
 };
+
+// 사용자 쿠폰 일괄 삭제 (데이터 초기화용)
+export const deleteAllCoupons = async () => {
+    const response = await apiClient.delete('/coupons');
+    return response.data;
+};

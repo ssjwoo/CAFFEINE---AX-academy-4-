@@ -1,11 +1,12 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, ScrollView, StyleSheet, Dimensions, RefreshControl, TouchableOpacity } from 'react-native';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { View, Text, ScrollView, StyleSheet, Dimensions, RefreshControl, TouchableOpacity, Modal, Platform, TextInput } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { LineChart } from 'react-native-chart-kit';
 import { Feather } from '@expo/vector-icons';
 import { useTheme } from '../contexts/ThemeContext';
 import { useAuth } from '../contexts/AuthContext';
 import { useTransactions } from '../contexts/TransactionContext';
+import { useFocusEffect } from '@react-navigation/native';
 import CountUpNumber from '../components/CountUpNumber';
 import FadeInView from '../components/FadeInView';
 import AnimatedButton from '../components/AnimatedButton';
@@ -16,37 +17,58 @@ import { CHART_COLORS, ANIMATION_DELAY } from '../constants';
 
 // 카테고리별 아이콘 매핑
 const CATEGORY_ICON = {
-    '쇼핑': { icon: 'shopping-bag', color: '#EC4899' },
+    // 식사
+    '외식': { icon: 'coffee', color: '#F97316' },
     '식비': { icon: 'coffee', color: '#F59E0B' },
-    '공과금': { icon: 'zap', color: '#8B5CF6' },
-    '여가': { icon: 'music', color: '#10B981' },
-    '교통': { icon: 'truck', color: '#3B82F6' },
-    '기타': { icon: 'box', color: '#6B7280' },
+    '식료품': { icon: 'shopping-bag', color: '#84CC16' },
     '카페': { icon: 'coffee', color: '#92400E' },
-    '편의점': { icon: 'package', color: '#059669' },
-    '마트': { icon: 'shopping-cart', color: '#DC2626' },
-    '의료': { icon: 'heart', color: '#EF4444' },
+    
+    // 생활 
+    '생활': { icon: 'home', color: '#8B5CF6' },
+    '주유': { icon: 'droplet', color: '#06B6D4' },
+    '교통': { icon: 'truck', color: '#3B82F6' },
+    '공과금': { icon: 'zap', color: '#6366F1' },
+    
+    // 쇼핑 
+    '쇼핑': { icon: 'shopping-bag', color: '#EC4899' },
+    '마트': { icon: 'shopping-cart', color: '#EF4444' },
+    '편의점': { icon: 'package', color: '#10B981' },
+    
+    // 여가/기타
+    '여가': { icon: 'music', color: '#14B8A6' },
+    '의료': { icon: 'heart', color: '#F43F5E' },
+    '문화': { icon: 'film', color: '#A855F7' },
+    '교육': { icon: 'book', color: '#0EA5E9' },
+    '통신': { icon: 'smartphone', color: '#6B7280' },
+    '기타': { icon: 'box', color: '#9CA3AF' },
 };
 
 // 이모지 폴백 (아이콘 없을 때)
 const CATEGORY_EMOJI = {
-    '쇼핑': '🛍️',
+    '외식': '🍽️',
     '식비': '🍔',
-    '공과금': '💡',
-    '여가': '🎮',
-    '교통': '🚗',
-    '기타': '📦',
+    '식료품': '🥗',
     '카페': '☕',
-    '편의점': '🏪',
+    '생활': '🏠',
+    '주유': '⛽',
+    '교통': '🚗',
+    '공과금': '💡',
+    '쇼핑': '🛍️',
     '마트': '🛒',
+    '편의점': '🏪',
+    '여가': '🎮',
     '의료': '🏥',
+    '문화': '🎬',
+    '교육': '📚',
+    '통신': '📱',
+    '기타': '📦',
 };
 
 // 대쉬보드 화면
 export default function DashboardScreen({ navigation }) {
     const { colors } = useTheme();
     const { user } = useAuth();
-    const { transactions, loading: transactionLoading, refresh } = useTransactions();
+    const { transactions, loading: transactionLoading, refresh, loadTransactionsFromServer } = useTransactions();
     const [refreshing, setRefreshing] = useState(false);
     const [summary, setSummary] = useState(null);
     const [monthlyData, setMonthlyData] = useState([]);
@@ -54,8 +76,33 @@ export default function DashboardScreen({ navigation }) {
     const [tooltip, setTooltip] = useState(null);
     const [predictedTransaction, setPredictedTransaction] = useState(null);
     const [couponReceived, setCouponReceived] = useState(false);
+    
+    // 생년월일 모달 state (카카오 로그인 사용자)
+    const [showBirthModal, setShowBirthModal] = useState(false);
+    const [birthDateInput, setBirthDateInput] = useState('');  // 6자리 YYMMDD
 
     const scrollViewRef = useRef(null);
+
+    // 로그인 후 거래 데이터 자동 로드
+    useEffect(() => {
+        if (user?.id && (!transactions || transactions.length === 0) && !transactionLoading) {
+            loadTransactionsFromServer(user.id);
+        }
+    }, [user?.id]);
+
+    // 대시보드 화면 포커스 시 생년월일 체크 (카카오 사용자)
+    useFocusEffect(
+        useCallback(() => {
+            // 데이터가 로드되고, 카카오 사용자이고, 생년월일이 없으면 모달 표시
+            if (transactions && transactions.length > 0 && !transactionLoading) {
+                if (user?.provider === 'kakao' && !user?.birth_date) {
+                    // 약간의 지연으로 화면 전환 후 모달 표시
+                    const timer = setTimeout(() => setShowBirthModal(true), 500);
+                    return () => clearTimeout(timer);
+                }
+            }
+        }, [transactions, transactionLoading, user])
+    );
 
     // 거래 데이터로부터 대시보드 요약 계산
     const calculateSummary = (txns) => {
@@ -242,6 +289,40 @@ export default function DashboardScreen({ navigation }) {
             // 중복 발급 등 에러 처리
             const message = error.response?.data?.detail || '쿠폰 발급에 실패했습니다.';
             alert(message);
+        }
+    };
+
+    // 생년월일 저장 (카카오 로그인 사용자)
+    const handleSaveBirthDate = async () => {
+        if (!birthDateInput || birthDateInput.length !== 6) {
+            alert('생년월일 6자리를 입력해주세요. (예: 000212)');
+            return;
+        }
+        
+        // YYMMDD -> YYYY-MM-DD 변환
+        const yy = birthDateInput.substring(0, 2);
+        const mm = birthDateInput.substring(2, 4);
+        const dd = birthDateInput.substring(4, 6);
+        const year = parseInt(yy) > 50 ? `19${yy}` : `20${yy}`;  // 50 이상이면 1900년대
+        const birthDate = `${year}-${mm}-${dd}`;
+        
+        try {
+            const { updateUserProfile } = await import('../api/users');
+            await updateUserProfile({ birth_date: birthDate });
+            
+            // AsyncStorage의 user 객체도 업데이트
+            const AsyncStorage = (await import('@react-native-async-storage/async-storage')).default;
+            const storedUser = await AsyncStorage.getItem('user');
+            if (storedUser) {
+                const updatedUser = { ...JSON.parse(storedUser), birth_date: birthDate };
+                await AsyncStorage.setItem('user', JSON.stringify(updatedUser));
+            }
+            
+            setShowBirthModal(false);
+            alert('생년월일이 저장되었습니다!');
+        } catch (error) {
+            console.error('생년월일 저장 오류:', error);
+            alert('저장에 실패했습니다. 다시 시도해주세요.');
         }
     };
 
@@ -585,6 +666,52 @@ export default function DashboardScreen({ navigation }) {
 
                 <View style={{ height: 100 }} />
             </ScrollView>
+
+            {/* 생년월일 입력 모달 (카카오 로그인 사용자) */}
+            <Modal
+                visible={showBirthModal}
+                transparent={true}
+                animationType="fade"
+                onRequestClose={() => setShowBirthModal(false)}>
+                <View style={styles.modalOverlay}>
+                    <View style={[styles.modalContent, { backgroundColor: colors.card }]}>
+                        <Text style={[styles.modalTitle, { color: colors.text }]}>생년월일 입력</Text>
+                        <Text style={[styles.modalDesc, { color: colors.textSecondary }]}>
+                            연령대별 소비 분석을 위해{'\n'}생년월일을 입력해주세요
+                        </Text>
+                        
+                        <View style={styles.birthInputContainer}>
+                            <TextInput
+                                style={styles.birthInput}
+                                placeholder="000212"
+                                placeholderTextColor="#9CA3AF"
+                                value={birthDateInput}
+                                onChangeText={(text) => {
+                                    // 숫자만 허용, 6자리로 제한
+                                    const numOnly = text.replace(/[^0-9]/g, '').slice(0, 6);
+                                    setBirthDateInput(numOnly);
+                                }}
+                                keyboardType="number-pad"
+                                maxLength={6}
+                            />
+                            <Text style={styles.birthHint}>예: 000212 (2000년 2월 12일)</Text>
+                        </View>
+                        
+                        <View style={styles.modalBtnRow}>
+                            <TouchableOpacity
+                                style={[styles.modalBtn, styles.modalBtnSecondary]}
+                                onPress={() => setShowBirthModal(false)}>
+                                <Text style={styles.modalBtnTextSecondary}>나중에</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                                style={[styles.modalBtn, styles.modalBtnPrimary]}
+                                onPress={handleSaveBirthDate}>
+                                <Text style={styles.modalBtnTextPrimary}>저장</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                </View>
+            </Modal>
         </LinearGradient>
     );
 }
@@ -1053,5 +1180,104 @@ const styles = StyleSheet.create({
     insightHighlight: {
         fontWeight: '700',
         color: '#2563EB',
+    },
+    
+    // 생년월일 모달 스타일
+    modalOverlay: {
+        flex: 1,
+        backgroundColor: 'rgba(0,0,0,0.5)',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    modalContent: {
+        width: '85%',
+        maxWidth: 360,
+        borderRadius: 20,
+        padding: 24,
+        alignItems: 'center',
+        backgroundColor: 'white',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.3,
+        shadowRadius: 10,
+        elevation: 10,
+    },
+    modalTitle: {
+        fontSize: 20,
+        fontWeight: '700',
+        marginBottom: 8,
+    },
+    modalDesc: {
+        fontSize: 14,
+        textAlign: 'center',
+        marginBottom: 24,
+        lineHeight: 20,
+    },
+    birthDateRow: {
+        flexDirection: 'row',
+        gap: 10,
+        marginBottom: 24,
+        width: '100%',
+    },
+    birthBtn: {
+        flex: 1,
+        borderWidth: 1,
+        borderRadius: 10,
+        paddingVertical: 14,
+        alignItems: 'center',
+    },
+    birthBtnText: {
+        fontSize: 15,
+        fontWeight: '500',
+    },
+    modalBtnRow: {
+        flexDirection: 'row',
+        gap: 12,
+        width: '100%',
+    },
+    modalBtn: {
+        flex: 1,
+        paddingVertical: 14,
+        borderRadius: 12,
+        alignItems: 'center',
+    },
+    modalBtnSecondary: {
+        backgroundColor: '#E5E7EB',
+    },
+    modalBtnPrimary: {
+        backgroundColor: '#2563EB',
+    },
+    modalBtnTextSecondary: {
+        fontSize: 15,
+        fontWeight: '600',
+        color: '#4B5563',
+    },
+    modalBtnTextPrimary: {
+        fontSize: 15,
+        fontWeight: '600',
+        color: 'white',
+    },
+    birthInputContainer: {
+        width: '100%',
+        marginBottom: 24,
+    },
+    birthInput: {
+        width: '100%',
+        borderWidth: 1,
+        borderColor: '#D1D5DB',
+        borderRadius: 12,
+        paddingHorizontal: 16,
+        paddingVertical: 14,
+        fontSize: 24,
+        fontWeight: '600',
+        textAlign: 'center',
+        letterSpacing: 4,
+        color: '#1F2937',
+    },
+    birthHint: {
+        marginTop: 8,
+        fontSize: 12,
+        color: '#9CA3AF',
+        textAlign: 'center',
     },
 });

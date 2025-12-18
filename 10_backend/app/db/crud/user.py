@@ -47,6 +47,16 @@ async def create_user(db: AsyncSession, user: UserCreate) -> User:
         raise ValueError("EMAIL_ALREADY_EXISTS")
 
     hashed_pw = hash_password(user.password)
+    
+    # birth_date 파싱 (문자열 -> date)
+    birth_date_parsed = None
+    if user.birth_date:
+        from datetime import datetime
+        try:
+            birth_date_parsed = datetime.strptime(user.birth_date, "%Y-%m-%d").date()
+        except ValueError:
+            pass
+    
     db_user = User(
         email=user.email,
         password_hash=hashed_pw,
@@ -58,6 +68,7 @@ async def create_user(db: AsyncSession, user: UserCreate) -> User:
         status=user.status or "ACTIVE",
         social_provider=user.social_provider,
         social_id=user.social_id,
+        birth_date=birth_date_parsed,
     )
     db.add(db_user)
     await db.commit()
@@ -78,6 +89,7 @@ async def update_user(
     push_token: Optional[str] = None,
     budget_limit: Optional[int] = None,
     budget_alert_enabled: Optional[bool] = None,
+    birth_date: Optional[str] = None,
 ) -> Optional[User]:
     
     #유저ID로 유저 조회
@@ -104,6 +116,9 @@ async def update_user(
         user_obj.budget_limit = budget_limit
     if budget_alert_enabled is not None:
         user_obj.budget_alert_enabled = budget_alert_enabled
+    if birth_date is not None:
+        from datetime import datetime
+        user_obj.birth_date = datetime.strptime(birth_date, "%Y-%m-%d")
 
     await db.commit()
     await db.refresh(user_obj)
