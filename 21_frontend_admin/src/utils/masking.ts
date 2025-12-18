@@ -27,6 +27,25 @@ export function maskEmail(email: string): string {
 }
 
 /**
+ * 생년월일 마스킹
+ * 예: 2000-01-15 → 20**.**.**
+ * @param birthDate - 생년월일 (문자열 또는 Date 객체)
+ */
+export function maskBirthDate(birthDate: string | Date | null | undefined): string {
+    if (!birthDate) return 'N/A';
+
+    try {
+        const dateStr = typeof birthDate === 'string' ? birthDate : birthDate.toISOString();
+        const year = dateStr.substring(0, 4);
+        const yearPrefix = year.substring(0, 2); // 앞 2자리 (예: "20")
+
+        return `${yearPrefix}**.**.**`;
+    } catch (error) {
+        return 'N/A';
+    }
+}
+
+/**
  * 이름 마스킹
  * - 2글자: 뒤 1글자 마스킹 (예: 김철 → 김*)
  * - 3글자 이상: 가운데만 마스킹 (예: 홍길동 → 홍*동, 남궁민수 → 남궁*수)

@@ -32,7 +32,9 @@ class User(Base):
     updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
     last_login_at = Column(DateTime(timezone=True), nullable=True)
 
+    # Relationships
     login_histories = relationship("LoginHistory", back_populates="user", cascade="all, delete-orphan", lazy="selectin")
+    # transactions는 Transaction 모델의 backref="transactions"로 자동 생성됨
 
     def __repr__(self):
         return f"<User(id={self.id}, email='{self.email}', name='{self.name}')>"
