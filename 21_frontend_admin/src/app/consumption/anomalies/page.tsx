@@ -4,47 +4,36 @@ import { useState, useEffect } from 'react';
 import { AlertTriangle, CheckCircle, XCircle, Clock, ChevronRight } from 'lucide-react';
 import { AnomalyData } from '@/types';
 import { AnomalySummaryCard } from '@/components/ui/AnomalySummaryCard';
+import { getAnomalies, approveAnomaly, rejectAnomaly } from '@/api/client';
 
 export default function AnomaliesPage() {
     // =========================================================================================
-    // [백엔드 연동 가이드 - 데이터 목록 가져오기]
-    // 1. useState를 사용하여 데이터를 저장할 상태 변수를 만듭니다. (이미 만들어져 있음)
-    // 2. useEffect를 사용하여 페이지가 로드될 때 백엔드 API를 호출합니다.
+    // [백엔드 연동 가이드 - 완료]
+    // Backend API (/api/anomalies)와 연결되어 실제 데이터를 가져옵니다.
     // =========================================================================================
     const [anomalies, setAnomalies] = useState<AnomalyData[]>([]);
-    const [isLoading, setIsLoading] = useState(true); // 로딩 상태 추가
+    const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
-        /**
-         * 백엔드 API에서 이상 거래 데이터를 가져오는 함수
-         * 
-         * [연동 단계]
-         * 1. fetch 함수 내부의 URL을 실제 백엔드 API 주소로 변경하세요. (예: /api/v1/anomalies)
-         * 2. 백엔드 응답 형태에 맞춰 data 구조를 확인하세요.
-         * 3. 필요한 경우 인증 토큰(Header)을 fetch 옵션에 추가해야 할 수도 있습니다.
-         */
-        const fetchAnomalies = async () => {
-            try {
-                setIsLoading(true);
-                // [TODO] 실제 백엔드 API 엔드포인트로 교체 필요
-                const response = await fetch('/api/v1/anomalies'); 
-                
-                if (!response.ok) {
-                    throw new Error('서버 응답이 올바르지 않습니다.');
-                }
-
-                const data = await response.json();
-                setAnomalies(data); // 데이터 상태 업데이트
-            } catch (error) {
-                console.error('❌ 데이터를 가져오는데 실패했습니다:', error);
-                // 에러 발생 시 사용자에게 알림을 보여주는 로직을 추가할 수 있습니다.
-            } finally {
-                setIsLoading(false); // 로딩 완료
-            }
-        };
-
         fetchAnomalies();
     }, []);
+
+    /**
+     * Backend API에서 이상 거래 데이터를 가져오는 함수
+     */
+    const fetchAnomalies = async () => {
+        try {
+            setIsLoading(true);
+            const data = await getAnomalies(); // Backend API 직접 호출
+            setAnomalies(data);
+            console.log('✅ Anomaly 데이터 로드 완료:', data.length, '건');
+        } catch (error) {
+            console.error('❌ Anomaly 데이터 로드 실패:', error);
+            setAnomalies([]);
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
     // =========================================================================================
     // [데이터 요약 계산]
@@ -53,7 +42,7 @@ export default function AnomaliesPage() {
     const pendingCount = anomalies.filter(a => a.status === 'pending').length;
     const approvedCount = anomalies.filter(a => a.status === 'approved').length;
     const rejectedCount = anomalies.filter(a => a.status === 'rejected').length;
-    
+
     // 위험 금액 합계 계산 (모든 이상 거래의 금액 합계)
     const totalRiskAmount = anomalies.reduce((sum, item) => sum + item.amount, 0);
 
@@ -70,31 +59,29 @@ export default function AnomaliesPage() {
     // [백엔드 연동 가이드 - 승인/거부 처리]
     // 각 버튼을 클릭했을 때 실행될 함수들입니다.
     // =========================================================================================
-    
+
     // 승인 처리 함수
     const handleApprove = async (id: number) => {
-        console.log(`[승인 요청] ID: ${id}`);
-        // [코드 예시]
-        // try {
-        //     await fetch(`/api/v1/anomalies/${id}/approve`, { method: 'POST' });
-        //     // 성공 시 목록을 다시 불러오거나 상태를 업데이트
-        //     alert('승인되었습니다.');
-        // } catch (e) {
-        //     alert('처리에 실패했습니다.');
-        // }
+        try {
+            await approveAnomaly(id);
+            alert('승인되었습니다.');
+            await fetchAnomalies(); // 목록 새로고침
+        } catch (error) {
+            console.error('승인 실패:', error);
+            alert('처리에 실패했습니다.');
+        }
     };
 
     // 거부 처리 함수
     const handleReject = async (id: number) => {
-        console.log(`[거부 요청] ID: ${id}`);
-        // [코드 예시]
-        // try {
-        //     await fetch(`/api/v1/anomalies/${id}/reject`, { method: 'POST' });
-        //     // 성공 시 목록을 다시 불러오거나 상태를 업데이트
-        //     alert('거부되었습니다.');
-        // } catch (e) {
-        //     alert('처리에 실패했습니다.');
-        // }
+        try {
+            await rejectAnomaly(id);
+            alert('거부되었습니다.');
+            await fetchAnomalies(); // 목록 새로고침
+        } catch (error) {
+            console.error('거부 실패:', error);
+            alert('처리에 실패했습니다.');
+        }
     };
 
     return (
@@ -137,7 +124,7 @@ export default function AnomaliesPage() {
                         {pendingCount}건의 검토 필요 항목
                     </span>
                 </div>
-                
+
                 {isLoading ? (
                     <div className="p-12 text-center text-gray-500">
                         데이터를 불러오는 중입니다...
@@ -179,12 +166,12 @@ export default function AnomaliesPage() {
                                         <button className="px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-50 font-medium text-sm transition-colors">
                                             상세 보기
                                         </button>
-                                        <button 
+                                        <button
                                             onClick={() => handleReject(anomaly.id)}
                                             className="px-4 py-2 bg-red-50 text-red-600 border border-red-100 rounded-lg hover:bg-red-100 font-medium text-sm transition-colors">
                                             거부
                                         </button>
-                                        <button 
+                                        <button
                                             onClick={() => handleApprove(anomaly.id)}
                                             className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium text-sm transition-colors shadow-sm">
                                             정상 승인

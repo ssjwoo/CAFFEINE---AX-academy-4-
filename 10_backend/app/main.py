@@ -6,7 +6,7 @@ Caffeine Backend API (v1.0)
 
 ✅ 실제 구현 보안 기능 (v1.0):
 - JWT 인증 + 라이트 RBAC (user/admin 역할 구분)
-- slowapi Rate Limiting (API 요청 속도 제한)
+- slow API Rate Limiting (API 요청 속도 제한)
 - 부분적 PII 암호화 (카드번호, 전화번호만)
 - 라이트 Audit 로그 (파일/콘솔 기반 간단한 로깅)
 - HTTPS + 보안 헤더 (Nginx와 함께 사용)
@@ -90,8 +90,14 @@ LOCAL_ORIGINS = [
     "http://localhost:8080",
     "http://localhost:19000",
     "http://localhost:19006",
+    # 127.0.0.1 variants (same as localhost but treated as different origin by browsers)
     "http://127.0.0.1:3000",
+    "http://127.0.0.1:3001",
     "http://127.0.0.1:8001",
+    "http://127.0.0.1:8082",
+    "http://127.0.0.1:8080",
+    "http://127.0.0.1:19000",
+    "http://127.0.0.1:19006"
 ]
 
 allowed_origins = LOCAL_ORIGINS + [CLOUDFRONT_URL]
@@ -208,7 +214,7 @@ async def health(request: Request):
 # ============================================================
 # 라우터 등록
 # ============================================================
-from app.routers import ml, analysis, transactions, reports, settings, user
+from app.routers import ml, analysis, transactions, user, settings, reports, anomalies, user_analytics, analytics_demographics
 from app.services.scheduler import start_scheduler, shutdown_scheduler
 
 # ML 예측 API (/ml/*)
@@ -220,14 +226,24 @@ app.include_router(analysis.router)
 # 거래 내역 API (/api/transactions/*)
 app.include_router(transactions.router)
 
-# 사용자 API (/users/*)
+# 사용자/인증 API (/users/*)
 app.include_router(user.router)
 
-# 리포트 API (/api/reports/*)
+# 관리자 사용자 분석 API (/api/admin/users/*)
+app.include_router(user_analytics.router)
+
+# 인구통계 분석 API (/api/analytics/demographics/*)
+app.include_router(analytics_demographics.router)
+
+# 관리자 설정 API (/api/admin/settings/*)
+app.include_router(settings.router)
+
+# 관리자 리포트 API (/api/admin/reports/*)
 app.include_router(reports.router)
 
-# 설정 API (/api/settings/*)
-app.include_router(settings.router)
+# 이상 거래 탐지 API (/api/anomalies/*)
+app.include_router(anomalies.router)
+
 
 # ============================================================
 # 시작 / 종료 이벤트
@@ -236,12 +252,12 @@ app.include_router(settings.router)
 @app.on_event("startup")
 async def startup_event():
     """
-    애플리케이션 시작 시 실행되는 이벤트 핸들러
+    Application startup event handler
     """
     logger.info("=" * 60)
-    logger.info("Caffeine API Started")
+    logger.info("Caffeine API started")
     logger.info(f"Environment: {os.getenv('ENVIRONMENT', 'development')}")
-    logger.info(f"Allowed Origins: {allowed_origins}")
+    logger.info(f"CORS Allowed Origins: {allowed_origins}")
     
     # ML 모델 로드
     ml.load_model()
@@ -249,38 +265,18 @@ async def startup_event():
     # 스케줄러 시작 (리포트 자동 발송)
     start_scheduler()
     
-    logger.info("=" * 60)
+    # DB 연결 초기화
+    from app.services.db_init import ensure_database_and_tables
+    await ensure_database_and_tables()
+
 
 @app.on_event("shutdown")
 async def shutdown_event():
     """
-    애플리케이션 종료 시 실행되는 이벤트 핸들러
-    
-    주요 작업:
-    - 종료 로그 기록
-    - 데이터베이스 연결 종료 (추후 추가)
-    - 리소스 정리 (추후 추가)
+    Application shutdown event handler
     """
+    # 스케줄러 종료
+    shutdown_scheduler()
+    
+    logger.info("Caffeine API stopped")
     logger.info("=" * 60)
-    logger.info("Caffeine API Stopped")
-    logger.info("=" * 60)
-
-# ============================================================
-# 추후 확장 예정 (v2.0+)
-# ============================================================
-# 다음 기능들은 v2.0 이후 버전에서 구현될 예정입니다:
-#
-# 1. JWT 블랙리스트 (토큰 리보크)
-#    - 로그아웃 시 토큰을 블랙리스트에 추가
-#    - Redis 또는 DB 기반 블랙리스트 관리
-#    - 토큰 검증 시 블랙리스트 확인
-#
-# 2. 풀스펙 Audit 시스템 (DB 기반)
-#    - audit_logs 테이블에 모든 작업 영구 저장
-#    - 상세한 변경 이력 추적 (Before/After 값)
-#    - 관리자 대시보드에서 로그 조회/검색
-#
-# 3. 복잡한 보안 정책 문서
-#    - 데이터 분류 체계 (Public/Internal/Confidential/Restricted)
-#    - 접근 제어 매트릭스 (Role별 권한 상세 정의)
-#    - 사고 대응 절차 (Incident Response Plan)

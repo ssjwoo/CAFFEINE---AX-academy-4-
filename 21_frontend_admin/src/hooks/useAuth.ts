@@ -32,7 +32,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     useEffect(() => {
         const initAuth = async () => {
-            const token = sessionStorage.getItem('accessToken');
+            const token = localStorage.getItem('accessToken');
             if (token) {
                 try {
                     apiClient.get('/users/me')
@@ -55,8 +55,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }, []);
 
     const login = (token: string, refreshToken: string) => {
-        sessionStorage.setItem('accessToken', token);
-        sessionStorage.setItem('refreshToken', refreshToken);
+        localStorage.setItem('accessToken', token);
+        localStorage.setItem('refreshToken', refreshToken);
 
         apiClient.get('/users/me').then(userData => {
             setUser(userData);
@@ -68,8 +68,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     };
 
     const logout = () => {
-        sessionStorage.removeItem('accessToken');
-        sessionStorage.removeItem('refreshToken');
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('refreshToken');
         setUser(null);
         if (pathname !== '/login') {
             router.push('/login');

@@ -50,8 +50,8 @@ async def create_user(db: AsyncSession, user: UserCreate) -> User:
         nickname=user.nickname,
         phone=user.phone,
         role="USER",
-        group_id=user.group_id,
-        status=user.status or "ACTIVE",
+        is_active=True, # Default to True
+        is_superuser=False, # Default to False
         social_provider=user.social_provider,
         social_id=user.social_id,
     )
@@ -69,8 +69,7 @@ async def update_user(
     nickname: Optional[str] = None,
     phone: Optional[str] = None,
     hashed_password: Optional[str] = None,
-    status: Optional[str] = None,
-    group_id: Optional[int] = None,
+    is_active: Optional[bool] = None,
 ) -> Optional[User]:
     
     #유저ID로 유저 조회
@@ -87,10 +86,8 @@ async def update_user(
         user_obj.phone = phone
     if hashed_password is not None:
         user_obj.password_hash = hashed_password
-    if status is not None:
-        user_obj.status = status
-    if group_id is not None:
-        user_obj.group_id = group_id
+    if is_active is not None:
+        user_obj.is_active = is_active
 
     await db.commit()
     await db.refresh(user_obj)

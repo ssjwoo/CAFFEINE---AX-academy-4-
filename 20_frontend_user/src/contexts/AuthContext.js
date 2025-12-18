@@ -248,31 +248,45 @@ export const AuthProvider = ({ children }) => {
      * }
      * ```
      */
-    const signup = async (name, email, password) => {
-        // ⚠️ 현재는 Mock (가짜) 회원가입
-        // 🔴 백엔드 연결 시 이 부분을 API 호출로 교체하세요!
-
-        if (name && email && password) {
-            // 가짜 사용자 정보 생성
-            const userData = {
-                id: Date.now(), // 현재 시간을 ID로 사용 (임시)
+    const signup = async (name, email, password, birthDate) => {
+        try {
+            // 실제 백엔드 API 호출
+            const response = await apiClient.post('/api/auth/register', {
                 name: name,
                 email: email,
-                createdAt: new Date().toISOString()
-            };
+                password: password,
+                birth_date: birthDate
+            });
 
-            // AsyncStorage에 저장
-            await AsyncStorage.setItem('user', JSON.stringify(userData));
+            if (response.data) {
+                const { access_token, refresh_token, user } = response.data;
 
-            // State 업데이트
-            setUser(userData);
+                // 토큰 저장
+                await AsyncStorage.setItem('accessToken', access_token);
+                await AsyncStorage.setItem('refreshToken', refresh_token);
 
-            // 성공 반환
-            return { success: true };
+                // 사용자 정보 저장
+                const userData = {
+                    id: user.id,
+                    name: user.name,
+                    email: user.email,
+                    birth_date: user.birth_date,
+                    createdAt: user.created_at
+                };
+                await AsyncStorage.setItem('user', JSON.stringify(userData));
+
+                // State 업데이트
+                setUser(userData);
+
+                return { success: true };
+            }
+
+            return { success: false, error: '회원가입에 실패했습니다.' };
+        } catch (error) {
+            console.error('Signup error:', error);
+            const errorMessage = error.response?.data?.detail || '회원가입 중 오류가 발생했습니다.';
+            return { success: false, error: errorMessage };
         }
-
-        // 실패 반환
-        return { success: false, error: '모든 필드를 입력해주세요.' };
     };
 
     /**

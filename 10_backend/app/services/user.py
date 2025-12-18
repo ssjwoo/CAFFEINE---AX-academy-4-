@@ -91,8 +91,7 @@ async def update_user(db: AsyncSession, user_id: int, user_data: UserUpdate):
         nickname=user_data.nickname,
         phone=user_data.phone,
         hashed_password=hashed_password,
-        status=user_data.status,
-        group_id=user_data.group_id,
+        is_active=user_data.is_active,
     )
 
     if not updated_user:

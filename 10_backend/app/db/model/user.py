@@ -14,12 +14,15 @@ class User(Base):
     name = Column(String(100), nullable=False)  # 이름
     nickname = Column(String(50), nullable=True)  # 닉네임(선택)
     phone = Column(String(20), nullable=True)  # 전화번호(선택)
+    birth_date = Column(DateTime, nullable=True)  # 생년월일 (연령대별 분석용)
 
     # 권한/상태
     role = Column(String(20), default="USER", nullable=False)  # USER/ADMIN 등
-    group_id = Column(BigInteger, ForeignKey("user_groups.id", ondelete="SET NULL"), nullable=True)
-    status = Column(String(20), default="ACTIVE", nullable=False)  # ACTIVE/AWAY/BUSY 등 상태값
-
+    is_superuser = Column(Boolean, default=False, nullable=False) # 슈퍼유저 여부
+    is_active = Column(Boolean, default=True, nullable=False) # 계정 활성화 여부
+    status = Column(String(20), default="ACTIVE", nullable=False)  # ACTIVE/INACTIVE/SUSPENDED
+    group_id = Column(BigInteger, nullable=True)  # 사용자 그룹 ID (FK 제거)
+    
     # 소셜 로그인
     social_provider = Column(String(20), nullable=True)  # LOCAL/GOOGLE/KAKAO/NAVER
     social_id = Column(String(255), nullable=True)
@@ -29,8 +32,9 @@ class User(Base):
     updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
     last_login_at = Column(DateTime(timezone=True), nullable=True)
 
-    group = relationship("UserGroup", back_populates="users")
-    login_histories = relationship("LoginHistory", back_populates="user", cascade="all, delete-orphan")
+    # Relationships
+    login_histories = relationship("LoginHistory", back_populates="user", cascade="all, delete-orphan", lazy="selectin")
+    # transactions는 Transaction 모델의 backref="transactions"로 자동 생성됨
 
     @property
     def is_superuser(self) -> bool:

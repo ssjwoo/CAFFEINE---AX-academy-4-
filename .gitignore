@@ -50,3 +50,11 @@ production_models/*.joblib
 production_models/*.json
 .vscode/
 .env
+
+.zip
+.log
+
+# Streamlit dashboards (발표 자료용)
+user_app_dashboard.py
+admin_app_dashboard.py
+*_dashboard.py
