@@ -61,6 +61,26 @@ async def is_user_churned(db: AsyncSession, user_id: int, days: int = 30) -> boo
     return result.scalar_one_or_none() is None
 
 
+@router.get("/", response_model=List[UserResponse])
+async def get_all_users(
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """
+    Get all users
+    
+    **Admin only endpoint**
+    """
+    await verify_superuser(current_user)
+    
+    result = await db.execute(
+        select(User).order_by(User.created_at.desc())
+    )
+    
+    users = result.scalars().all()
+    return users
+
+
 @router.get("/new-signups", response_model=List[UserResponse])
 async def get_new_signups(
     days: int = Query(30, ge=1, le=365, description="Number of days to look back"),

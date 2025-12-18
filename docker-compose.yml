@@ -20,8 +20,8 @@ services:
   # 프론트엔드 (관리자)
   # ============================================================
   admin_front:
-    # build: ./21_frontend_admin
-    image: caffeine-admin-front:latest
+    build: ./21_frontend_admin
+    # image: caffeine-admin-front:latest
     container_name: caf_front_admin
     ports:
       - "3001:3000"
