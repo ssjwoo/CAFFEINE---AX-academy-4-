@@ -43,12 +43,19 @@ async def create_user(db: AsyncSession, user: UserCreate) -> User:
         raise ValueError("EMAIL_ALREADY_EXISTS")
 
     hashed_pw = hash_password(user.password)
+    
+    # birth_date에서 timezone 제거 (DB 컬럼이 TIMESTAMP WITHOUT TIME ZONE이므로)
+    birth_date_naive = None
+    if user.birth_date:
+        birth_date_naive = user.birth_date.replace(tzinfo=None)
+    
     db_user = User(
         email=user.email,
         password_hash=hashed_pw,
         name=user.name,
         nickname=user.nickname,
         phone=user.phone,
+        birth_date=birth_date_naive,
         role="USER",
         is_active=True, # Default to True
         is_superuser=False, # Default to False

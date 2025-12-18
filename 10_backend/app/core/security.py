@@ -1,7 +1,7 @@
 #비밀번호 암호화
 from passlib.context import CryptContext
 
-
+# bcrypt 4.0.x 사용 (5.0은 passlib과 호환 문제 있음)
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 def hash_password(password: str) -> str:

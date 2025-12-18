@@ -105,7 +105,7 @@ async def get_transactions(
     max_amount: Optional[float] = None,
     search: Optional[str] = None,
     page: int = Query(1, ge=1),
-    page_size: int = Query(20, ge=1, le=100),
+    page_size: int = Query(20, ge=1),  # No upper limit for flexibility
     db: AsyncSession = Depends(get_db)
 ):
     """

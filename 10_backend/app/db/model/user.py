@@ -14,6 +14,7 @@ class User(Base):
     name = Column(String(100), nullable=False)  # 이름
     nickname = Column(String(50), nullable=True)  # 닉네임(선택)
     phone = Column(String(20), nullable=True)  # 전화번호(선택)
+    birth_date = Column(DateTime, nullable=True)  # 생년월일 (연령대별 분석용)
 
     # 권한/상태
     role = Column(String(20), default="USER", nullable=False)  # USER/ADMIN 등

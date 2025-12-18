@@ -85,11 +85,21 @@ CLOUDFRONT_URL = "https://d26uyg5darllja.cloudfront.net"
 LOCAL_ORIGINS = [
     "http://localhost:3000",
     "http://localhost:3001",
-    "http://localhost:8081",
+    "http://localhost:8001",
+    "http://localhost:8081",  # Expo Web
     "http://localhost:8082",
     "http://localhost:8080",
     "http://localhost:19000",
-    "http://localhost:19006"
+    "http://localhost:19006",
+    # 127.0.0.1 variants (same as localhost but treated as different origin by browsers)
+    "http://127.0.0.1:3000",
+    "http://127.0.0.1:3001",
+    "http://127.0.0.1:8001",
+    "http://127.0.0.1:8081",  # Expo Web
+    "http://127.0.0.1:8082",
+    "http://127.0.0.1:8080",
+    "http://127.0.0.1:19000",
+    "http://127.0.0.1:19006"
 ]
 
 allowed_origins = LOCAL_ORIGINS + [CLOUDFRONT_URL]
@@ -206,7 +216,7 @@ async def health(request: Request):
 # ============================================================
 # 라우터 등록
 # ============================================================
-from app.routers import ml, analysis, transactions, user, settings, reports, anomalies, coupons
+from app.routers import ml, analysis, transactions, user, settings, reports, anomalies, user_analytics, analytics_demographics, coupons
 from app.routers.chatbot import router as chatbot_router
 
 # ML 예측 API (/ml/*)
@@ -220,6 +230,12 @@ app.include_router(transactions.router)
 
 # 사용자/인증 API (/users/*)
 app.include_router(user.router)
+
+# 관리자 사용자 분석 API (/api/admin/users/*)
+app.include_router(user_analytics.router)
+
+# 인구통계 분석 API (/api/analytics/demographics/*)
+app.include_router(analytics_demographics.router)
 
 # 관리자 설정 API (/api/admin/settings/*)
 app.include_router(settings.router)

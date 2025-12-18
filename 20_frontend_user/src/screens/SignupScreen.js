@@ -13,13 +13,14 @@ export default function SignupScreen({ navigation }) {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
+    const [birthDate, setBirthDate] = useState(''); // NEW: Birth date field
     const [loading, setLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
     const handleSignup = async () => {
         // Validation
-        if (isEmpty(name) || isEmpty(email) || isEmpty(password) || isEmpty(confirmPassword)) {
+        if (isEmpty(name) || isEmpty(email) || isEmpty(password) || isEmpty(confirmPassword) || isEmpty(birthDate)) {
             alert('⚠️ 모든 필드를 입력해주세요.');
             return;
         }
@@ -46,7 +47,7 @@ export default function SignupScreen({ navigation }) {
         }
 
         setLoading(true);
-        const result = await signup(name, email, password);
+        const result = await signup(name, email, password, birthDate); // Added birthDate parameter
         setLoading(false);
 
         if (!result.success) {
@@ -63,14 +64,14 @@ export default function SignupScreen({ navigation }) {
             <KeyboardAvoidingView
                 behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
                 style={styles.keyboardView}>
-                <ScrollView 
+                <ScrollView
                     contentContainerStyle={styles.scrollContent}
                     showsVerticalScrollIndicator={false}>
-                    
+
                     {/* Logo Section */}
                     <View style={styles.logoSection}>
-                        <Image 
-                            source={require('../../assets/images/caffeine_logo.png')} 
+                        <Image
+                            source={require('../../assets/images/caffeine_logo.png')}
                             style={styles.logoImage}
                             resizeMode="contain"
                         />
@@ -107,6 +108,19 @@ export default function SignupScreen({ navigation }) {
                             />
                         </View>
 
+                        {/* Birth Date Input */}
+                        <View style={styles.inputContainer}>
+                            <TextInput
+                                style={styles.input}
+                                placeholder="생년월일 (YYYY-MM-DD)"
+                                placeholderTextColor="#9E9E9E"
+                                value={birthDate}
+                                onChangeText={setBirthDate}
+                                autoCapitalize="none"
+                                keyboardType="default"
+                            />
+                        </View>
+
                         {/* Password Input */}
                         <View style={styles.inputContainer}>
                             <View style={styles.passwordWrapper}>
@@ -119,8 +133,8 @@ export default function SignupScreen({ navigation }) {
                                     secureTextEntry={!showPassword}
                                     autoCapitalize="none"
                                 />
-                                <TouchableOpacity 
-                                    onPress={() => setShowPassword(!showPassword)} 
+                                <TouchableOpacity
+                                    onPress={() => setShowPassword(!showPassword)}
                                     style={styles.eyeButton}>
                                     <Text style={styles.eyeIcon}>
                                         {showPassword ? '👁' : '👁‍🗨'}
@@ -142,8 +156,8 @@ export default function SignupScreen({ navigation }) {
                                     secureTextEntry={!showConfirmPassword}
                                     autoCapitalize="none"
                                 />
-                                <TouchableOpacity 
-                                    onPress={() => setShowConfirmPassword(!showConfirmPassword)} 
+                                <TouchableOpacity
+                                    onPress={() => setShowConfirmPassword(!showConfirmPassword)}
                                     style={styles.eyeButton}>
                                     <Text style={styles.eyeIcon}>
                                         {showConfirmPassword ? '👁' : '👁‍🗨'}
@@ -186,7 +200,7 @@ export default function SignupScreen({ navigation }) {
                     </View>
                 </ScrollView>
             </KeyboardAvoidingView>
-        </LinearGradient>
+        </LinearGradient >
     );
 }
 

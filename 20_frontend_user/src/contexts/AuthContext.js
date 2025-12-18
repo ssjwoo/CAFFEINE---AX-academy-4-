@@ -28,6 +28,7 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { apiClient } from '../api/client';  // API client for backend calls
 
 // ═══ Context 생성 ═══
 // Context = 데이터 공유 창고 (앱 전체에서 접근 가능)
@@ -248,31 +249,36 @@ export const AuthProvider = ({ children }) => {
      * }
      * ```
      */
-    const signup = async (name, email, password) => {
-        // ⚠️ 현재는 Mock (가짜) 회원가입
-        // 🔴 백엔드 연결 시 이 부분을 API 호출로 교체하세요!
+    const signup = async (name, email, password, birthDate) => {
+        try {
+            // birthDate를 ISO 형식으로 변환 (YYYY.MM.DD, YYYY-MM-DD, YYYY/MM/DD 등 지원)
+            let formattedBirthDate = null;
+            if (birthDate) {
+                // 점(.), 슬래시(/), 하이픈(-) 모두 지원
+                const normalizedDate = birthDate.replace(/[.\/]/g, '-');
+                formattedBirthDate = new Date(normalizedDate).toISOString();
+            }
 
-        if (name && email && password) {
-            // 가짜 사용자 정보 생성
-            const userData = {
-                id: Date.now(), // 현재 시간을 ID로 사용 (임시)
+            // 백엔드 API 호출
+            const response = await apiClient.post('/users/signup', {
                 name: name,
                 email: email,
-                createdAt: new Date().toISOString()
-            };
+                password: password,
+                birth_date: formattedBirthDate,
+            });
 
-            // AsyncStorage에 저장
+            // 성공 시 사용자 정보 저장
+            const userData = response.data;
             await AsyncStorage.setItem('user', JSON.stringify(userData));
-
-            // State 업데이트
             setUser(userData);
 
-            // 성공 반환
             return { success: true };
+        } catch (error) {
+            // 에러 처리
+            console.error('회원가입 실패:', error);
+            const errorMessage = error.response?.data?.detail || '회원가입 중 오류가 발생했습니다.';
+            return { success: false, error: errorMessage };
         }
-
-        // 실패 반환
-        return { success: false, error: '모든 필드를 입력해주세요.' };
     };
 
     /**
