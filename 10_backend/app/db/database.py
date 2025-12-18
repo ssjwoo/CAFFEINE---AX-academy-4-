@@ -90,8 +90,13 @@ def get_current_db_type() -> str:
     return _current_db_type or "unknown"
 
 
+# 비동기 세션 팩토리 (전역)
+_async_session_factory = None
+
 # 비동기 세션 의존성 주입용
 async def get_db():
+    global _async_session_factory
+    
     # 엔진이 없으면 초기화 (폴백 포함)
     if _async_engine is None:
         await init_db()

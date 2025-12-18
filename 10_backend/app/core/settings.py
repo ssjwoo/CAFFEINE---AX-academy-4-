@@ -34,7 +34,7 @@ class Settings(BaseSettings):
     # JWT 설정
     secret_key: str = Field("change-me-secret", alias="SECRET_KEY")
     algorithm: str = Field("HS256", alias="ALGORITHM")
-    access_token_expire_minutes: int = Field(30, alias="ACCESS_TOKEN_EXPIRE_MINUTES")
+    access_token_expire_minutes: int = Field(480, alias="ACCESS_TOKEN_EXPIRE_MINUTES")  # 8시간
     refresh_token_expire_days: int = Field(7, alias="REFRESH_TOKEN_EXPIRE_DAYS")
 
     class Config:

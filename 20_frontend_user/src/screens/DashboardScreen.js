@@ -177,11 +177,29 @@ export default function DashboardScreen({ navigation }) {
             .slice(-6)
             .map(([month, amount]) => ({ month, total_amount: amount }));
 
-        // 데이터가 없으면 현재 월 기본값 반환
-        if (sortedData.length === 0) {
+        // 최소 3개월 데이터 보장 (그래프 가독성 향상)
+        if (sortedData.length < 3) {
             const now = new Date();
-            const currentMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
-            return [{ month: currentMonth, total_amount: 0 }];
+            const months = [];
+            
+            // 최근 6개월 생성
+            for (let i = 5; i >= 0; i--) {
+                const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+                const monthStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+                months.push(monthStr);
+            }
+            
+            // 기존 데이터를 맵으로 변환
+            const existingMap = {};
+            sortedData.forEach(item => {
+                existingMap[item.month] = item.total_amount;
+            });
+            
+            // 6개월 데이터 생성 (없으면 0)
+            return months.map(month => ({
+                month,
+                total_amount: existingMap[month] || 0
+            }));
         }
 
         return sortedData;
@@ -201,13 +219,30 @@ export default function DashboardScreen({ navigation }) {
         setRefreshing(false);
     };
 
-    const handleGetCoupon = () => {
+    const handleGetCoupon = async () => {
         if (couponReceived) {
             alert('이미 쿠폰을 받으셨습니다!');
             return;
         }
-        setCouponReceived(true);
-        alert(`쿠폰 발급 완료!\n\n${predictedTransaction?.merchant}에서 사용 가능한\n${formatCurrency(predictedTransaction?.couponDiscount)} 할인 쿠폰이 발급되었습니다!`);
+        
+        try {
+            // API 호출하여 쿠폰 발급
+            const { issueCoupon } = await import('../api/coupons');
+            const result = await issueCoupon(
+                predictedTransaction?.merchant,
+                predictedTransaction?.couponDiscount
+            );
+            
+            if (result.success) {
+                setCouponReceived(true);
+                alert(`쿠폰 발급 완료!\n\n${predictedTransaction?.merchant}에서 사용 가능한\n${formatCurrency(predictedTransaction?.couponDiscount)} 할인 쿠폰이 발급되었습니다!`);
+            }
+        } catch (error) {
+            console.error('쿠폰 발급 오류:', error);
+            // 중복 발급 등 에러 처리
+            const message = error.response?.data?.detail || '쿠폰 발급에 실패했습니다.';
+            alert(message);
+        }
     };
 
     // 로딩 중

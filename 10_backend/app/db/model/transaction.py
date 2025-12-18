@@ -62,36 +62,68 @@ class Transaction(Base):
         return f"<Transaction(id={self.id}, merchant='{self.merchant_name}', amount={self.amount})>"
 
 
-class Coupon(Base):
+class CouponTemplate(Base):
     """
-    쿠폰 테이블 (RDS 스키마)
+    쿠폰 템플릿 테이블 (정규화)
+    - 쿠폰의 기본 정보를 저장
+    - 여러 사용자에게 발급되어도 중복 저장 방지
     """
-    __tablename__ = "coupons"
+    __tablename__ = "coupon_templates"
 
     id = Column(BigInteger, primary_key=True, autoincrement=True)
-    user_id = Column(BigInteger, ForeignKey("users.id", ondelete="CASCADE"), nullable=True, index=True)
     category_id = Column(BigInteger, ForeignKey("categories.id"), nullable=True)
     
     # 쿠폰 정보
     merchant_name = Column(String(255), nullable=True)
-    code = Column(String(50), unique=True, nullable=False)
     title = Column(String(100), nullable=False)
     description = Column(Text, nullable=True)
-    discount_type = Column(String(20), default="rate", nullable=False)  # rate/amount
+    discount_type = Column(String(20), default="amount", nullable=False)  # rate(%) / amount(원)
     discount_value = Column(BigInteger, default=0, nullable=False)
-    min_amount = Column(BigInteger, nullable=True)
+    min_amount = Column(BigInteger, nullable=True)  # 최소 결제 금액
     
-    # 유효기간
-    valid_from = Column(DateTime(timezone=True), nullable=True)
-    valid_until = Column(DateTime(timezone=True), nullable=True)
+    # 유효기간 (일 수)
+    validity_days = Column(Integer, default=30, nullable=False)
     is_active = Column(Boolean, default=True, nullable=False)
     
     # 타임스탬프
     created_at = Column(DateTime(timezone=True), server_default=func.now())
-    used_at = Column(DateTime(timezone=True), nullable=True)
+
+    # 관계
+    user_coupons = relationship("UserCoupon", back_populates="template")
 
     def __repr__(self):
-        return f"<Coupon(id={self.id}, code='{self.code}', title='{self.title}')>"
+        return f"<CouponTemplate(id={self.id}, title='{self.title}')>"
+
+
+class UserCoupon(Base):
+    """
+    사용자 쿠폰 테이블 (정규화)
+    - 사용자별 발급 기록
+    - template_id로 쿠폰 정보 참조 (중복 저장 방지)
+    """
+    __tablename__ = "user_coupons"
+
+    id = Column(BigInteger, primary_key=True, autoincrement=True)
+    user_id = Column(BigInteger, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
+    template_id = Column(BigInteger, ForeignKey("coupon_templates.id", ondelete="CASCADE"), nullable=False)
+    
+    # 발급 정보
+    code = Column(String(50), unique=True, nullable=False)  # 고유 쿠폰 코드
+    status = Column(String(20), default="available", nullable=False)  # available/used/expired
+    
+    # 유효기간
+    valid_until = Column(DateTime(timezone=True), nullable=False)
+    
+    # 타임스탬프
+    issued_at = Column(DateTime(timezone=True), server_default=func.now())
+    used_at = Column(DateTime(timezone=True), nullable=True)
+
+    # 관계
+    template = relationship("CouponTemplate", back_populates="user_coupons")
+    user = relationship("User", backref="coupons")
+
+    def __repr__(self):
+        return f"<UserCoupon(id={self.id}, code='{self.code}', status='{self.status}')>"
 
 
 class Anomaly(Base):

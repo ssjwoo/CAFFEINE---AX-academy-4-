@@ -144,16 +144,62 @@ const MOCK_COUPONS = [
     },
 ];
 
-export default function CouponScreen() {
+export default function CouponScreen({ route }) {
     const { colors } = useTheme();
-    const [coupons, setCoupons] = useState(MOCK_COUPONS);
+    const [coupons, setCoupons] = useState([]);
+    const [loading, setLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedCategory, setSelectedCategory] = useState('전체');
     const [showUsed, setShowUsed] = useState(false);
-    // ⭐ 쿠폰 1개 제한: 선택된 쿠폰 ID 관리
+    // 쿠폰 1개 제한: 선택된 쿠폰 ID 관리
     const [selectedCouponId, setSelectedCouponId] = useState(null);
 
-    const categories = ['전체', '식비', '쇼핑', '편의점', '여가'];
+    // API에서 쿠폰 목록 로드
+    const loadCoupons = async () => {
+        try {
+            setLoading(true);
+            const { getCoupons } = await import('../api/coupons');
+            const data = await getCoupons();
+            
+            // API 응답을 화면에 맞는 형식으로 변환
+            const formattedCoupons = data.map(coupon => ({
+                id: coupon.id,
+                merchant: coupon.merchant_name || '알 수 없음',
+                icon: '',
+                discount: coupon.discount_value,
+                category: '기타', // TODO: 카테고리 매핑
+                expiryDate: coupon.valid_until?.split('T')[0],
+                status: coupon.status,
+                description: coupon.description || 'AI 예측 기반 자동 발급',
+                minPurchase: coupon.min_amount || 5000,
+                daysLeft: calculateDaysLeft(coupon.valid_until),
+                usedDate: coupon.used_at?.split('T')[0]
+            }));
+            
+            setCoupons(formattedCoupons);
+        } catch (error) {
+            console.error('쿠폰 로드 실패:', error);
+            // 에러 시 빈 배열
+            setCoupons([]);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // 마운트 시 쿠폰 로드
+    React.useEffect(() => {
+        loadCoupons();
+    }, []);
+
+    // AI 예측 쿠폰이 전달되면 새로고침
+    React.useEffect(() => {
+        if (route?.params?.newCoupon) {
+            loadCoupons();
+            alert(`새 쿠폰이 발급되었습니다!`);
+        }
+    }, [route?.params?.newCoupon]);
+
+    const categories = ['전체', '식비', '쇼핑', '편의점', '여가', '교통', '주유'];
 
     // 필터링 로직
     const filteredCoupons = coupons.filter(coupon => {
@@ -227,7 +273,7 @@ export default function CouponScreen() {
     //     }
     // };
     // ============================================================
-    // ⭐ 쿠폰 선택 핸들러 (1개만 선택 가능)
+    // 쿠폰 선택 핸들러 (1개만 선택 가능)
     const handleSelectCoupon = (coupon) => {
         // 이미 선택된 쿠폰을 다시 누르면 선택 해제
         if (selectedCouponId === coupon.id) {
@@ -245,22 +291,33 @@ export default function CouponScreen() {
         setSelectedCouponId(coupon.id);
     };
 
-    // ⭐ 쿠폰 실제 사용 핸들러
-    const handleUseCoupon = (coupon) => {
-        alert(`✅ ${coupon.merchant} 쿠폰 사용!\n\n할인 금액: ${formatCurrency(coupon.discount)}\n최소 구매금액: ${formatCurrency(coupon.minPurchase)}\n\n다음 소비에 자동 적용됩니다.`);
-        
-        // 쿠폰 상태를 used로 변경
-        setCoupons(prev => prev.map(c => 
-            c.id === coupon.id 
-                ? { ...c, status: 'used', usedDate: new Date().toISOString().split('T')[0] }
-                : c
-        ));
-        
-        // 선택 상태 초기화
-        setSelectedCouponId(null);
+    // 쿠폰 실제 사용 핸들러
+    const handleUseCoupon = async (coupon) => {
+        try {
+            const { useCoupon } = await import('../api/coupons');
+            const result = await useCoupon(coupon.id);
+            
+            if (result.success) {
+                alert(`${coupon.merchant} 쿠폰 사용!\n\n할인 금액: ${formatCurrency(coupon.discount)}\n\n다음 소비에 자동 적용됩니다.`);
+                
+                // 쿠폰 상태를 used로 변경
+                setCoupons(prev => prev.map(c => 
+                    c.id === coupon.id 
+                        ? { ...c, status: 'used', usedDate: new Date().toISOString().split('T')[0] }
+                        : c
+                ));
+                
+                // 선택 상태 초기화
+                setSelectedCouponId(null);
+            }
+        } catch (error) {
+            console.error('쿠폰 사용 실패:', error);
+            const message = error.response?.data?.detail || '쿠폰 사용에 실패했습니다.';
+            alert(message);
+        }
     };
 
-    // ⭐ 선택 해제 핸들러
+    // 선택 해제 핸들러
     const handleDeselectCoupon = () => {
         setSelectedCouponId(null);
     };
@@ -268,7 +325,7 @@ export default function CouponScreen() {
     const CouponCard = ({ item }) => {
         const isExpiringSoon = item.status === 'available' && item.daysLeft <= 7;
         const isUsed = item.status === 'used' || item.status === 'expired';
-        // ⭐ 선택 상태 체크
+        // 선택 상태 체크
         const isSelected = selectedCouponId === item.id;
 
         return (
@@ -277,14 +334,14 @@ export default function CouponScreen() {
                     styles(colors).couponCard,
                     isUsed && styles(colors).couponCardUsed,
                     isExpiringSoon && styles(colors).couponCardExpiring,
-                    // ⭐ 선택된 쿠폰 하이라이트
+                    // 선택된 쿠폰 하이라이트
                     isSelected && styles(colors).couponCardSelected
                 ]}
                 onPress={() => !isUsed && handleSelectCoupon(item)}
                 disabled={isUsed}
                 activeOpacity={0.7}>
 
-                {/* ⭐ 선택됨 배지 */}
+                {/* 선택됨 배지 */}
                 {isSelected && (
                     <View style={styles(colors).selectedBadge}>
                         <Text style={styles(colors).selectedBadgeText}>✓ 선택됨</Text>
@@ -360,7 +417,7 @@ export default function CouponScreen() {
                     </View>
                 </View>
 
-                {/* ⭐ 버튼 영역: 선택 상태에 따라 다른 버튼 표시 */}
+                {/* 버튼 영역: 선택 상태에 따라 다른 버튼 표시 */}
                 {item.status === 'available' && (
                     <View style={styles(colors).couponButtonContainer}>
                         {isSelected ? (
@@ -790,8 +847,7 @@ const styles = (colors) => StyleSheet.create({
         fontSize: 14,
         color: colors.textSecondary
     },
-
-    // ⭐ 쿠폰 1개 제한 관련 스타일
+    // 쿠폰 1개 제한 관련 스타일
     couponCardSelected: {
         borderColor: '#10B981',
         borderWidth: 3,

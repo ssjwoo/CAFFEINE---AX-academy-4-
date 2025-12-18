@@ -1,9 +1,9 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
 import { StatusBar } from 'expo-status-bar';
-import { Text, ActivityIndicator, View } from 'react-native';
+import { Text, ActivityIndicator, View, Platform } from 'react-native';
 import { ThemeProvider, useTheme } from './src/contexts/ThemeContext';
 import { AuthProvider, useAuth } from './src/contexts/AuthContext';
 import { TransactionProvider } from './src/contexts/TransactionContext';
@@ -19,6 +19,8 @@ import MoreScreen from './src/screens/MoreScreen';
 import SettingsScreen from './src/screens/SettingsScreen';
 import LoginScreen from './src/screens/LoginScreen';
 import SignupScreen from './src/screens/SignupScreen';
+import FindEmailScreen from './src/screens/FindEmailScreen';
+import ResetPasswordScreen from './src/screens/ResetPasswordScreen';
 
 // 스플래시 스크린 유지
 SplashScreen.preventAutoHideAsync();
@@ -125,13 +127,34 @@ function AuthStack() {
       }}>
       <Stack.Screen name="Login" component={LoginScreen} />
       <Stack.Screen name="Signup" component={SignupScreen} />
+      <Stack.Screen name="FindEmail" component={FindEmailScreen} />
+      <Stack.Screen name="ResetPassword" component={ResetPasswordScreen} />
     </Stack.Navigator>
   );
 }
 
 function AppContent() {
   const { colors, isDarkMode } = useTheme();
-  const { user, loading } = useAuth();
+  const { user, loading, kakaoLogin } = useAuth();
+
+  // 카카오 OAuth 콜백 처리 (웹 환경에서만)
+  useEffect(() => {
+    if (Platform.OS === 'web' && typeof window !== 'undefined' && window.location) {
+      const urlParams = new URLSearchParams(window.location.search);
+      const code = urlParams.get('code');
+      const pathname = window.location.pathname;
+      
+      // /auth/kakao/callback 경로이거나 code가 있을 때 처리
+      if (code && !user) {
+        console.log('카카오 인증 코드 감지:', code);
+        console.log('현재 경로:', pathname);
+        // URL에서 code 파라미터 제거하고 메인으로 이동
+        window.history.replaceState({}, document.title, '/');
+        // 카카오 로그인 처리
+        kakaoLogin(code);
+      }
+    }
+  }, [user]);
 
   if (loading) {
     return (

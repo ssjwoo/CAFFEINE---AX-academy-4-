@@ -50,7 +50,11 @@ export default function SignupScreen({ navigation }) {
         const result = await signup(name, email, password, birthDate); // Added birthDate parameter
         setLoading(false);
 
-        if (!result.success) {
+        if (result.success) {
+            // 회원가입 성공 → 로그인 페이지로 이동
+            alert('✅ 회원가입이 완료되었습니다!\n로그인해주세요.');
+            navigation.navigate('Login');
+        } else {
             alert('❌ ' + result.error);
         }
     };

@@ -18,11 +18,13 @@ class User(Base):
 
     # 권한/상태
     role = Column(String(20), default="USER", nullable=False)  # USER/ADMIN 등
-    is_superuser = Column(Boolean, default=False, nullable=False) # 슈퍼유저 여부
-    is_active = Column(Boolean, default=True, nullable=False) # 계정 활성화 여부
-    status = Column(String(20), default="ACTIVE", nullable=False)  # ACTIVE/INACTIVE/SUSPENDED
-    group_id = Column(BigInteger, nullable=True)  # 사용자 그룹 ID (FK 제거)
-    
+    is_superuser = Column(Boolean, default=False, nullable=False)  # 슈퍼유저 여부
+    is_active = Column(Boolean, default=True, nullable=False)  # 계정 활성화 여부
+    group_id = Column(BigInteger, ForeignKey("user_groups.id", ondelete="SET NULL"), nullable=True)
+    status = Column(String(20), default="ACTIVE", nullable=False)  # ACTIVE/AWAY/BUSY 등 상태값
+    push_token = Column(String(255), nullable=True)  # 앱 푸시 토큰 (Expo)
+    budget_limit = Column(BigInteger, default=0, nullable=True)  # 월 예산 설정액
+
     # 소셜 로그인
     social_provider = Column(String(20), nullable=True)  # LOCAL/GOOGLE/KAKAO/NAVER
     social_id = Column(String(255), nullable=True)

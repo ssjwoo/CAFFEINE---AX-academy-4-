@@ -1,394 +1,297 @@
-"""
-쿠폰 API 라우터
+# 쿠폰 API 라우터
+# - GET /coupons: 사용자 쿠폰 목록
+# - POST /coupons/issue: 쿠폰 발급
+# - POST /coupons/{id}/use: 쿠폰 사용
 
-ML 예측 기반 쿠폰 자동 생성 및 관리
-"""
-
-from fastapi import APIRouter, HTTPException, Depends, status
-from pydantic import BaseModel
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, and_
-from typing import List, Optional
-from datetime import datetime, timedelta
 import random
-import logging
+import string
+from datetime import datetime, timedelta, timezone
+from typing import Optional, List, Annotated
+from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi.security import OAuth2PasswordBearer
+from pydantic import BaseModel
+from sqlalchemy import select, and_
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
+from jose import JWTError
 
 from app.db.database import get_db
-from app.db.model.transaction import Coupon
-from app.db.model.user import User
+from app.db.model.transaction import CouponTemplate, UserCoupon
+from app.core.jwt import verify_access_token
 
-logger = logging.getLogger(__name__)
+router = APIRouter(prefix="/coupons", tags=["쿠폰"])
 
-router = APIRouter(
-    prefix="/api/coupons",
-    tags=["coupons"],
-    responses={404: {"description": "Not found"}},
-)
+# DB 세션 의존성
+DB_Dependency = Annotated[AsyncSession, Depends(get_db)]
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/users/login")
 
 
-# ============================================================
+# 현재 인증된 유저 ID 가져오기
+async def get_current_user_id(token: str = Depends(oauth2_scheme)) -> int:
+    try:
+        payload = verify_access_token(token)
+        user_id_str: str = payload.get("sub")
+        if user_id_str is None:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="인증 정보가 유효하지 않습니다.",
+            )
+        return int(user_id_str)
+    except JWTError:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="인증 토큰이 만료되었거나 유효하지 않습니다.",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+
 # Pydantic 스키마
-# ============================================================
-
-class CouponCreate(BaseModel):
-    """쿠폰 생성 요청"""
-    predicted_category: str  # ML 예측 카테고리
-    confidence: Optional[float] = 0.8
-
-
-class CouponResponse(BaseModel):
-    """쿠폰 응답"""
+class CouponTemplateResponse(BaseModel):
     id: int
-    user_id: int
-    merchant_name: str
+    merchant_name: Optional[str]
     title: str
+    description: Optional[str]
+    discount_type: str
     discount_value: int
-    is_active: bool
-    valid_until: str
-    created_at: str
-    
+    min_amount: Optional[int]
+
     class Config:
         from_attributes = True
 
 
-# ============================================================
-# 쿠폰 템플릿 (ML 카테고리 기준)
-# ============================================================
-
-COUPON_TEMPLATES = {
-    "교통": [
-        {"merchant": "카카오택시", "discount": 3000},
-        {"merchant": "타다", "discount": 3000},
-        {"merchant": "티머니", "discount": 2000}
-    ],
-    "생활": [
-        {"merchant": "다이소", "discount": 3000},
-        {"merchant": "올리브영", "discount": 3000},
-        {"merchant": "CU", "discount": 2000},
-        {"merchant": "GS25", "discount": 2000},
-        {"merchant": "한국전력", "discount": 10000},
-        {"merchant": "세탁소", "discount": 5000},
-        {"merchant": "미용실", "discount": 10000}
-    ],
-    "쇼핑": [
-        {"merchant": "무신사", "discount": 5000},
-        {"merchant": "29CM", "discount": 4000},
-        {"merchant": "쿠팡", "discount": 3000}
-    ],
-    "식료품": [
-        {"merchant": "이마트", "discount": 5000},
-        {"merchant": "홈플러스", "discount": 4000},
-        {"merchant": "롯데마트", "discount": 4000}
-    ],
-    "외식": [
-        {"merchant": "스타벅스", "discount": 3000},
-        {"merchant": "맘스터치", "discount": 3000},
-        {"merchant": "서브웨이", "discount": 2500},
-        {"merchant": "이디야", "discount": 2000}
-    ],
-    "주유": [
-        {"merchant": "SK에너지", "discount": 5000},
-        {"merchant": "GS칼텍스", "discount": 5000},
-        {"merchant": "현대오일뱅크", "discount": 5000}
-    ]
-}
+class UserCouponResponse(BaseModel):
+    id: int
+    code: str
+    status: str
+    valid_until: datetime
+    issued_at: datetime
+    used_at: Optional[datetime]
+    # 템플릿 정보 포함
+    merchant_name: Optional[str]
+    title: str
+    description: Optional[str]
+    discount_type: str
+    discount_value: int
+    min_amount: Optional[int]
 
 
-# ============================================================
-# API 엔드포인트
-# ============================================================
+class IssueCouponRequest(BaseModel):
+    template_id: Optional[int] = None  # 특정 템플릿 지정 (없으면 merchant_name으로 자동 생성)
+    merchant_name: Optional[str] = None  # AI 예측 기반 가맹점명
+    discount_value: Optional[int] = None  # 할인 금액
 
-@router.get("", response_model=List[CouponResponse])
-async def get_coupons(
-    user_id: int = 1,  # TODO: 실제로는 JWT 토큰에서 추출
-    show_used: bool = False,
-    db: AsyncSession = Depends(get_db)
+
+class IssueCouponResponse(BaseModel):
+    success: bool
+    message: str
+    coupon: Optional[UserCouponResponse]
+
+
+class UseCouponResponse(BaseModel):
+    success: bool
+    message: str
+
+
+# 쿠폰 코드 생성
+def generate_coupon_code(length: int = 12) -> str:
+    """고유한 쿠폰 코드 생성 (영문 대문자 + 숫자)"""
+    chars = string.ascii_uppercase + string.digits
+    return ''.join(random.choices(chars, k=length))
+
+
+# GET /coupons - 사용자 쿠폰 목록 조회
+@router.get("", response_model=List[UserCouponResponse])
+async def get_user_coupons(
+    status: Optional[str] = Query(None, description="쿠폰 상태 필터 (available/used/expired)"),
+    db: DB_Dependency = None,
+    user_id: int = Depends(get_current_user_id)
 ):
     """
-    사용자의 쿠폰 목록 조회
-    
-    Args:
-        user_id: 사용자 ID (추후 JWT 인증으로 대체)
-        show_used: True면 사용된 쿠폰도 포함, False면 미사용만
-        db: 데이터베이스 세션
-    
-    Returns:
-        쿠폰 목록
+    현재 로그인한 사용자의 쿠폰 목록 조회
     """
-    try:
-        # 쿠폰 조회
-        query = select(Coupon).where(Coupon.user_id == user_id)
-        
-        if not show_used:
-            query = query.where(Coupon.is_active == True)
-        
-        # 만료일 기준 정렬 (만료 임박 순)
-        query = query.order_by(Coupon.valid_until.asc())
-        
-        result = await db.execute(query)
-        coupons = result.scalars().all()
-        
-        logger.info(f"Retrieved {len(coupons)} coupons for user {user_id}")
-        
-        return [
-            CouponResponse(
-                id=c.id,
-                user_id=c.user_id,
-                merchant_name=c.merchant_name or "가맹점",
-                title=c.title,
-                discount_value=c.discount_value,
-                is_active=c.is_active,
-                valid_until=c.valid_until.strftime("%Y-%m-%d %H:%M") if c.valid_until else "무제한",
-                created_at=c.created_at.strftime("%Y-%m-%d %H:%M")
-            )
-            for c in coupons
-        ]
-        
-    except Exception as e:
-        logger.error(f"Failed to fetch coupons: {e}", exc_info=True)
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"쿠폰 조회 실패: {str(e)}"
-        )
+    
+    # 쿠폰 조회 (템플릿 정보 포함)
+    query = select(UserCoupon).options(
+        selectinload(UserCoupon.template)
+    ).where(UserCoupon.user_id == user_id)
+    
+    # 상태 필터
+    if status:
+        query = query.where(UserCoupon.status == status)
+    
+    # 최신순 정렬
+    query = query.order_by(UserCoupon.issued_at.desc())
+    
+    result = await db.execute(query)
+    user_coupons = result.scalars().all()
+    
+    # 만료된 쿠폰 상태 자동 업데이트
+    now = datetime.now(timezone.utc)
+    for coupon in user_coupons:
+        if coupon.status == "available" and coupon.valid_until < now:
+            coupon.status = "expired"
+            await db.commit()
+    
+    # 응답 변환
+    response = []
+    for uc in user_coupons:
+        template = uc.template
+        response.append(UserCouponResponse(
+            id=uc.id,
+            code=uc.code,
+            status=uc.status,
+            valid_until=uc.valid_until,
+            issued_at=uc.issued_at,
+            used_at=uc.used_at,
+            merchant_name=template.merchant_name if template else None,
+            title=template.title if template else "쿠폰",
+            description=template.description if template else None,
+            discount_type=template.discount_type if template else "amount",
+            discount_value=template.discount_value if template else 0,
+            min_amount=template.min_amount if template else None
+        ))
+    
+    return response
 
 
-@router.post("/generate-from-prediction", response_model=CouponResponse)
-async def generate_coupon_from_prediction(
-    data: CouponCreate,
-    user_id: int = 1,  # TODO: JWT에서 추출
-    db: AsyncSession = Depends(get_db)
+# POST /coupons/issue - 쿠폰 발급
+@router.post("/issue", response_model=IssueCouponResponse)
+async def issue_coupon(
+    request: IssueCouponRequest,
+    db: DB_Dependency = None,
+    user_id: int = Depends(get_current_user_id)
 ):
     """
-    ML 예측 기반 쿠폰 자동 생성
-    
-    Args:
-        data: 예측 카테고리 정보
-        user_id: 사용자 ID
-        db: 데이터베이스 세션
-    
-    Returns:
-        생성된 쿠폰 정보
+    쿠폰 발급 (AI 예측 기반 또는 템플릿 지정)
     """
-    try:
-        category = data.predicted_category
-        
-        # 카테고리 검증
-        if category not in COUPON_TEMPLATES:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail=f"지원하지 않는 카테고리: {category}"
+    template = None
+    
+    # 1. 템플릿 ID로 발급
+    if request.template_id:
+        result = await db.execute(
+            select(CouponTemplate).where(
+                and_(CouponTemplate.id == request.template_id, CouponTemplate.is_active == True)
             )
-        
-        # 랜덤 선택
-        templates = COUPON_TEMPLATES[category]
-        selected = random.choice(templates)
-        
-        # 만료일 계산 (3일)
-        valid_until = datetime.now() + timedelta(days=3)
-        
-        # 고유 코드 생성
-        import uuid
-        coupon_code = f"ML-{category[:2].upper()}-{uuid.uuid4().hex[:8].upper()}"
-        
-        # 쿠폰 생성
-        new_coupon = Coupon(
-            user_id=user_id,
-            merchant_name=selected["merchant"],
-            code=coupon_code,
-            title=f"{selected['merchant']} {selected['discount']//1000}천원 할인",
-            description=f"ML 예측 기반 {category} 카테고리 쿠폰",
-            discount_type="amount",
-            discount_value=selected["discount"],
-            valid_until=valid_until,
-            is_active=True
         )
-        
-        db.add(new_coupon)
-        await db.commit()
-        await db.refresh(new_coupon)
-        
-        logger.info(f"Generated coupon {new_coupon.id} for user {user_id} (category: {category})")
-        
-        return CouponResponse(
-            id=new_coupon.id,
-            user_id=new_coupon.user_id,
-            merchant_name=new_coupon.merchant_name,
-            title=new_coupon.title,
-            discount_value=new_coupon.discount_value,
-            is_active=new_coupon.is_active,
-            valid_until=new_coupon.valid_until.strftime("%Y-%m-%d %H:%M"),
-            created_at=new_coupon.created_at.strftime("%Y-%m-%d %H:%M")
+        template = result.scalar_one_or_none()
+        if not template:
+            raise HTTPException(status_code=404, detail="쿠폰 템플릿을 찾을 수 없습니다.")
+    
+    # 2. 가맹점명으로 자동 생성 (AI 예측 기반)
+    elif request.merchant_name:
+        # 기존 템플릿 찾기
+        result = await db.execute(
+            select(CouponTemplate).where(
+                and_(
+                    CouponTemplate.merchant_name == request.merchant_name,
+                    CouponTemplate.is_active == True
+                )
+            )
         )
+        template = result.scalar_one_or_none()
         
-    except HTTPException:
-        raise
-    except Exception as e:
-        logger.error(f"Failed to generate coupon: {e}", exc_info=True)
-        await db.rollback()
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"쿠폰 생성 실패: {str(e)}"
+        # 없으면 새 템플릿 생성
+        if not template:
+            discount = request.discount_value or 1000  # 기본 1000원
+            template = CouponTemplate(
+                merchant_name=request.merchant_name,
+                title=f"{request.merchant_name} 할인 쿠폰",
+                description="AI 예측 기반 자동 발급 쿠폰",
+                discount_type="amount",
+                discount_value=discount,
+                min_amount=5000,
+                validity_days=30,
+                is_active=True
+            )
+            db.add(template)
+            await db.flush()  # ID 생성
+    else:
+        raise HTTPException(status_code=400, detail="template_id 또는 merchant_name이 필요합니다.")
+    
+    # 중복 발급 체크 (같은 템플릿, 미사용 쿠폰)
+    existing = await db.execute(
+        select(UserCoupon).where(
+            and_(
+                UserCoupon.user_id == user_id,
+                UserCoupon.template_id == template.id,
+                UserCoupon.status == "available"
+            )
         )
+    )
+    if existing.scalar_one_or_none():
+        raise HTTPException(status_code=400, detail="이미 동일한 쿠폰을 보유하고 있습니다.")
+    
+    # 쿠폰 발급
+    valid_until = datetime.now(timezone.utc) + timedelta(days=template.validity_days)
+    user_coupon = UserCoupon(
+        user_id=user_id,
+        template_id=template.id,
+        code=generate_coupon_code(),
+        status="available",
+        valid_until=valid_until
+    )
+    db.add(user_coupon)
+    await db.commit()
+    await db.refresh(user_coupon)
+    
+    return IssueCouponResponse(
+        success=True,
+        message=f"{template.title} 쿠폰이 발급되었습니다!",
+        coupon=UserCouponResponse(
+            id=user_coupon.id,
+            code=user_coupon.code,
+            status=user_coupon.status,
+            valid_until=user_coupon.valid_until,
+            issued_at=user_coupon.issued_at,
+            used_at=None,
+            merchant_name=template.merchant_name,
+            title=template.title,
+            description=template.description,
+            discount_type=template.discount_type,
+            discount_value=template.discount_value,
+            min_amount=template.min_amount
+        )
+    )
 
 
-@router.post("/{coupon_id}/use", response_model=CouponResponse)
+# POST /coupons/{coupon_id}/use - 쿠폰 사용
+@router.post("/{coupon_id}/use", response_model=UseCouponResponse)
 async def use_coupon(
     coupon_id: int,
-    user_id: int = 1,  # TODO: JWT
-    db: AsyncSession = Depends(get_db)
+    db: DB_Dependency = None,
+    user_id: int = Depends(get_current_user_id)
 ):
     """
-    쿠폰 사용
-    
-    Args:
-        coupon_id: 쿠폰 ID
-        user_id: 사용자 ID
-        db: 데이터베이스 세션
-    
-    Returns:
-        사용 처리된 쿠폰
+    쿠폰 사용 처리
     """
-    try:
-        # 쿠폰 조회
-        result = await db.execute(
-            select(Coupon).where(
-                and_(
-                    Coupon.id == coupon_id,
-                    Coupon.user_id == user_id
-                )
-            )
+    
+    # 쿠폰 조회
+    result = await db.execute(
+        select(UserCoupon).options(
+            selectinload(UserCoupon.template)
+        ).where(
+            and_(UserCoupon.id == coupon_id, UserCoupon.user_id == user_id)
         )
-        coupon = result.scalar_one_or_none()
-        
-        if not coupon:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="쿠폰을 찾을 수 없습니다"
-            )
-        
-        if not coupon.is_active:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="이미 사용된 쿠폰입니다"
-            )
-        
-        if coupon.valid_until and coupon.valid_until < datetime.now():
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="만료된 쿠폰입니다"
-            )
-        
-        # 사용 처리
-        coupon.is_active = False
-        coupon.used_at = datetime.now()
-        
+    )
+    coupon = result.scalar_one_or_none()
+    
+    if not coupon:
+        raise HTTPException(status_code=404, detail="쿠폰을 찾을 수 없습니다.")
+    
+    if coupon.status == "used":
+        raise HTTPException(status_code=400, detail="이미 사용된 쿠폰입니다.")
+    
+    if coupon.status == "expired" or coupon.valid_until < datetime.now(timezone.utc):
+        coupon.status = "expired"
         await db.commit()
-        await db.refresh(coupon)
-        
-        logger.info(f"Coupon {coupon_id} used by user {user_id}")
-        
-        return CouponResponse(
-            id=coupon.id,
-            user_id=coupon.user_id,
-            merchant_name=coupon.merchant_name or "가맹점",
-            title=coupon.title,
-            discount_value=coupon.discount_value,
-            is_active=coupon.is_active,
-            valid_until=coupon.valid_until.strftime("%Y-%m-%d %H:%M") if coupon.valid_until else "무제한",
-            created_at=coupon.created_at.strftime("%Y-%m-%d %H:%M")
-        )
-        
-    except HTTPException:
-        raise
-    except Exception as e:
-        logger.error(f"Failed to use coupon: {e}", exc_info=True)
-        await db.rollback()
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"쿠폰 사용 실패: {str(e)}"
-        )
-
-
-@router.delete("/{coupon_id}")
-async def delete_coupon(
-    coupon_id: int,
-    user_id: int = 1,  # TODO: JWT
-    db: AsyncSession = Depends(get_db)
-):
-    """
-    쿠폰 삭제
+        raise HTTPException(status_code=400, detail="만료된 쿠폰입니다.")
     
-    Args:
-        coupon_id: 쿠폰 ID
-        user_id: 사용자 ID
-        db: 데이터베이스 세션
+    # 쿠폰 사용 처리
+    coupon.status = "used"
+    coupon.used_at = datetime.now(timezone.utc)
+    await db.commit()
     
-    Returns:
-        삭제 확인 메시지
-    """
-    try:
-        result = await db.execute(
-            select(Coupon).where(
-                and_(
-                    Coupon.id == coupon_id,
-                    Coupon.user_id == user_id
-                )
-            )
-        )
-        coupon = result.scalar_one_or_none()
-        
-        if not coupon:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="쿠폰을 찾을 수 없습니다"
-            )
-        
-        await db.delete(coupon)
-        await db.commit()
-        
-        logger.info(f"Coupon {coupon_id} deleted by user {user_id}")
-        
-        return {"message": "쿠폰이 삭제되었습니다", "id": coupon_id}
-        
-    except HTTPException:
-        raise
-    except Exception as e:
-        logger.error(f"Failed to delete coupon: {e}", exc_info=True)
-        await db.rollback()
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"쿠폰 삭제 실패: {str(e)}"
-        )
-
-
-@router.delete("/user/all")
-async def delete_all_user_coupons(
-    user_id: int = 1,  # TODO: JWT
-    db: AsyncSession = Depends(get_db)
-):
-    """
-    사용자의 모든 쿠폰 삭제
-    """
-    try:
-        result = await db.execute(
-            select(Coupon).where(Coupon.user_id == user_id)
-        )
-        coupons = result.scalars().all()
-        
-        count = len(coupons)
-        for coupon in coupons:
-            await db.delete(coupon)
-        
-        await db.commit()
-        
-        logger.info(f"Deleted {count} coupons for user {user_id}")
-        
-        return {"message": f"{count}개 쿠폰이 삭제되었습니다", "count": count}
-        
-    except Exception as e:
-        logger.error(f"Failed to delete all coupons: {e}", exc_info=True)
-        await db.rollback()
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"쿠폰 삭제 실패: {str(e)}"
-        )
+    return UseCouponResponse(
+        success=True,
+        message=f"{coupon.template.title} 쿠폰이 사용되었습니다!"
+    )

@@ -72,3 +72,41 @@ export const getTransactionStats = async (userId = null) => {
         throw error;
     }
 };
+
+/**
+ * 거래 일괄 생성 (CSV 업로드용)
+ */
+export const createTransactionsBulk = async (userId, transactions) => {
+    try {
+        const response = await apiClient.post('/api/transactions/bulk', {
+            user_id: userId,
+            transactions: transactions.map(t => ({
+                merchant: t.merchant || t.businessName,
+                amount: Math.abs(t.amount),
+                category: t.category || t.originalCategory || '기타',
+                transaction_date: t.date || new Date().toISOString(),
+                description: t.notes || t.description || '',
+                currency: 'KRW'
+            }))
+        });
+        return response.data;
+    } catch (error) {
+        console.error('거래 일괄 생성 실패:', error);
+        throw error;
+    }
+};
+
+/**
+ * 사용자의 모든 거래 삭제
+ */
+export const deleteAllTransactions = async (userId) => {
+    try {
+        const response = await apiClient.delete('/api/transactions', {
+            params: { user_id: userId }
+        });
+        return response.data;
+    } catch (error) {
+        console.error('거래 삭제 실패:', error);
+        throw error;
+    }
+};

@@ -31,7 +31,11 @@ async def authenticate_user(db: AsyncSession, email: str, password: str) -> User
     user = await get_user_by_email(db, email)
     if not user:
         return None
-    if not verify_password(password, user.password_hash):
+    # greenlet 에러 방지: CPU 작업을 별도 스레드에서 실행
+    import asyncio
+    loop = asyncio.get_event_loop()
+    is_valid = await loop.run_in_executor(None, verify_password, password, user.password_hash)
+    if not is_valid:
         return None
     return user
 
@@ -57,8 +61,6 @@ async def create_user(db: AsyncSession, user: UserCreate) -> User:
         phone=user.phone,
         birth_date=birth_date_naive,
         role="USER",
-        is_active=True, # Default to True
-        is_superuser=False, # Default to False
         social_provider=user.social_provider,
         social_id=user.social_id,
     )
@@ -76,7 +78,10 @@ async def update_user(
     nickname: Optional[str] = None,
     phone: Optional[str] = None,
     hashed_password: Optional[str] = None,
-    is_active: Optional[bool] = None,
+    status: Optional[str] = None,
+    group_id: Optional[int] = None,
+    push_token: Optional[str] = None,
+    budget_limit: Optional[int] = None,
 ) -> Optional[User]:
     
     #유저ID로 유저 조회
@@ -93,8 +98,14 @@ async def update_user(
         user_obj.phone = phone
     if hashed_password is not None:
         user_obj.password_hash = hashed_password
-    if is_active is not None:
-        user_obj.is_active = is_active
+    if status is not None:
+        user_obj.status = status
+    if group_id is not None:
+        user_obj.group_id = group_id
+    if push_token is not None:
+        user_obj.push_token = push_token
+    if budget_limit is not None:
+        user_obj.budget_limit = budget_limit
 
     await db.commit()
     await db.refresh(user_obj)

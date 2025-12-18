@@ -15,12 +15,12 @@ export default function ProfileScreen({ navigation }) {
     const { saveTransactions, clearTransactions, loading: syncLoading } = useTransactions();
     const [infoModalVisible, setInfoModalVisible] = useState(false);
     const [infoContent, setInfoContent] = useState({ title: '', content: '' });
-    // ⭐ 동기화 진행 상태
+    // 동기화 진행 상태
     const [syncModalVisible, setSyncModalVisible] = useState(false);
     const [syncProgress, setSyncProgress] = useState('');
     const spinValue = useRef(new Animated.Value(0)).current;
     
-    // ⭐ 회전 애니메이션
+    // 회전 애니메이션
     useEffect(() => {
         if (syncModalVisible) {
             Animated.loop(
@@ -81,7 +81,7 @@ export default function ProfileScreen({ navigation }) {
         return transactions;
     };
 
-    // 데이터 동기화 (CSV 파일 선택) - ⭐ 애니메이션 추가
+    // 데이터 동기화 (CSV 파일 선택) - 애니메이션 추가
     const handleSyncData = async () => {
         try {
             // 파일 선택 다이얼로그 열기
@@ -97,7 +97,7 @@ export default function ProfileScreen({ navigation }) {
             const file = result.assets[0];
             console.log('선택된 파일:', file.name);
             
-            // ⭐ 동기화 모달 표시
+            // 동기화 모달 표시
             setSyncModalVisible(true);
             setSyncProgress('📂 파일 읽는 중...');
 
@@ -105,7 +105,7 @@ export default function ProfileScreen({ navigation }) {
             const response = await fetch(file.uri);
             const csvText = await response.text();
             
-            // ⭐ 진행 상태 업데이트
+            // 진행 상태 업데이트
             setSyncProgress('🔄 데이터 분석 중...');
             await new Promise(resolve => setTimeout(resolve, 500)); // 시각적 효과
 
@@ -118,14 +118,14 @@ export default function ProfileScreen({ navigation }) {
                 return;
             }
             
-            // ⭐ 진행 상태 업데이트
+            // 진행 상태 업데이트
             setSyncProgress(`💾 ${transactions.length}건 저장 중...`);
             await new Promise(resolve => setTimeout(resolve, 500)); // 시각적 효과
 
             // TransactionContext에 저장
             const saveResult = await saveTransactions(transactions);
             
-            // ⭐ 완료 상태
+            // 완료 상태
             setSyncProgress('✅ 동기화 완료!');
             await new Promise(resolve => setTimeout(resolve, 1000)); // 완료 표시
             
@@ -300,7 +300,7 @@ export default function ProfileScreen({ navigation }) {
                     </View>
                 </Modal>
 
-                {/* ⭐ 동기화 진행 모달 */}
+                {/* 동기화 진행 모달 */}
                 <Modal
                     animationType="fade"
                     transparent={true}
@@ -539,7 +539,7 @@ const styles = StyleSheet.create({
         fontFamily: 'Inter_700Bold',
     },
 
-    // ⭐ 동기화 모달 스타일
+    // 동기화 모달 스타일
     syncModalOverlay: {
         flex: 1,
         backgroundColor: 'rgba(0, 0, 0, 0.6)',
