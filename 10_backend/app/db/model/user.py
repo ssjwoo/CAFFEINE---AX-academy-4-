@@ -21,8 +21,13 @@ class User(Base):
     is_superuser = Column(Boolean, default=False, nullable=False) # 슈퍼유저 여부
     is_active = Column(Boolean, default=True, nullable=False) # 계정 활성화 여부
     status = Column(String(20), default="ACTIVE", nullable=False)  # ACTIVE/INACTIVE/SUSPENDED
-    group_id = Column(BigInteger, nullable=True)  # 사용자 그룹 ID (FK 제거)
+    group_id = Column(BigInteger, ForeignKey("user_groups.id", ondelete="SET NULL"), nullable=True)
     
+    # 앱 관련
+    push_token = Column(String(255), nullable=True)  # 앱 푸시 토큰 (Expo)
+    budget_limit = Column(BigInteger, default=0, nullable=True)  # 월 예산 설정액
+    budget_alert_enabled = Column(Boolean, default=True, nullable=False)  # 예산 초과 알림 활성화
+
     # 소셜 로그인
     social_provider = Column(String(20), nullable=True)  # LOCAL/GOOGLE/KAKAO/NAVER
     social_id = Column(String(255), nullable=True)
@@ -34,7 +39,6 @@ class User(Base):
 
     # Relationships
     login_histories = relationship("LoginHistory", back_populates="user", cascade="all, delete-orphan", lazy="selectin")
-    # transactions는 Transaction 모델의 backref="transactions"로 자동 생성됨
 
     @property
     def is_superuser(self) -> bool:

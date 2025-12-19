@@ -2,7 +2,7 @@ from sqlalchemy import update
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from sqlalchemy.sql import func
-from typing import Optional, List
+from typing import Optional, List, Any
 from app.db.model.user import LoginHistory, User
 from app.db.schema.user import LoginHistoryCreate, UserCreate, UserUpdate
 from app.core.security import hash_password, verify_password
@@ -31,7 +31,11 @@ async def authenticate_user(db: AsyncSession, email: str, password: str) -> User
     user = await get_user_by_email(db, email)
     if not user:
         return None
-    if not verify_password(password, user.password_hash):
+    # greenlet 에러 방지: CPU 작업을 별도 스레드에서 실행
+    import asyncio
+    loop = asyncio.get_event_loop()
+    is_valid = await loop.run_in_executor(None, verify_password, password, user.password_hash)
+    if not is_valid:
         return None
     return user
 
@@ -43,17 +47,22 @@ async def create_user(db: AsyncSession, user: UserCreate) -> User:
         raise ValueError("EMAIL_ALREADY_EXISTS")
 
     hashed_pw = hash_password(user.password)
+    
     db_user = User(
         email=user.email,
         password_hash=hashed_pw,
         name=user.name,
         nickname=user.nickname,
         phone=user.phone,
+        birth_date=user.birth_date,
         role="USER",
         is_active=True, # Default to True
         is_superuser=False, # Default to False
         social_provider=user.social_provider,
         social_id=user.social_id,
+        group_id=user.group_id,
+        status=user.status or "ACTIVE",
+        push_token=user.push_token,
     )
     db.add(db_user)
     await db.commit()
@@ -69,6 +78,12 @@ async def update_user(
     nickname: Optional[str] = None,
     phone: Optional[str] = None,
     hashed_password: Optional[str] = None,
+    status: Optional[str] = None,
+    group_id: Optional[int] = None,
+    push_token: Optional[str] = None,
+    budget_limit: Optional[int] = None,
+    budget_alert_enabled: Optional[bool] = None,
+    birth_date: Optional[Any] = None,
     is_active: Optional[bool] = None,
 ) -> Optional[User]:
     
@@ -86,6 +101,18 @@ async def update_user(
         user_obj.phone = phone
     if hashed_password is not None:
         user_obj.password_hash = hashed_password
+    if status is not None:
+        user_obj.status = status
+    if group_id is not None:
+        user_obj.group_id = group_id
+    if push_token is not None:
+        user_obj.push_token = push_token
+    if budget_limit is not None:
+        user_obj.budget_limit = budget_limit
+    if budget_alert_enabled is not None:
+        user_obj.budget_alert_enabled = budget_alert_enabled
+    if birth_date is not None:
+        user_obj.birth_date = birth_date
     if is_active is not None:
         user_obj.is_active = is_active
 

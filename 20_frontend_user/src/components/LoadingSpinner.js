@@ -85,10 +85,7 @@ const styles = StyleSheet.create({
     },
 });
 
-/**
- * FullScreenLoading 컴포넌트
- * 전체 화면을 덮는 로딩 오버레이
- */
+// 전체 화면을 덮는 로딩 오버레이
 export function FullScreenLoading({ message }) {
     const { colors } = useTheme();
 

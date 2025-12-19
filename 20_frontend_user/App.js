@@ -1,9 +1,9 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
 import { StatusBar } from 'expo-status-bar';
-import { Text, ActivityIndicator, View } from 'react-native';
+import { Text, ActivityIndicator, View, Platform } from 'react-native';
 import { ThemeProvider, useTheme } from './src/contexts/ThemeContext';
 import { AuthProvider, useAuth } from './src/contexts/AuthContext';
 import { TransactionProvider } from './src/contexts/TransactionContext';
@@ -19,6 +19,8 @@ import MoreScreen from './src/screens/MoreScreen';
 import SettingsScreen from './src/screens/SettingsScreen';
 import LoginScreen from './src/screens/LoginScreen';
 import SignupScreen from './src/screens/SignupScreen';
+import FindEmailScreen from './src/screens/FindEmailScreen';
+import ResetPasswordScreen from './src/screens/ResetPasswordScreen';
 
 // 스플래시 스크린 유지
 SplashScreen.preventAutoHideAsync();
@@ -125,13 +127,47 @@ function AuthStack() {
       }}>
       <Stack.Screen name="Login" component={LoginScreen} />
       <Stack.Screen name="Signup" component={SignupScreen} />
+      <Stack.Screen name="FindEmail" component={FindEmailScreen} />
+      <Stack.Screen name="ResetPassword" component={ResetPasswordScreen} />
     </Stack.Navigator>
   );
 }
 
 function AppContent() {
   const { colors, isDarkMode } = useTheme();
-  const { user, loading } = useAuth();
+  const { user, loading, kakaoLogin, kakaoSignup } = useAuth();
+
+  // 카카오 OAuth 콜백 처리 (웹 환경에서만)
+  useEffect(() => {
+    if (Platform.OS === 'web' && typeof window !== 'undefined' && window.location) {
+      const urlParams = new URLSearchParams(window.location.search);
+      const code = urlParams.get('code');
+      const pathname = window.location.pathname;
+      
+      // code가 있고 로그인되지 않은 경우
+      if (code && !user) {
+        // URL에서 code 파라미터 제거
+        window.history.replaceState({}, document.title, '/');
+        
+        // 회원가입 콜백인지 로그인 콜백인지 경로로 구분
+        if (pathname.includes('/signup')) {
+          // 카카오 회원가입 처리
+          kakaoSignup(code).then(result => {
+            if (!result.success) {
+              alert('카카오 회원가입 실패: ' + result.error);
+            }
+          });
+        } else {
+          // 카카오 로그인 처리
+          kakaoLogin(code).then(result => {
+            if (!result.success) {
+              alert('카카오 로그인 실패: ' + result.error);
+            }
+          });
+        }
+      }
+    }
+  }, [user]);
 
   if (loading) {
     return (
@@ -192,6 +228,7 @@ function AppContent() {
   );
 }
 
+// App 컴포넌트
 export default function App() {
   const [fontsLoaded] = useFonts({
     Inter_400Regular,

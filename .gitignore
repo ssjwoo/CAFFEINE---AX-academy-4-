@@ -1,5 +1,3 @@
-# Learn more https://docs.github.com/en/get-started/getting-started-with-git/ignoring-files
-
 # dependencies
 node_modules/
 
@@ -30,31 +28,42 @@ yarn-error.*
 .DS_Store
 *.pem
 
-# local env files
-.env*.local
+# Environment variables
+.env
 .env*
+.env*.local
+*.env
+.env.*
 
 # typescript
 *.tsbuildinfo
 
 # generated native folders
 /ios
-/androidpostgres_data/
+/android
 
+# Database
+postgres_data/
+
+# Python
 __pycache__/
 *.pyc
 *.pyo
-*.DS_Store
-postgres_data/
+
+# ML Models
 production_models/*.joblib
 production_models/*.json
+
+# IDE
 .vscode/
-.env
 
-.zip
-.log
-
-# Streamlit dashboards (발표 자료용)
+# Presentation/Dashboards
+presentation/
 user_app_dashboard.py
 admin_app_dashboard.py
 *_dashboard.py
+
+# Others
+.zip
+.log
+audit.log

@@ -1,14 +1,15 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, KeyboardAvoidingView, Platform, ScrollView, Image } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, KeyboardAvoidingView, Platform, ScrollView, Image, Linking } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import Svg, { Path, Defs, LinearGradient as SvgLinearGradient, Stop, Line, Text as SvgText, Ellipse } from 'react-native-svg';
 import { useTheme } from '../contexts/ThemeContext';
 import { useAuth } from '../contexts/AuthContext';
 import { isValidEmail, isEmpty } from '../utils/validation';
 
+// 로그인 화면
 export default function LoginScreen({ navigation }) {
     const { colors } = useTheme();
-    const { login } = useAuth();
+    const { login, kakaoLogin } = useAuth();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [loading, setLoading] = useState(false);
@@ -35,8 +36,34 @@ export default function LoginScreen({ navigation }) {
         }
     };
 
+    // 구글 로그인 버튼
     const handleGoogleLogin = () => {
         alert('Google 로그인 기능은 준비 중입니다.');
+    };
+
+    // 카카오 로그인 버튼
+    const KAKAO_REST_API_KEY = 'fa925a6646f9491a77eb9c8fd6537a21';
+    const REDIRECT_URI = 'http://localhost:8081/auth/kakao/callback';
+    
+    const handleKakaoLogin = async () => {
+        try {
+            setLoading(true);
+            // 카카오 OAuth 인증 URL (REST API 키 + redirect_uri 인코딩)
+            const encodedRedirectUri = encodeURIComponent(REDIRECT_URI);
+            const kakaoAuthUrl = `https://kauth.kakao.com/oauth/authorize?client_id=${KAKAO_REST_API_KEY}&redirect_uri=${encodedRedirectUri}&response_type=code`;
+            
+            // 웹 브라우저에서 카카오 로그인 페이지 열기
+            if (Platform.OS === 'web') {
+                window.location.href = kakaoAuthUrl;
+            } else {
+                await Linking.openURL(kakaoAuthUrl);
+            }
+        } catch (error) {
+            console.error('카카오 로그인 오류:', error);
+            alert('카카오 로그인 중 오류가 발생했습니다.');
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
@@ -102,12 +129,26 @@ export default function LoginScreen({ navigation }) {
                             </View>
                         </View>
 
-                        {/* Forgot Password */}
-                        <TouchableOpacity style={styles.forgotPasswordContainer}>
-                            <Text style={styles.forgotPasswordText}>
-                                비밀번호를 <Text style={styles.forgotPasswordLink}>잊으셨나요?</Text>
-                            </Text>
-                        </TouchableOpacity>
+                        {/* 아이디 찾기 | 비밀번호 찾기 */}
+                        <View style={styles.findLinksContainer}>
+                            <TouchableOpacity 
+                                onPress={() => navigation.navigate('FindEmail')}>
+                                <Text style={styles.findLinkText}>아이디 찾기</Text>
+                            </TouchableOpacity>
+                            <Text style={styles.findLinkDivider}>|</Text>
+                            <TouchableOpacity 
+                                onPress={() => navigation.navigate('ResetPassword')}>
+                                <Text style={styles.findLinkText}>비밀번호 찾기</Text>
+                            </TouchableOpacity>
+                        </View>
+
+                        {/* Signup Link */}
+                        <View style={styles.signupSectionTop}>
+                            <Text style={styles.signupText}>계정이 없으신가요? </Text>
+                            <TouchableOpacity onPress={() => navigation.navigate('Signup')}>
+                                <Text style={styles.signupLink}>회원가입</Text>
+                            </TouchableOpacity>
+                        </View>
 
                         {/* Login Button */}
                         <TouchableOpacity
@@ -131,6 +172,25 @@ export default function LoginScreen({ navigation }) {
                             <Text style={styles.dividerText}>또는</Text>
                             <View style={styles.dividerLine} />
                         </View>
+
+                        {/* Kakao Login Button */}
+                        <TouchableOpacity 
+                            style={styles.kakaoButton}
+                            onPress={handleKakaoLogin}
+                            activeOpacity={0.7}
+                            disabled={loading}>
+                            <View style={styles.kakaoLogoContainer}>
+                                <Svg width={20} height={20} viewBox="0 0 24 24">
+                                    <Path
+                                        fill="#000000"
+                                        d="M12 3C6.48 3 2 6.58 2 11c0 2.84 1.89 5.34 4.73 6.77-.16.56-.58 2.03-.67 2.35-.11.4.15.39.31.28.13-.08 2.05-1.39 2.88-1.96.9.13 1.83.2 2.75.2 5.52 0 10-3.58 10-8S17.52 3 12 3z"
+                                    />
+                                </Svg>
+                            </View>
+                            <Text style={styles.kakaoButtonText}>
+                                {loading ? '로그인 중...' : '카카오로 시작하기'}
+                            </Text>
+                        </TouchableOpacity>
 
                         {/* Google Login Button */}
                         <TouchableOpacity 
@@ -159,14 +219,6 @@ export default function LoginScreen({ navigation }) {
                             </View>
                             <Text style={styles.googleButtonText}>Google로 계속하기</Text>
                         </TouchableOpacity>
-
-                        {/* Signup Link */}
-                        <View style={styles.signupSection}>
-                            <Text style={styles.signupText}>계정이 없으신가요? </Text>
-                            <TouchableOpacity onPress={() => navigation.navigate('Signup')}>
-                                <Text style={styles.signupLink}>회원가입</Text>
-                            </TouchableOpacity>
-                        </View>
                     </View>
 
                     {/* Terms Footer */}
@@ -252,7 +304,7 @@ const styles = StyleSheet.create({
         alignSelf: 'center',
     },
 
-    // Input Styles (1번 원본 디자인 - 둥근 박스, 회색 배경, 테두리)
+    // Input Styles
     inputContainer: {
         marginBottom: 16,
     },
@@ -290,19 +342,29 @@ const styles = StyleSheet.create({
         color: '#9E9E9E',
     },
 
-    // Forgot Password
-    forgotPasswordContainer: {
-        alignItems: 'flex-end',
+    // 아이디 찾기 | 비밀번호 찾기 링크
+    findLinksContainer: {
+        flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'center',
         marginBottom: 24,
         marginTop: 8,
+        gap: 12,
     },
-    forgotPasswordText: {
+    findLinkText: {
         fontSize: 14,
-        color: '#757575',
-    },
-    forgotPasswordLink: {
         color: '#2563EB',
-        fontWeight: '600',
+        fontWeight: '500',
+    },
+    findLinkDivider: {
+        fontSize: 14,
+        color: '#9CA3AF',
+    },
+    signupSectionTop: {
+        flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginBottom: 20,
     },
 
     // Login Button
@@ -342,7 +404,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 8,
     },
 
-    // Google Button (3번 원본 디자인 - 컬러 Google 로고)
+    // Google Button
     googleButton: {
         flexDirection: 'row',
         alignItems: 'center',
@@ -364,13 +426,35 @@ const styles = StyleSheet.create({
     googleLogoG: {
         fontSize: 18,
         fontWeight: 'bold',
-        // 여러 색상으로 표현 (대표 색상 사용)
         color: '#4285F4',
     },
     googleButtonText: {
         fontSize: 15,
         color: '#374151',
         fontWeight: '500',
+    },
+
+    // Kakao Button
+    kakaoButton: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        paddingVertical: 14,
+        borderRadius: 16,
+        backgroundColor: '#FEE500',
+        marginBottom: 12,
+    },
+    kakaoLogoContainer: {
+        width: 24,
+        height: 24,
+        marginRight: 10,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    kakaoButtonText: {
+        fontSize: 15,
+        color: '#000000',
+        fontWeight: '600',
     },
 
     // Signup Section

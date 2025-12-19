@@ -5,6 +5,7 @@ import { Feather } from '@expo/vector-icons';
 import { useTheme } from '../contexts/ThemeContext';
 import FadeInView from '../components/FadeInView';
 
+// 잠깐만AI 챗봇
 export default function MoreScreen({ navigation, route }) {
     const { colors } = useTheme();
     const [chatStarted, setChatStarted] = useState(false);
@@ -56,6 +57,7 @@ export default function MoreScreen({ navigation, route }) {
         return levelResponses[Math.floor(Math.random() * levelResponses.length)];
     };
     
+    // 챗봇 시작
     const startChat = () => {
         setChatStarted(true);
         setMessages([
@@ -146,14 +148,14 @@ export default function MoreScreen({ navigation, route }) {
         }
     ];
     
-    // 예산 저장 핸들러
+    // 예산 저장 버튼
     const handleSaveBudget = () => {
         // TODO: 백엔드 연결 시 저장 API 호출
         alert(`✅ 예산이 저장되었습니다!\n\n월 예산: ${Number(monthlyBudget).toLocaleString()}원`);
         setBudgetModalVisible(false);
     };
     
-    // 예산 초기화 핸들러
+    // 예산 초기화 버튼
     const handleResetBudget = () => {
         setMonthlyBudget('0');
         setCategoryBudgets({
@@ -165,6 +167,7 @@ export default function MoreScreen({ navigation, route }) {
         });
     };
     
+    // 메뉴 아이템
     const menuItems = [
         {
             title: '지출 분석',
@@ -192,7 +195,6 @@ export default function MoreScreen({ navigation, route }) {
         },
     ];
 
-    // 프로필과 설정 분리
     const profileItems = [
         {
             title: '프로필',

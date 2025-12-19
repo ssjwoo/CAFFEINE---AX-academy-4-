@@ -8,32 +8,24 @@ from app.core.settings import settings
 from app.db.database import Base
 
 # 모델들을 명시적으로 import (Base.metadata에 등록하기 위해 필수)
-# 이 import가 없으면 create_all()이 실행되어도 테이블이 생성되지 않음
 from app.db.model.user import User, LoginHistory
-
-from app.db.model.transaction import Transaction, Coupon  # 2025-12-10 추가
-
+from app.db.model.group import UserGroup
+from app.db.model.transaction import Transaction, Category, CouponTemplate, UserCoupon, Anomaly
 
 async def ensure_database_and_tables():
     """
     RDS 데이터베이스에 테이블 생성
-    
-    AWS RDS에서는 DB가 이미 생성되어 있으므로,
-    테이블만 생성합니다 (CREATE TABLE IF NOT EXISTS)
     """
     try:
-        # 테이블 생성 (DB 포함된 URL로 엔진 생성)
+        # 테이블 생성
         full_engine = create_async_engine(settings.database_url, echo=False)
         async with full_engine.begin() as conn:
             await conn.run_sync(Base.metadata.create_all)
         await full_engine.dispose()
-        
         print("RDS table verification/creation completed")
-        
     except Exception as e:
         print(f"DB initialization failed: {e}")
         raise
-
 
 async def test_db_connection():
     """

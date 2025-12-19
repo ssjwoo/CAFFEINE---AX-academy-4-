@@ -31,12 +31,11 @@ async def create_engine_with_fallback():
     global _async_engine, _current_db_type
     
     # 1. AWS RDS 연결 시도
-    # 1. AWS RDS 연결 시도
     logger.info(f"Connecting to AWS RDS: {settings.db_host}")
     rds_engine = create_async_engine(
         settings.database_url, 
         echo=False,
-        pool_pre_ping=False,
+        pool_pre_ping=False,  # greenlet 에러 방지
         connect_args={"timeout": 5}
     )
     
@@ -53,7 +52,7 @@ async def create_engine_with_fallback():
     local_engine = create_async_engine(
         settings.local_database_url,
         echo=False,
-        pool_pre_ping=False,
+        pool_pre_ping=False,  # greenlet 에러 방지
         connect_args={"timeout": 5}
     )
     
@@ -90,16 +89,29 @@ def get_current_db_type() -> str:
     return _current_db_type or "unknown"
 
 
+# 비동기 세션 팩토리 (전역)
+_async_session_factory = None
+
 # 비동기 세션 의존성 주입용
 async def get_db():
+    global _async_session_factory
+    
     # 엔진이 없으면 초기화 (폴백 포함)
     if _async_engine is None:
         await init_db()
     
-    async_session = sessionmaker(
-        autocommit=False, autoflush=False, bind=_async_engine, class_=AsyncSession, expire_on_commit=False
-    )
-    async with async_session() as session:
+    # 세션 팩토리가 없으면 생성 (한 번만)
+    if _async_session_factory is None:
+        from sqlalchemy.ext.asyncio import async_sessionmaker
+        _async_session_factory = async_sessionmaker(
+            bind=_async_engine, 
+            class_=AsyncSession,
+            autocommit=False, 
+            autoflush=False,
+            expire_on_commit=False
+        )
+    
+    async with _async_session_factory() as session:
         try:
             yield session
             await session.commit()
