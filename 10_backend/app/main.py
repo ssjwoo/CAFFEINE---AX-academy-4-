@@ -65,14 +65,6 @@ LOCAL_ORIGINS = [
 
 allowed_origins = LOCAL_ORIGINS + [CLOUDFRONT_URL]
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=allowed_origins,
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
 
 # 보안 헤더 미들웨어
 @app.middleware("http")
@@ -146,6 +138,15 @@ app.include_router(analytics_demographics.router)
 app.include_router(settings.router)
 app.include_router(reports.router)
 app.include_router(anomalies.router)
+
+# CORS 설정을 가장 마지막에 추가하여 outermost 레이어로 만듦
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=allowed_origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 # 시작 / 종료 이벤트

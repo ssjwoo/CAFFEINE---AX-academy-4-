@@ -40,10 +40,6 @@ class User(Base):
     # Relationships
     login_histories = relationship("LoginHistory", back_populates="user", cascade="all, delete-orphan", lazy="selectin")
 
-    @property
-    def is_superuser(self) -> bool:
-        return self.role == "ADMIN"
-
     def __repr__(self):
         return f"<User(id={self.id}, email='{self.email}', name='{self.name}')>"
 
