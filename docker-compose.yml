@@ -1,25 +1,6 @@
 version: "3.9"
 
 services:
-  # ============================================================
-  # PostgreSQL 데이터베이스
-  # ============================================================
-  db:
-    image: postgres:15
-    container_name: caf_db
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: caffeineapprds
-      POSTGRES_DB: caffeine_db
-    ports:
-      - "5432:5432"
-    volumes:
-      - ./postgres_data:/var/lib/postgresql/data
-    healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
-      interval: 5s
-      timeout: 5s
-      retries: 5
 
   # ============================================================
   # FastAPI 백엔드
@@ -28,22 +9,13 @@ services:
     build: ./10_backend
     # image: caffeine-backend:latest
     container_name: caf_backend
-    depends_on:
-      db:
-        condition: service_healthy
     environment:
-      # 2025-12-11: AWS RDS 우선, 연결 실패 시 로컬 DB 폴백
+      # AWS RDS 연결
       DB_HOST: caffeine-database.c58og6ke6t36.ap-northeast-2.rds.amazonaws.com
       DB_USER: postgres
       DB_PASSWORD: caffeineapprds
       DB_PORT: 5432
       DB_NAME: postgres
-      # Fallback: Local PostgreSQL (Docker 컨테이너)
-      LOCAL_DB_HOST: db
-      LOCAL_DB_PORT: 5432
-      LOCAL_DB_NAME: caffeine_db
-      LOCAL_DB_USER: postgres
-      LOCAL_DB_PASSWORD: caffeineapprds
       # App
       SECRET_KEY: your-super-secret-key-change-in-production
       # Gmail SMTP
@@ -77,20 +49,6 @@ services:
       - "80:80"
     depends_on:
       - backend
-
-  # ============================================================
-  # ML 서비스
-  # ============================================================
-  ml_next:
-    build: ./40_ml_next
-    container_name: caf_ml_next
-    ports:
-      - "9001:9001"
-    volumes:
-      - ./10_backend/app/model_xgboost_acc_73.47.joblib:/app/model.joblib:ro
-    environment:
-      LOCAL_MODEL_PATH: /app/model.joblib
-
   # ============================================================
   # LLM 서비스
   # ============================================================
