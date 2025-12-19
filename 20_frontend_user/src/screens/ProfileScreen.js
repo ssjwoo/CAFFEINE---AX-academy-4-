@@ -20,7 +20,7 @@ export default function ProfileScreen({ navigation }) {
     const [syncModalVisible, setSyncModalVisible] = useState(false);
     const [syncProgress, setSyncProgress] = useState('');
     const spinValue = useRef(new Animated.Value(0)).current;
-    
+
     // 회전 애니메이션
     useEffect(() => {
         if (syncModalVisible) {
@@ -36,7 +36,7 @@ export default function ProfileScreen({ navigation }) {
             spinValue.setValue(0);
         }
     }, [syncModalVisible]);
-    
+
     const spin = spinValue.interpolate({
         inputRange: [0, 1],
         outputRange: ['0deg', '360deg'],
@@ -97,15 +97,25 @@ export default function ProfileScreen({ navigation }) {
 
             const file = result.assets[0];
             console.log('선택된 파일:', file.name);
-            
+
             // 동기화 모달 표시
             setSyncModalVisible(true);
             setSyncProgress('📂 파일 읽는 중...');
 
-            // 파일 읽기
+            // 파일 읽기 - 인코딩 자동 감지
             const response = await fetch(file.uri);
-            const csvText = await response.text();
-            
+            const arrayBuffer = await response.arrayBuffer();
+            // UTF-8 시도
+            let csvText;
+            try {
+                const decoder = new TextDecoder('utf-8', { fatal: true });
+                csvText = decoder.decode(arrayBuffer);
+            } catch (e) {
+                // UTF-8 실패 시 EUC-KR(CP949) 시도
+                const decoder = new TextDecoder('euc-kr');
+                csvText = decoder.decode(arrayBuffer);
+            }
+
             // 진행 상태 업데이트
             setSyncProgress('🔄 데이터 분석 중...');
             await new Promise(resolve => setTimeout(resolve, 500)); // 시각적 효과
@@ -118,18 +128,18 @@ export default function ProfileScreen({ navigation }) {
                 alert('CSV 파일에서 거래 데이터를 찾을 수 없습니다.\n\n올바른 형식의 CSV 파일인지 확인해주세요.');
                 return;
             }
-            
+
             // 진행 상태 업데이트
             setSyncProgress(`${transactions.length}건 저장 중...`);
             await new Promise(resolve => setTimeout(resolve, 500)); // 시각적 효과
 
             // TransactionContext에 저장
             const saveResult = await saveTransactions(transactions);
-            
+
             // 완료 상태
             setSyncProgress('동기화 완료!');
             await new Promise(resolve => setTimeout(resolve, 1000)); // 완료 표시
-            
+
             setSyncModalVisible(false);
 
             if (saveResult.success) {
@@ -154,13 +164,13 @@ export default function ProfileScreen({ navigation }) {
     const handleClearCache = async () => {
         // 확인 다이얼로그
         const confirmed = confirm('정말 모든 거래 데이터를 삭제하시겠습니까?\n\n이 작업은 되돌릴 수 없습니다.\n(거래 내역 및 쿠폰이 삭제됩니다)');
-        
+
         if (!confirmed) return;
 
         try {
             // TransactionContext의 clearTransactions 호출
             await clearTransactions();
-            
+
             // 쿠폰 삭제 API 호출
             try {
                 const { deleteAllCoupons } = await import('../api/coupons');
@@ -168,7 +178,7 @@ export default function ProfileScreen({ navigation }) {
             } catch (couponError) {
                 console.warn('쿠폰 삭제 실패 (무시):', couponError);
             }
-            
+
             // AsyncStorage에서도 삭제 (user-specific 캐시 키 사용)
             if (user?.id) {
                 await AsyncStorage.removeItem(`transactions_cache_${user.id}`);
@@ -177,9 +187,9 @@ export default function ProfileScreen({ navigation }) {
             // 일반 키도 삭제 (호환성)
             await AsyncStorage.removeItem('transactions_cache');
             await AsyncStorage.removeItem('last_sync_time');
-            
+
             alert('캐시가 삭제되었습니다!\n\n모든 거래 데이터와 쿠폰이 초기화되었습니다.\n다시 동기화해주세요.');
-            
+
             // 페이지 새로고침 효과
             if (typeof window !== 'undefined') {
                 window.location.reload();
@@ -226,7 +236,7 @@ export default function ProfileScreen({ navigation }) {
         if (!confirm('정말로 회원탈퇴 하시겠습니까?\n\n모든 데이터가 삭제되며 복구할 수 없습니다.')) {
             return;
         }
-        
+
         try {
             const token = await AsyncStorage.getItem('authToken');
             const response = await fetch('http://localhost:8001/auth/delete-account', {
@@ -236,7 +246,7 @@ export default function ProfileScreen({ navigation }) {
                     'Content-Type': 'application/json'
                 }
             });
-            
+
             if (response.ok) {
                 await clearTransactions();
                 await logout();
@@ -341,8 +351,8 @@ export default function ProfileScreen({ navigation }) {
                             <ScrollView style={styles.modalScroll} showsVerticalScrollIndicator={false}>
                                 <Text style={[styles.modalText, { color: colors.text }]}>{infoContent.content}</Text>
                             </ScrollView>
-                            <TouchableOpacity 
-                                style={styles.modalButton} 
+                            <TouchableOpacity
+                                style={styles.modalButton}
                                 onPress={() => setInfoModalVisible(false)}
                                 activeOpacity={0.8}
                             >
@@ -362,7 +372,7 @@ export default function ProfileScreen({ navigation }) {
                     animationType="fade"
                     transparent={true}
                     visible={syncModalVisible}
-                    onRequestClose={() => {}}
+                    onRequestClose={() => { }}
                 >
                     <View style={styles.syncModalOverlay}>
                         <View style={[styles.syncModalContent, { backgroundColor: colors.cardBackground }]}>
@@ -377,19 +387,19 @@ export default function ProfileScreen({ navigation }) {
                             </Animated.View>
                             <Text style={[styles.syncTitle, { color: colors.text }]}>데이터 동기화</Text>
                             <Text style={[styles.syncProgress, { color: colors.textSecondary }]}>{syncProgress}</Text>
-                            
+
                             {/* 진행 바 애니메이션 */}
                             <View style={styles.progressBarContainer}>
                                 <View style={styles.progressBar}>
-                                    <Animated.View 
+                                    <Animated.View
                                         style={[
                                             styles.progressBarFill,
-                                            { 
-                                                width: syncProgress.includes('완료') ? '100%' : 
-                                                       syncProgress.includes('저장') ? '70%' :
-                                                       syncProgress.includes('분석') ? '40%' : '20%' 
+                                            {
+                                                width: syncProgress.includes('완료') ? '100%' :
+                                                    syncProgress.includes('저장') ? '70%' :
+                                                        syncProgress.includes('분석') ? '40%' : '20%'
                                             }
-                                        ]} 
+                                        ]}
                                     />
                                 </View>
                             </View>

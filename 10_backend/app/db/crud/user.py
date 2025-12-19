@@ -2,7 +2,7 @@ from sqlalchemy import update
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from sqlalchemy.sql import func
-from typing import Optional, List
+from typing import Optional, List, Any
 from app.db.model.user import LoginHistory, User
 from app.db.schema.user import LoginHistoryCreate, UserCreate, UserUpdate
 from app.core.security import hash_password, verify_password

@@ -72,7 +72,7 @@ class AnomalyReport(BaseModel):
 # 거래 내역 조회 API
 @router.get("", response_model=TransactionList)
 async def get_transactions(
-    user_id: int = Query(..., description="사용자 ID (필수)"),
+    user_id: Optional[int] = Query(None, description="사용자 ID (선택)"),
     category: Optional[str] = None,
     start_date: Optional[str] = None,
     end_date: Optional[str] = None,
@@ -88,8 +88,11 @@ async def get_transactions(
         query = select(Transaction).options(selectinload(Transaction.category))
         count_query = select(func.count(Transaction.id))
         
-        # user_id는 필수 조건
-        conditions = [Transaction.user_id == user_id]
+        conditions = []
+        
+        # user_id가 제공된 경우에만 필터링 (관리자는 전체 조회 가능)
+        if user_id is not None:
+            conditions.append(Transaction.user_id == user_id)
         
         if start_date:
             start_dt = datetime.strptime(start_date, "%Y-%m-%d")
