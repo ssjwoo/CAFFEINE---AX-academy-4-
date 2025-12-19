@@ -135,7 +135,7 @@ function AuthStack() {
 
 function AppContent() {
   const { colors, isDarkMode } = useTheme();
-  const { user, loading, kakaoLogin } = useAuth();
+  const { user, loading, kakaoLogin, kakaoSignup } = useAuth();
 
   // 카카오 OAuth 콜백 처리 (웹 환경에서만)
   useEffect(() => {
@@ -144,14 +144,27 @@ function AppContent() {
       const code = urlParams.get('code');
       const pathname = window.location.pathname;
       
-      // /auth/kakao/callback 경로이거나 code가 있을 때 처리
+      // code가 있고 로그인되지 않은 경우
       if (code && !user) {
-        console.log('카카오 인증 코드 감지:', code);
-        console.log('현재 경로:', pathname);
-        // URL에서 code 파라미터 제거하고 메인으로 이동
+        // URL에서 code 파라미터 제거
         window.history.replaceState({}, document.title, '/');
-        // 카카오 로그인 처리
-        kakaoLogin(code);
+        
+        // 회원가입 콜백인지 로그인 콜백인지 경로로 구분
+        if (pathname.includes('/signup')) {
+          // 카카오 회원가입 처리
+          kakaoSignup(code).then(result => {
+            if (!result.success) {
+              alert('카카오 회원가입 실패: ' + result.error);
+            }
+          });
+        } else {
+          // 카카오 로그인 처리
+          kakaoLogin(code).then(result => {
+            if (!result.success) {
+              alert('카카오 로그인 실패: ' + result.error);
+            }
+          });
+        }
       }
     }
   }, [user]);
@@ -215,6 +228,7 @@ function AppContent() {
   );
 }
 
+// App 컴포넌트
 export default function App() {
   const [fontsLoaded] = useFonts({
     Inter_400Regular,

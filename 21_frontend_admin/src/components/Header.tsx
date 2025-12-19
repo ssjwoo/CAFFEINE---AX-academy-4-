@@ -24,12 +24,13 @@ import { useAuth } from '@/hooks/useAuth';
  * ============================================================
  */
 const pageTitles: { [key: string]: string } = {
-    '/': '대시보드',
-    '/age-analysis': '연령대별 소비 분석',
-    '/consumption': '소비 분석',
-    '/consumption/anomalies': '이상 거래 탐지',
-    '/summary': '분석 요약',
-    '/settings': '설정',
+    '/': '대시보드',                              // 대시보드
+    '/analysis': '소비 분석',                     // 분석 페이지
+    '/reports': '보고서',                         // 보고서
+    '/consumption/anomalies': '이상 거래 탐지',  // 이상 거래 탐지
+    '/users': '사용자 관리',                      // 사용자 리스트
+    '/transactions': '거래 관리',                 // 거래 내역
+    '/settings': '설정',                          // 설정 페이지
 };
 
 /**

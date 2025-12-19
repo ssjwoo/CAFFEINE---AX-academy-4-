@@ -13,6 +13,7 @@ export default function TransactionsPage() {
     // 필터 상태
     const [filters, setFilters] = useState({
         search: '',
+        searchType: 'merchant' as 'date' | 'merchant' | 'category', // 검색 타입: 날짜/가맹점명/카테고리
         category: '모든 카테고리',
         start_date: '',
         end_date: '',
@@ -83,6 +84,7 @@ export default function TransactionsPage() {
     const handleResetFilters = () => {
         setFilters({
             search: '',
+            searchType: 'merchant',
             category: '모든 카테고리',
             start_date: '',
             end_date: '',
@@ -122,6 +124,46 @@ export default function TransactionsPage() {
                 <div>
                     <h2 className="text-2xl font-bold text-gray-800">거래 관리</h2>
                     <p className="text-gray-500 mt-1">전체 거래 내역을 조회하고 관리합니다</p>
+                </div>
+
+                {/* 날짜 선택기 & 검색 */}
+                <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-2">
+                        <Calendar className="w-5 h-5 text-gray-600" />
+                        <input
+                            type="month"
+                            className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            value={`${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(2, '0')}`}
+                            onChange={(e) => console.log('Month changed:', e.target.value)}
+                        />
+                    </div>
+
+                    {/* 드롭다운 */}
+                    <select
+                        className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                        value={filters.searchType}
+                        onChange={(e) => handleFilterChange('searchType', e.target.value)}
+                    >
+                        <option value="date">날짜</option>
+                        <option value="merchant">가맹점명</option>
+                        <option value="category">카테고리</option>
+                    </select>
+
+                    {/* 검색창 */}
+                    <div className="relative">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                        <input
+                            type="text"
+                            placeholder={
+                                filters.searchType === 'date' ? '날짜 검색 (YYYY-MM-DD)...' :
+                                    filters.searchType === 'merchant' ? '가맹점명 검색...' :
+                                        '카테고리 검색...'
+                            }
+                            className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            value={filters.search}
+                            onChange={(e) => handleFilterChange('search', e.target.value)}
+                        />
+                    </div>
                 </div>
             </div>
 
@@ -370,8 +412,8 @@ export default function TransactionsPage() {
                                         key={pageNum}
                                         onClick={() => setPagination(prev => ({ ...prev, page: pageNum }))}
                                         className={`px-3 py-1 rounded text-sm font-medium ${pagination.page === pageNum
-                                                ? 'bg-blue-600 text-white'
-                                                : 'border border-gray-300 text-gray-600 hover:bg-gray-50'
+                                            ? 'bg-blue-600 text-white'
+                                            : 'border border-gray-300 text-gray-600 hover:bg-gray-50'
                                             }`}
                                     >
                                         {pageNum}

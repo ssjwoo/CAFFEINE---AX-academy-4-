@@ -295,3 +295,25 @@ async def use_coupon(
         success=True,
         message=f"{coupon.template.title} 쿠폰이 사용되었습니다!"
     )
+
+
+# DELETE /coupons - 사용자 쿠폰 일괄 삭제
+@router.delete("", response_model=dict)
+async def delete_user_coupons(
+    db: DB_Dependency = None,
+    user_id: int = Depends(get_current_user_id)
+):
+    
+    # 현재 로그인한 사용자의 모든 쿠폰 삭제 (데이터 초기화용)
+    from sqlalchemy import delete
+    
+    # 사용자의 모든 쿠폰 삭제
+    stmt = delete(UserCoupon).where(UserCoupon.user_id == user_id)
+    result = await db.execute(stmt)
+    await db.commit()
+    
+    return {
+        "success": True,
+        "message": f"{result.rowcount}개의 쿠폰이 삭제되었습니다.",
+        "deleted_count": result.rowcount
+    }

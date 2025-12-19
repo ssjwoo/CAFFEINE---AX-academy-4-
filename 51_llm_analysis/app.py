@@ -240,4 +240,3 @@ async def get_saving_tips(category: str = "전체"):
         
     except Exception as e:
         logger.error(f"❌ 팁 생성 실패: {e}")
-        raise HTTPException(status_code=500, detail=str(e))

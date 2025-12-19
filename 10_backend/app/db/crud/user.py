@@ -2,7 +2,7 @@ from sqlalchemy import update
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from sqlalchemy.sql import func
-from typing import Optional, List
+from typing import Optional, List, Any
 from app.db.model.user import LoginHistory, User
 from app.db.schema.user import LoginHistoryCreate, UserCreate, UserUpdate
 from app.core.security import hash_password, verify_password
@@ -48,21 +48,19 @@ async def create_user(db: AsyncSession, user: UserCreate) -> User:
 
     hashed_pw = hash_password(user.password)
     
-    # birth_date에서 timezone 제거 (DB 컬럼이 TIMESTAMP WITHOUT TIME ZONE이므로)
-    birth_date_naive = None
-    if user.birth_date:
-        birth_date_naive = user.birth_date.replace(tzinfo=None)
-    
     db_user = User(
         email=user.email,
         password_hash=hashed_pw,
         name=user.name,
         nickname=user.nickname,
         phone=user.phone,
-        birth_date=birth_date_naive,
+        birth_date=user.birth_date,
         role="USER",
         social_provider=user.social_provider,
         social_id=user.social_id,
+        group_id=user.group_id,
+        status=user.status or "ACTIVE",
+        push_token=user.push_token,
     )
     db.add(db_user)
     await db.commit()
@@ -82,6 +80,9 @@ async def update_user(
     group_id: Optional[int] = None,
     push_token: Optional[str] = None,
     budget_limit: Optional[int] = None,
+    budget_alert_enabled: Optional[bool] = None,
+    birth_date: Optional[Any] = None,
+    is_active: Optional[bool] = None,
 ) -> Optional[User]:
     
     #유저ID로 유저 조회
@@ -106,6 +107,12 @@ async def update_user(
         user_obj.push_token = push_token
     if budget_limit is not None:
         user_obj.budget_limit = budget_limit
+    if budget_alert_enabled is not None:
+        user_obj.budget_alert_enabled = budget_alert_enabled
+    if birth_date is not None:
+        user_obj.birth_date = birth_date
+    if is_active is not None:
+        user_obj.is_active = is_active
 
     await db.commit()
     await db.refresh(user_obj)

@@ -25,6 +25,7 @@ export default function TransactionScreen({ navigation }) {
 
     // 카테고리별 쿠폰 정보 매핑
     const CATEGORY_COUPONS = {
+        '식료품': { merchant: '이마트', discount: 3000, description: '마트 할인 쿠폰' },
         '주유': { merchant: 'SK에너지', discount: 3000, description: '주유 할인 쿠폰' },
         '교통': { merchant: '카카오택시', discount: 2000, description: '택시비 할인 쿠폰' },
         '식비': { merchant: '배달의민족', discount: 3000, description: '배달 할인 쿠폰' },
@@ -71,7 +72,6 @@ export default function TransactionScreen({ navigation }) {
             const blob = new Blob([csvContent], { type: 'text/csv' });
             formData.append('file', blob, 'transactions.csv');
 
-            console.log(`${transactions.length}건 거래 데이터로 예측 중...`);
 
             // predict-next API 호출 (전체 이력 기반)
             const response = await apiClient.post('/ml/predict-next', formData, {
@@ -82,7 +82,6 @@ export default function TransactionScreen({ navigation }) {
             const confidence = response.data.confidence;
             setPrediction(predictedCategory);
 
-            console.log(`예측 결과: ${predictedCategory} (신뢰도: ${(confidence * 100).toFixed(1)}%)`);
 
             // 예측된 카테고리에 맞는 쿠폰 발급 알림
             const couponInfo = CATEGORY_COUPONS[predictedCategory] || CATEGORY_COUPONS['기타'];
@@ -214,6 +213,7 @@ export default function TransactionScreen({ navigation }) {
         }, 300);
     };
 
+    // 메모 저장
     const handleSaveNote = async () => {
         if (selectedTransaction) {
             const result = await updateTransactionNote(selectedTransaction.id, editedNote);
@@ -228,6 +228,7 @@ export default function TransactionScreen({ navigation }) {
         }
     };
 
+    // 거래 내역 렌더링
     const renderItem = ({ item }) => (
         <TouchableOpacity style={styles(colors).transactionCard} onPress={() => handleTransactionClick(item)} activeOpacity={0.7}>
             <View style={styles(colors).transactionHeader}>
@@ -246,6 +247,7 @@ export default function TransactionScreen({ navigation }) {
         </TouchableOpacity>
     );
 
+    // 거래 내역 화면
     return (
         <LinearGradient colors={colors.screenGradient} style={styles(colors).container}>
             {/* Header */}
@@ -261,7 +263,7 @@ export default function TransactionScreen({ navigation }) {
                 </View>
             </View>
 
-            {/* AI Prediction Card - 거래가 있을 때만 표시 */}
+            {/* AI Prediction Card */}
             {transactions.length > 0 && (
                 <View style={styles(colors).predictionCard}>
                     <View style={styles(colors).predictionHeader}>
@@ -294,7 +296,7 @@ export default function TransactionScreen({ navigation }) {
                 </View>
             )}
 
-            {/* 쿠폰 발급 알림 배너 - 최상단 배치 */}
+            {/* 쿠폰 발급 알림 배너 */}
             {couponNotification && (
                 <View style={styles(colors).couponBannerTop}>
                     <TouchableOpacity onPress={() => setCouponNotification(null)} style={styles(colors).couponBannerCloseTop}>
@@ -319,9 +321,7 @@ export default function TransactionScreen({ navigation }) {
                                     couponNotification.couponInfo.merchant,
                                     couponNotification.couponInfo.discount
                                 );
-                                console.log('쿠폰 발급 완료');
                             } catch (error) {
-                                console.error('쿠폰 발급 오류:', error);
                                 // 중복 발급 등 에러는 무시하고 쿠폰함으로 이동
                             }
                             navigation.navigate('쿠폰함');
@@ -547,6 +547,7 @@ export default function TransactionScreen({ navigation }) {
     );
 }
 
+// 스타일
 const styles = (colors) => StyleSheet.create({
     container: { flex: 1 },
     header: {
@@ -860,7 +861,7 @@ const styles = (colors) => StyleSheet.create({
         fontWeight: '700',
     },
 
-    // Top Coupon Banner (파란색 테마, 기존 디자인과 통일)
+    // Top Coupon Banner
     couponBannerTop: {
         marginHorizontal: 16,
         marginTop: 8,

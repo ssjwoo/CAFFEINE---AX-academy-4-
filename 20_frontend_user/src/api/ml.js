@@ -1,10 +1,6 @@
-// API Services - ML Prediction
-
 import { apiClient } from './client';
 
-/**
- * 다음 소비 예측
- */
+// 다음 소비 예측
 export const predictNextTransaction = async (file) => {
     try {
         const formData = new FormData();
@@ -22,9 +18,7 @@ export const predictNextTransaction = async (file) => {
     }
 };
 
-/**
- * CSV 일괄 예측
- */
+// CSV 일괄 예측
 export const uploadAndPredict = async (file) => {
     try {
         const formData = new FormData();
@@ -42,9 +36,7 @@ export const uploadAndPredict = async (file) => {
     }
 };
 
-/**
- * 단일 거래 예측
- */
+// 단일 거래 예측
 export const predictSingle = async (transactionData) => {
     try {
         const response = await apiClient.post('/ml/predict', transactionData);

@@ -1,27 +1,36 @@
+version: "3.9"
+
 services:
+
+  # ============================================================
+  # FastAPI 백엔드
+  # ============================================================
   backend:
     build: ./10_backend
+    # image: caffeine-backend:latest
     container_name: caf_backend
+    environment:
+      # AWS RDS 연결
+      DB_HOST: caffeine-database.c58og6ke6t36.ap-northeast-2.rds.amazonaws.com
+      DB_USER: postgres
+      DB_PASSWORD: caffeineapprds
+      DB_PORT: 5432
+      DB_NAME: postgres
+      # App
+      SECRET_KEY: your-super-secret-key-change-in-production
+      # Gmail SMTP
+      GMAIL_ADDRESS: ${GMAIL_ADDRESS}
+      GMAIL_APP_PASSWORD: ${GMAIL_APP_PASSWORD}
     ports:
       - "8001:8000"
-  # ============================================================
-  # 프론트엔드 (사용자) - Expo 앱, 로컬에서 실행 권장
-  # cd 20_frontend_user && npm start
-  # ============================================================
-  # app_front:
-  #   build: ./20_frontend_user
-  #   container_name: caf_front_user
-  #   ports:
-  #     - "3000:3000"
-  #   depends_on:
-  #     - backend
+    volumes:
+      - ./10_backend/app:/app/app # 핫 리로드용
 
   # ============================================================
   # 프론트엔드 (관리자)
   # ============================================================
   admin_front:
     build: ./21_frontend_admin
-    # image: caffeine-admin-front:latest
     container_name: caf_front_admin
     ports:
       - "3001:3000"
@@ -34,8 +43,7 @@ services:
   # Nginx (리버스 프록시)
   # ============================================================
   nginx:
-    # build: ./30_nginx
-    image: caffeine-nginx:latest
+    build: ./30_nginx
     container_name: caf_nginx
     ports:
       - "80:80"
@@ -43,61 +51,13 @@ services:
       - ./30_nginx/default.conf:/etc/nginx/conf.d/default.conf
     depends_on:
       - backend
-      # ============================================================
-      # ML 서비스
-      # ============================================================
-      # ml_next:
-      #   # build: ./40_ml_next
-      #   image: caffeine-ml-next:latest
-      #   container_name: caf_ml_next
-      #   ports:
-      #     - "9001:9001"
-      #   volumes:
-      #     - ./10_backend/app/model_xgboost_acc_73.47.joblib:/app/model.joblib:ro
-      #   environment:
-      #     # 로컬 모델 경로 (기본값)
-      #     LOCAL_MODEL_PATH: /app/model.joblib
-      # ============================================================
-      # ML 서비스
-      # ============================================================
-      # ml_next:
-      #   # build: ./40_ml_next
-      #   image: caffeine-ml-next:latest
-      #   container_name: caf_ml_next
-      #   ports:
-      #     - "9001:9001"
-      #   volumes:
-      #     - ./10_backend/app/model_xgboost_acc_73.47.joblib:/app/model.joblib:ro
-      #   environment:
-      #     # 로컬 모델 경로 (기본값)
-      #     LOCAL_MODEL_PATH: /app/model.joblib
-      # S3 설정 (선택사항 - 설정하면 S3 우선 사용)
-      # AWS_ACCESS_KEY_ID: your-access-key
-      # AWS_SECRET_ACCESS_KEY: your-secret-key
-      # S3_BUCKET: caffeine-ml-models
-      # MODEL_KEY: models/model.joblib
-
-      # ml_fraud:
-      #   build: ./41_ml_fraud
-      #   container_name: caf_ml_fraud
-      #   ports:
-      #     - "9002:9002"
-
-      # ============================================================
-      # LLM 서비스
-      # ============================================================
-      # ============================================================
-      # llm_category:
-      #   build: ./50_llm_category
-      #   container_name: caf_llm_category
-      #   ports:
-      #     - "9100:9100"
-
+  # ============================================================
+  # LLM 서비스
+  # ============================================================
   llm_analysis:
-    # build: ./51_llm_analysis
-    image: caffeine-llm-analysis:latest
+    build: ./51_llm_analysis
     container_name: caf_llm_analysis
     ports:
       - "9102:9102"
     environment:
-      GEMINI_API_KEY: AIzaSyDQ4GpW4Vs6eyYvqFi_GNevT5v9Bx50zhM
+      GEMINI_API_KEY: ${GEMINI_API_KEY}

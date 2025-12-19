@@ -28,8 +28,12 @@ yarn-error.*
 .DS_Store
 *.pem
 
-# local env files
+# Environment variables
+.env
+.env*
 .env*.local
+*.env
+.env.*
 
 # typescript
 *.tsbuildinfo
@@ -38,59 +42,30 @@ yarn-error.*
 /ios
 /android
 
-# =====================
-# 협업용 설정
-# =====================
-
-# 환경 변수
-.env
-.env.local
-.env.*.local
-*.env
+# Database
+postgres_data/
 
 # Python
 __pycache__/
-*.py[cod]
-*.class
-*.so
-.Python
-venv/
-.venv/
+*.pyc
+*.pyo
 
-# IDE
-.idea/
-.vscode/
-*.swp
-*.swo
-
-# 로그
-*.log
-logs/
-
-# 테스트
-.coverage
-htmlcov/
-.pytest_cache/
-
-# Docker
-postgres_data/
-
-# 빌드
-dist/
-build/
-*.egg-info/
-
-# 기타
-*.zip
+# ML Models
 production_models/*.joblib
 production_models/*.json
+
+# IDE
 .vscode/
-.env
 
-.zip
-.log
-
-# Streamlit dashboards (발표 자료용)
+# Presentation/Dashboards
+presentation/
 user_app_dashboard.py
 admin_app_dashboard.py
 *_dashboard.py
+
+# Others
+.zip
+.log
+audit.log
+
+.pid

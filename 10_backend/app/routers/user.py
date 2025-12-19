@@ -66,22 +66,37 @@ async def login_for_user(
     db: AsyncSession = Depends(get_db),
     user_agent: str | None = Header(default=None),
 ):
-    email = user.username
-    result = await login_user(
-        db,
-        email=email,
-        password=user.password,
-        user_agent=user_agent,
-    )
-
-    if not result:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect email or password",
-            headers={"WWW-Authenticate": "Bearer"},
+    try:
+        email = user.username
+        result = await login_user(
+            db,
+            email=email,
+            password=user.password,
+            user_agent=user_agent,
         )
 
-    return {"access_token": result["access_token"], "refresh_token": result["refresh_token"], "token_type": "bearer"}
+        if not result:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Incorrect email or password",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
+
+        return {"access_token": result["access_token"], "refresh_token": result["refresh_token"], "token_type": "bearer"}
+    except HTTPException:
+        raise
+    except Exception as e:
+        import traceback
+        print(f"\n\n=== LOGIN ERROR ===")
+        print(f"Error type: {type(e).__name__}")
+        print(f"Error: {str(e)}")
+        print(f"Traceback:")
+        traceback.print_exc()
+        print(f"===================\n\n")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Internal server error: {str(e)}"
+        )
 
 
 #유저 생성

@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import { View, StyleSheet, Animated } from 'react-native';
 import { useTheme } from '../contexts/ThemeContext';
 
+// 스켈레톤 카드 컴포넌트
 export function SkeletonCard() {
     const { colors } = useTheme();
     const opacity = useRef(new Animated.Value(0.3)).current;
@@ -32,6 +33,7 @@ export function SkeletonCard() {
     );
 }
 
+// 스켈레톤 리스트 컴포넌트
 export function SkeletonList({ count = 3 }) {
     return (
         <View>

@@ -1,10 +1,6 @@
-// API Services - Analysis
-
 import { apiClient } from './client';
 
-/**
- * 대시보드 요약 통계
- */
+// 대시보드 요약 통계
 export const getDashboardSummary = async (userId = null) => {
     try {
         const params = userId ? { user_id: userId } : {};
@@ -16,9 +12,7 @@ export const getDashboardSummary = async (userId = null) => {
     }
 };
 
-/**
- * 카테고리별 소비 분석
- */
+// 카테고리별 소비 분석
 export const getCategoryBreakdown = async (userId = null, months = 1) => {
     try {
         const params = { months };
@@ -31,9 +25,7 @@ export const getCategoryBreakdown = async (userId = null, months = 1) => {
     }
 };
 
-/**
- * 월별 지출 추이
- */
+// 월별 지출 추이
 export const getMonthlyTrend = async (userId = null, months = 6) => {
     try {
         const params = { months };
@@ -46,9 +38,7 @@ export const getMonthlyTrend = async (userId = null, months = 6) => {
     }
 };
 
-/**
- * AI 소비 인사이트
- */
+// AI 소비 인사이트
 export const getSpendingInsights = async (userId = null) => {
     try {
         const params = userId ? { user_id: userId } : {};
@@ -60,9 +50,7 @@ export const getSpendingInsights = async (userId = null) => {
     }
 };
 
-/**
- * 전체 분석 데이터 (통합)
- */
+// 전체 분석 데이터 (통합)
 export const getFullAnalysis = async (userId = null) => {
     try {
         const params = userId ? { user_id: userId } : {};

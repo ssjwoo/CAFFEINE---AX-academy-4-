@@ -18,7 +18,6 @@ const menuItems: MenuItem[] = [
     { name: '소비 분석', href: '/analysis', icon: PieChart },
     { name: '이상 거래 탐지', href: '/consumption/anomalies', icon: AlertTriangle },
     { name: '사용자 관리', href: '/users', icon: Users },
-    { name: '분석 요약', href: '/summary', icon: FileText },
     { name: '설정', href: '/settings', icon: Settings },
 ];
 

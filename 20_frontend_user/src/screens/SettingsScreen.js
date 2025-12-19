@@ -6,10 +6,11 @@ import { useTheme } from '../contexts/ThemeContext';
 import { getUserProfile, updateUserProfile } from '../api';
 import { registerForPushNotificationsAsync } from '../utils/pushNotifications';
 
+// 설정 화면
 export default function SettingsScreen({ navigation }) {
     const { colors, isDarkMode, toggleTheme } = useTheme();
     
-    // 설정 상태들
+    // 설정 상태
     const [pushNotification, setPushNotification] = useState(false);
     const [budgetAlert, setBudgetAlert] = useState(false);
     const [budgetLimit, setBudgetLimit] = useState(''); // 예산 금액
@@ -31,15 +32,16 @@ export default function SettingsScreen({ navigation }) {
                 if (user.budget_limit) {
                     setBudgetLimit(String(user.budget_limit));
                     setOriginalBudget(String(user.budget_limit));
-                    if (user.budget_limit > 0) setBudgetAlert(true);
                 }
+                // budget_alert_enabled 상태 반영
+                setBudgetAlert(user.budget_alert_enabled ?? true);
             }
         } catch (error) {
             console.error('사용자 설정 로드 실패:', error);
         }
     };
 
-    // 푸시 알림 토글 핸들러
+    // 푸시 알림 토글 버튼
     const handlePushToggle = async (value) => {
         if (Platform.OS === 'web') {
             Alert.alert('알림', '웹 브라우저에서는 푸시 알림을 지원하지 않습니다.');
@@ -61,48 +63,83 @@ export default function SettingsScreen({ navigation }) {
         }
     };
     
-    // 예산 저장
+    // 예산 저장 버튼
     const handleSaveBudget = async () => {
         const limit = parseInt(budgetLimit.replace(/,/g, ''), 10);
-        if (isNaN(limit)) return;
+        if (isNaN(limit) || limit <= 0) {
+            if (Platform.OS === 'web') {
+                alert('올바른 금액을 입력해주세요.');
+            } else {
+                Alert.alert('알림', '올바른 금액을 입력해주세요.');
+            }
+            return;
+        }
 
         try {
             await updateUserProfile({ budget_limit: limit });
             setOriginalBudget(String(limit));
-            Alert.alert('저장 완료', '월 예산이 설정되었습니다.');
+            if (Platform.OS === 'web') {
+                alert(`저장 완료! 월 예산이 ${limit.toLocaleString()}원으로 설정되었습니다.`);
+            } else {
+                Alert.alert('저장 완료', `월 예산이 ${limit.toLocaleString()}원으로 설정되었습니다.`);
+            }
         } catch (error) {
-            Alert.alert('오류', '예산 저장 중 오류가 발생했습니다.');
+            if (Platform.OS === 'web') {
+                alert('예산 저장 중 오류가 발생했습니다.');
+            } else {
+                Alert.alert('오류', '예산 저장 중 오류가 발생했습니다.');
+            }
         }
     };
 
-    const handleResetSettings = () => {
-        Alert.alert(
-            '설정 초기화',
-            '모든 설정을 초기화하시겠습니까?',
-            [
-                { text: '취소', style: 'cancel' },
-                {
-                    text: '초기화',
-                    style: 'destructive',
-                    onPress: async () => {
-                        setPushNotification(false);
-                        setBudgetAlert(false);
-                        setBudgetLimit('');
-                        setAnomalyAlert(true);
-                        setAutoSync(true);
-                        
-                        await updateUserProfile({ 
-                            push_token: null,
-                            budget_limit: 0 
-                        });
-                        
-                        Alert.alert('완료', '설정이 초기화되었습니다.');
-                    }
+    // 설정 초기화 버튼
+    const handleResetSettings = async () => {
+        const doReset = async () => {
+            try {
+                // UI 상태 초기화
+                setPushNotification(false);
+                setBudgetAlert(false);
+                setBudgetLimit('');
+                setAnomalyAlert(false);
+                
+                // 백엔드에 저장
+                await updateUserProfile({ 
+                    push_token: null,
+                    budget_limit: 0,
+                    budget_alert_enabled: false
+                });
+                
+                if (Platform.OS === 'web') {
+                    alert('설정이 초기화되었습니다.');
+                } else {
+                    Alert.alert('완료', '설정이 초기화되었습니다.');
                 }
-            ]
-        );
+            } catch (error) {
+                if (Platform.OS === 'web') {
+                    alert('초기화 중 오류가 발생했습니다.');
+                } else {
+                    Alert.alert('오류', '초기화 중 오류가 발생했습니다.');
+                }
+            }
+        };
+
+        if (Platform.OS === 'web') {
+            if (confirm('모든 설정을 초기화하시겠습니까?')) {
+                await doReset();
+            }
+        } else {
+            Alert.alert(
+                '설정 초기화',
+                '모든 설정을 초기화하시겠습니까?',
+                [
+                    { text: '취소', style: 'cancel' },
+                    { text: '초기화', style: 'destructive', onPress: doReset }
+                ]
+            );
+        }
     };
 
+    // 설정 아이템 컴포넌트
     const SettingItem = ({ icon, title, subtitle, value, onValueChange, type = 'switch', children }) => (
         <View style={[styles.settingItem, { backgroundColor: colors.cardBackground }]}>
             <View style={[styles.settingIcon, { backgroundColor: colors.background }]}>
@@ -128,7 +165,8 @@ export default function SettingsScreen({ navigation }) {
     );
 
     const Divider = () => <View style={[styles.divider, { backgroundColor: colors.border }]} />;
-
+    
+    // 설정 화면 UI
     return (
         <LinearGradient colors={colors.screenGradient} style={styles.container}>
             <ScrollView showsVerticalScrollIndicator={false}>
@@ -163,11 +201,13 @@ export default function SettingsScreen({ navigation }) {
                             title="예산 초과 알림"
                             subtitle="예산 80% 도달 시 알림"
                             value={budgetAlert}
-                            onValueChange={(val) => {
+                            onValueChange={async (val) => {
                                 setBudgetAlert(val);
-                                // 끄면 예산 0으로? 아니면 그냥 알림만 안 가게?
-                                // 여기선 예산 금액은 유지하되 알림 로직에서 체크하도록 (백엔드 로직 수정 필요할 수 있음)
-                                // 일단 UI적으로만 처리
+                                try {
+                                    await updateUserProfile({ budget_alert_enabled: val });
+                                } catch (error) {
+                                    console.error('예산 알림 설정 저장 실패:', error);
+                                }
                             }}
                         />
                         
@@ -183,13 +223,15 @@ export default function SettingsScreen({ navigation }) {
                                         placeholderTextColor={colors.textSecondary}
                                         value={budgetLimit}
                                         onChangeText={setBudgetLimit}
-                                        onEndEditing={handleSaveBudget}
                                     />
                                     <Text style={[styles.currencyText, { color: colors.text }]}>원</Text>
+                                    <TouchableOpacity 
+                                        style={styles.budgetSaveButton}
+                                        onPress={handleSaveBudget}
+                                    >
+                                        <Text style={styles.budgetSaveButtonText}>저장</Text>
+                                    </TouchableOpacity>
                                 </View>
-                                <Text style={[styles.helperText, { color: colors.textSecondary }]}>
-                                    * 입력 후 완료를 누르면 저장됩니다.
-                                </Text>
                             </View>
                         )}
                         
@@ -317,5 +359,17 @@ const styles = StyleSheet.create({
     helperText: {
         fontSize: 12,
         marginTop: 8,
+    },
+    budgetSaveButton: {
+        backgroundColor: '#6366F1',
+        paddingHorizontal: 16,
+        paddingVertical: 10,
+        borderRadius: 8,
+        marginLeft: 8,
+    },
+    budgetSaveButtonText: {
+        color: '#FFFFFF',
+        fontSize: 14,
+        fontWeight: '600',
     }
 });

@@ -19,6 +19,7 @@ export interface UserData {
     created_at: string;
     is_active: boolean;
     is_superuser: boolean;
+    has_recent_activity?: boolean; // 최근 30일 내 거래 여부
 }
 
 // 거래 관리
@@ -65,11 +66,6 @@ export interface ChurnMetrics {
     total_users: number;
 }
 
-export interface AgeGroupData {
-    age_group: string;
-    count: number;
-}
-
 export interface CategoryAmount {
     category: string;
     amount: number;
@@ -88,4 +84,48 @@ export interface CategoryPreferenceByAge {
     top_category: string;
     second_category: string;
     third_category: string;
+}
+
+// ============================================
+// Analytics Summary Types
+// ============================================
+
+export interface AnalyticsSummary {
+    total_amount: number;
+    total_transactions: number;
+    avg_amount: number;
+    active_users: number;
+    period_start: string;
+    period_end: string;
+}
+
+export interface TopCategory {
+    category: string;
+    amount: number;
+    percentage: number;
+    transaction_count: number;
+}
+
+export interface MonthlyTrend {
+    month: string;
+    amount: number;
+    transaction_count: number;
+    change_percent: number | null;
+}
+
+export interface HourlyData {
+    hour: number;
+    count: number;
+}
+
+export interface DayHeatmap {
+    day: string;
+    hourly_data: HourlyData[];
+}
+
+export interface Insight {
+    type: string; // trend, pattern, alert, recommendation
+    title: string;
+    description: string;
+    severity: string; // info, warning, critical
 }

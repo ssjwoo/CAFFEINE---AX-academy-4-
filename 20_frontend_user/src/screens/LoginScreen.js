@@ -6,6 +6,7 @@ import { useTheme } from '../contexts/ThemeContext';
 import { useAuth } from '../contexts/AuthContext';
 import { isValidEmail, isEmpty } from '../utils/validation';
 
+// 로그인 화면
 export default function LoginScreen({ navigation }) {
     const { colors } = useTheme();
     const { login, kakaoLogin } = useAuth();
@@ -35,11 +36,12 @@ export default function LoginScreen({ navigation }) {
         }
     };
 
+    // 구글 로그인 버튼
     const handleGoogleLogin = () => {
         alert('Google 로그인 기능은 준비 중입니다.');
     };
 
-    // 카카오 로그인 핸들러
+    // 카카오 로그인 버튼
     const KAKAO_REST_API_KEY = 'fa925a6646f9491a77eb9c8fd6537a21';
     const REDIRECT_URI = 'http://localhost:8081/auth/kakao/callback';
     
@@ -140,6 +142,14 @@ export default function LoginScreen({ navigation }) {
                             </TouchableOpacity>
                         </View>
 
+                        {/* Signup Link */}
+                        <View style={styles.signupSectionTop}>
+                            <Text style={styles.signupText}>계정이 없으신가요? </Text>
+                            <TouchableOpacity onPress={() => navigation.navigate('Signup')}>
+                                <Text style={styles.signupLink}>회원가입</Text>
+                            </TouchableOpacity>
+                        </View>
+
                         {/* Login Button */}
                         <TouchableOpacity
                             onPress={handleLogin}
@@ -209,14 +219,6 @@ export default function LoginScreen({ navigation }) {
                             </View>
                             <Text style={styles.googleButtonText}>Google로 계속하기</Text>
                         </TouchableOpacity>
-
-                        {/* Signup Link */}
-                        <View style={styles.signupSection}>
-                            <Text style={styles.signupText}>계정이 없으신가요? </Text>
-                            <TouchableOpacity onPress={() => navigation.navigate('Signup')}>
-                                <Text style={styles.signupLink}>회원가입</Text>
-                            </TouchableOpacity>
-                        </View>
                     </View>
 
                     {/* Terms Footer */}
@@ -302,7 +304,7 @@ const styles = StyleSheet.create({
         alignSelf: 'center',
     },
 
-    // Input Styles (1번 원본 디자인 - 둥근 박스, 회색 배경, 테두리)
+    // Input Styles
     inputContainer: {
         marginBottom: 16,
     },
@@ -358,6 +360,12 @@ const styles = StyleSheet.create({
         fontSize: 14,
         color: '#9CA3AF',
     },
+    signupSectionTop: {
+        flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginBottom: 20,
+    },
 
     // Login Button
     loginButton: {
@@ -396,7 +404,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 8,
     },
 
-    // Google Button (3번 원본 디자인 - 컬러 Google 로고)
+    // Google Button
     googleButton: {
         flexDirection: 'row',
         alignItems: 'center',
@@ -418,7 +426,6 @@ const styles = StyleSheet.create({
     googleLogoG: {
         fontSize: 18,
         fontWeight: 'bold',
-        // 여러 색상으로 표현 (대표 색상 사용)
         color: '#4285F4',
     },
     googleButtonText: {
@@ -427,7 +434,7 @@ const styles = StyleSheet.create({
         fontWeight: '500',
     },
 
-    // Kakao Button (노란색 테마)
+    // Kakao Button
     kakaoButton: {
         flexDirection: 'row',
         alignItems: 'center',

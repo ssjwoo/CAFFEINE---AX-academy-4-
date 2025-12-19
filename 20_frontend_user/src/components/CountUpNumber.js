@@ -54,5 +54,3 @@ export default function CountUpNumber({
     );
 }
 
-// 포맷터 함수들은 이제 utils/currency.js에서 import하여 사용
-// import { formatCurrency, formatCompactCurrency } from '../utils/currency';

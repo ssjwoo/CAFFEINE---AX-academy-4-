@@ -107,7 +107,7 @@
         <mxCell id="leg-line2" edge="1" parent="legend" style="endArrow=none;html=1;strokeWidth=2;strokeColor=#9673a6;dashed=1;">
           <mxGeometry height="50" relative="1" width="50" as="geometry">
             <mxPoint x="150" y="120" as="sourcePoint" />
-            <mxPoint x="220" y="120" as="targetPoint" />
+            <mxPoint x="220" y="120" as="targetPoiasdnt" />
           </mxGeometry>
         </mxCell>
       </root>

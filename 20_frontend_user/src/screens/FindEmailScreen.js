@@ -6,6 +6,7 @@ import { Feather } from '@expo/vector-icons';
 import { useTheme } from '../contexts/ThemeContext';
 import { apiClient } from '../api/client';
 
+// 이메일 찾기 화면
 export default function FindEmailScreen({ navigation }) {
     const { colors } = useTheme();
     
@@ -29,12 +30,12 @@ export default function FindEmailScreen({ navigation }) {
         return formatted;
     };
     
-    // 전화번호 입력 핸들러
+    // 전화번호 입력 버튼
     const handlePhoneChange = (text) => {
         setPhone(formatPhone(text));
     };
     
-    // 이메일 찾기 API 호출
+    // 이메일 찾기 버튼
     const handleFindEmail = async () => {
         // 입력값 검증
         if (!name.trim()) {
@@ -211,7 +212,6 @@ export default function FindEmailScreen({ navigation }) {
     );
 }
 
-// 스타일 정의
 const styles = StyleSheet.create({
     // 컨테이너
     container: {

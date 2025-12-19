@@ -6,14 +6,15 @@ import { Feather } from '@expo/vector-icons';
 import { useTheme } from '../contexts/ThemeContext';
 import { apiClient } from '../api/client';
 
+// 비밀번호 재설정 화면
 export default function ResetPasswordScreen({ navigation }) {
     const { colors } = useTheme();
     
     // 상태 관리
-    const [step, setStep] = useState(1);                    // 현재 단계 (1: 이메일, 2: 인증코드, 3: 새 비밀번호)
-    const [email, setEmail] = useState('');                 // 이메일 입력
-    const [code, setCode] = useState('');                   // 인증 코드 입력
-    const [newPassword, setNewPassword] = useState('');     // 새 비밀번호
+    const [step, setStep] = useState(1);                        // 현재 단계 (1: 이메일, 2: 인증코드, 3: 새 비밀번호)
+    const [email, setEmail] = useState('');                     // 이메일 입력
+    const [code, setCode] = useState('');                       // 인증 코드 입력
+    const [newPassword, setNewPassword] = useState('');         // 새 비밀번호
     const [confirmPassword, setConfirmPassword] = useState(''); // 비밀번호 확인
     const [showPassword, setShowPassword] = useState(false);    // 비밀번호 표시 토글
     const [loading, setLoading] = useState(false);              // 로딩 상태
@@ -35,6 +36,7 @@ export default function ResetPasswordScreen({ navigation }) {
         
         setLoading(true);
         
+        // 인증 코드 발송
         try {
             await apiClient.post('/auth/request-password-reset', { email });
             Alert.alert('발송 완료', '인증 코드가 이메일로 발송되었습니다.\n이메일을 확인해주세요.');
@@ -58,6 +60,7 @@ export default function ResetPasswordScreen({ navigation }) {
         
         setLoading(true);
         
+        // 인증 코드 확인
         try {
             await apiClient.post('/auth/verify-reset-code', { email, code });
             setStep(3);  // 3단계로 이동
@@ -86,6 +89,7 @@ export default function ResetPasswordScreen({ navigation }) {
         
         setLoading(true);
         
+        // 비밀번호 변경 
         try {
             await apiClient.post('/auth/reset-password', { 
                 email, 
@@ -93,7 +97,7 @@ export default function ResetPasswordScreen({ navigation }) {
                 new_password: newPassword 
             });
             // 성공 알림 표시 후 로그인 페이지로 이동
-            alert('✅ 비밀번호가 성공적으로 변경되었습니다!\n로그인해주세요.');
+            alert('비밀번호가 성공적으로 변경되었습니다!\n로그인해주세요.');
             navigation.navigate('Login');
         } catch (error) {
             console.error('비밀번호 변경 오류:', error);
@@ -395,7 +399,6 @@ export default function ResetPasswordScreen({ navigation }) {
     );
 }
 
-// 스타일 정의
 const styles = StyleSheet.create({
     // 컨테이너
     container: {

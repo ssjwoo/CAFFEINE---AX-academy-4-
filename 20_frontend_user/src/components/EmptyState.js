@@ -2,6 +2,8 @@ import React, { useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Animated, Dimensions } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 
+
+// 빈 상태 화면을 표시하는 컴포넌트
 export default function EmptyState({ icon = '📊', title, description, actionText, onAction }) {
     const fadeAnim = useRef(new Animated.Value(0)).current;
     const scaleAnim = useRef(new Animated.Value(0.9)).current;
@@ -131,6 +133,7 @@ export default function EmptyState({ icon = '📊', title, description, actionTe
     );
 }
 
+// 스타일
 const styles = StyleSheet.create({
     gradientContainer: {
         flex: 1,

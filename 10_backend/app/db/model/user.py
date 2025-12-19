@@ -18,12 +18,15 @@ class User(Base):
 
     # 권한/상태
     role = Column(String(20), default="USER", nullable=False)  # USER/ADMIN 등
-    is_superuser = Column(Boolean, default=False, nullable=False)  # 슈퍼유저 여부
-    is_active = Column(Boolean, default=True, nullable=False)  # 계정 활성화 여부
+    is_superuser = Column(Boolean, default=False, nullable=False) # 슈퍼유저 여부
+    is_active = Column(Boolean, default=True, nullable=False) # 계정 활성화 여부
+    status = Column(String(20), default="ACTIVE", nullable=False)  # ACTIVE/INACTIVE/SUSPENDED
     group_id = Column(BigInteger, ForeignKey("user_groups.id", ondelete="SET NULL"), nullable=True)
-    status = Column(String(20), default="ACTIVE", nullable=False)  # ACTIVE/AWAY/BUSY 등 상태값
+    
+    # 앱 관련
     push_token = Column(String(255), nullable=True)  # 앱 푸시 토큰 (Expo)
     budget_limit = Column(BigInteger, default=0, nullable=True)  # 월 예산 설정액
+    budget_alert_enabled = Column(Boolean, default=True, nullable=False)  # 예산 초과 알림 활성화
 
     # 소셜 로그인
     social_provider = Column(String(20), nullable=True)  # LOCAL/GOOGLE/KAKAO/NAVER
@@ -34,6 +37,7 @@ class User(Base):
     updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
     last_login_at = Column(DateTime(timezone=True), nullable=True)
 
+    # Relationships
     login_histories = relationship("LoginHistory", back_populates="user", cascade="all, delete-orphan", lazy="selectin")
 
     def __repr__(self):

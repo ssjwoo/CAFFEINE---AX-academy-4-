@@ -33,20 +33,20 @@ export default function Dashboard() {
       const analysis = await getFullAnalysis(selectedMonth.year, selectedMonth.month);
       setDataSource(analysis.data_source || 'DB');
 
-      const summary = analysis.summary;
+      const summary = analysis.summary || {};
       setStats([
         {
           title: '총 거래 건수',
-          value: summary.transaction_count.toLocaleString() + '건',
-          trend: `${summary.transaction_count_mom_change > 0 ? '+' : ''}${summary.transaction_count_mom_change.toFixed(1)}% 전월 대비`,
+          value: (summary.transaction_count || 0).toLocaleString() + '건',
+          trend: `${(summary.transaction_count_mom_change || 0) > 0 ? '+' : ''}${(summary.transaction_count_mom_change || 0).toFixed(1)}% 전월 대비`,
           icon: ShoppingCart,
           color: 'text-blue-600',
-          trendColor: summary.transaction_count_mom_change > 0 ? 'text-green-500' : 'text-red-500'
+          trendColor: (summary.transaction_count_mom_change || 0) > 0 ? 'text-green-500' : 'text-red-500'
         },
         {
           title: '총 거래액',
-          value: '₩' + (summary.total_spending / 10000).toFixed(1) + '만',
-          trend: `${summary.month_over_month_change > 0 ? '+' : ''}${summary.month_over_month_change.toFixed(1)}% 전월 대비`,
+          value: '₩' + ((summary.total_spending || 0) / 10000).toFixed(1) + '만',
+          trend: `${(summary.month_over_month_change || 0) > 0 ? '+' : ''}${(summary.month_over_month_change || 0).toFixed(1)}% 전월 대비`,
           icon: DollarSign,
           color: 'text-blue-600',
           trendColor: summary.month_over_month_change > 0 ? 'text-green-500' : 'text-red-500'
@@ -70,10 +70,10 @@ export default function Dashboard() {
       ]);
 
       // 월별 추이 차트
-      const monthlyTrend = analysis.monthly_trend || [];
-      const lineChartData = monthlyTrend.map((item: any) => ({
-        name: item.month.split('-')[1] + '월',
-        value: Math.round(item.total_amount / 10000),
+      const trends = analysis.monthly_trend || [];
+      const lineChartData = trends.map((item: any) => ({
+        name: item.month ? item.month.substring(5) + '월' : '',
+        value: Math.round((item.total_amount || 0) / 10000),
       }));
       setLineData(lineChartData);
 
@@ -81,7 +81,7 @@ export default function Dashboard() {
       const categories = analysis.category_breakdown || [];
       const barChartData = categories.map((item: any) => ({
         name: item.category,
-        value: Math.round(item.total_amount / 10000),
+        value: Math.round((item.total_amount || 0) / 10000),
       }));
       setBarData(barChartData);
 

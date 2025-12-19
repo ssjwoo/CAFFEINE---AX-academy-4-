@@ -62,23 +62,34 @@ async def is_user_churned(db: AsyncSession, user_id: int, days: int = 30) -> boo
 
 
 @router.get("/", response_model=List[UserResponse])
-async def get_all_users(
+async def get_all_users_admin(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
     """
-    Get all users
+    Get all users list (excluding superusers) with recent activity status
     
     **Admin only endpoint**
     """
     await verify_superuser(current_user)
-    
     result = await db.execute(
-        select(User).order_by(User.created_at.desc())
+        select(User)
+        .where(User.is_superuser == False)
+        .order_by(User.id.asc())
     )
-    
     users = result.scalars().all()
-    return users
+    
+    # Calculate has_recent_activity for each user
+    user_responses = []
+    for user in users:
+        has_activity = not await is_user_churned(db, user.id, days=30)
+        user_dict = {
+            **user.__dict__,
+            'has_recent_activity': has_activity
+        }
+        user_responses.append(UserResponse(**user_dict))
+    
+    return user_responses
 
 
 @router.get("/new-signups", response_model=List[UserResponse])
@@ -88,7 +99,7 @@ async def get_new_signups(
     current_user: User = Depends(get_current_user)
 ):
     """
-    Get users who signed up in the last N days
+    Get users who signed up in the last N days (excluding superusers) with recent activity status
     
     **Admin only endpoint**
     """
@@ -97,12 +108,28 @@ async def get_new_signups(
     
     result = await db.execute(
         select(User)
-        .where(User.created_at >= cutoff_date)
+        .where(
+            and_(
+                User.created_at >= cutoff_date,
+                User.is_superuser == False
+            )
+        )
         .order_by(User.created_at.desc())
     )
     
     users = result.scalars().all()
-    return users
+    
+    # Calculate has_recent_activity for each user
+    user_responses = []
+    for user in users:
+        has_activity = not await is_user_churned(db, user.id, days=30)
+        user_dict = {
+            **user.__dict__,
+            'has_recent_activity': has_activity
+        }
+        user_responses.append(UserResponse(**user_dict))
+    
+    return user_responses
 
 
 @router.get("/churned", response_model=List[UserResponse])
@@ -112,24 +139,31 @@ async def get_churned_users(
     current_user: User = Depends(get_current_user)
 ):
     """
-    Get users with no transactions in the last N days
+    Get users with no transactions in the last N days (excluding superusers)
     
     **Admin only endpoint**
+    **Note**: This returns users based on transaction history, not is_active field
     """
     await verify_superuser(current_user)
-    cutoff_date = datetime.now() - timedelta(days=days)
     
-    # Get all users
-    result = await db.execute(select(User))
+    # Get all non-superuser users
+    result = await db.execute(
+        select(User)
+        .where(User.is_superuser == False)
+    )
     all_users = result.scalars().all()
     
-    # Filter churned users
-    churned_users = []
+    # Filter churned users (no transactions in last N days)
+    churned_user_responses = []
     for user in all_users:
         if await is_user_churned(db, user.id, days):
-            churned_users.append(user)
+            user_dict = {
+                **user.__dict__,
+                'has_recent_activity': False  # Churned users have no recent activity
+            }
+            churned_user_responses.append(UserResponse(**user_dict))
     
-    return churned_users
+    return churned_user_responses
 
 
 @router.get("/stats/churn-rate", response_model=ChurnMetrics)
@@ -140,31 +174,43 @@ async def get_churn_rate(
     current_user: User = Depends(get_current_user)
 ):
     """
-    Get churn rate and related metrics
+    Get churn rate and related metrics based on transaction history
     
     **Admin only endpoint**
     
-    - **churn_rate**: Percentage of users who are churned
-    - **total_churned**: Number of churned users
-    - **active_users**: Number of active users (not churned)
+    - **churn_rate**: Percentage of users with no transactions in last N days
+    - **total_churned**: Number of users with no recent transactions
+    - **active_users**: Number of users with recent transactions
     - **new_signups**: New users in the specified period
-    - **total_users**: Total registered users
+    - **total_users**: Total registered users (excluding superusers)
     """
     await verify_superuser(current_user)
-    # Get total users
-    total_result = await db.execute(select(func.count(User.id)))
+    
+    # Get total non-superuser users
+    total_result = await db.execute(
+        select(func.count(User.id))
+        .where(User.is_superuser == False)
+    )
     total_users = total_result.scalar() or 0
     
-    # Get new signups
+    # Get new signups (excluding superusers)
     signup_cutoff = datetime.now() - timedelta(days=signup_days)
     signup_result = await db.execute(
         select(func.count(User.id))
-        .where(User.created_at >= signup_cutoff)
+        .where(
+            and_(
+                User.created_at >= signup_cutoff,
+                User.is_superuser == False
+            )
+        )
     )
     new_signups = signup_result.scalar() or 0
     
-    # Get all users and check churn status
-    result = await db.execute(select(User))
+    # Get all non-superuser users and check transaction history
+    result = await db.execute(
+        select(User)
+        .where(User.is_superuser == False)
+    )
     all_users = result.scalars().all()
     
     total_churned = 0
