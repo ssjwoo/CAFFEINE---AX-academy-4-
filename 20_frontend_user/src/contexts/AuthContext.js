@@ -132,6 +132,11 @@ export const AuthProvider = ({ children }) => {
         await AsyncStorage.removeItem('last_sync_time');
         
         setUser(null);
+        
+        // 페이지 새로고침으로 모든 React state 초기화
+        if (typeof window !== 'undefined') {
+            window.location.reload();
+        }
     };
     // 카카오 로그인
     const kakaoLogin = async (code) => {
