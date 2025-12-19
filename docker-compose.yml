@@ -16,7 +16,7 @@ services:
     volumes:
       - ./postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -32,7 +32,6 @@ services:
         condition: service_healthy
     environment:
       # 2025-12-11: AWS RDS 우선, 연결 실패 시 로컬 DB 폴백
-      # Primary: AWS RDS
       DB_HOST: caffeine-database.c58og6ke6t36.ap-northeast-2.rds.amazonaws.com
       DB_USER: postgres
       DB_PASSWORD: caffeineapprds
@@ -46,25 +45,13 @@ services:
       LOCAL_DB_PASSWORD: caffeineapprds
       # App
       SECRET_KEY: your-super-secret-key-change-in-production
-      # Gmail SMTP (비밀번호 찾기 이메일 발송용)
+      # Gmail SMTP
       GMAIL_ADDRESS: ${GMAIL_ADDRESS}
       GMAIL_APP_PASSWORD: ${GMAIL_APP_PASSWORD}
     ports:
       - "8001:8000"
     volumes:
       - ./10_backend/app:/app/app # 핫 리로드용
-
-  # ============================================================
-  # 프론트엔드 (사용자) - Expo 앱, 로컬에서 실행 권장
-  # cd 20_frontend_user && npm start
-  # ============================================================
-  # app_front:
-  #   build: ./20_frontend_user
-  #   container_name: caf_front_user
-  #   ports:
-  #     - "3000:3000"
-  #   depends_on:
-  #     - backend
 
   # ============================================================
   # 프론트엔드 (관리자)
@@ -74,6 +61,8 @@ services:
     container_name: caf_front_admin
     ports:
       - "3001:3000"
+    environment:
+      NEXT_PUBLIC_API_URL: http://localhost
     depends_on:
       - backend
 
@@ -99,31 +88,15 @@ services:
     volumes:
       - ./10_backend/app/model_xgboost_acc_73.47.joblib:/app/model.joblib:ro
     environment:
-      # 로컬 모델 경로 (기본값)
       LOCAL_MODEL_PATH: /app/model.joblib
-      # S3 설정 (선택사항 - 설정하면 S3 우선 사용)
-      # AWS_ACCESS_KEY_ID: your-access-key
-      # AWS_SECRET_ACCESS_KEY: your-secret-key
-      # S3_BUCKET: caffeine-ml-models
-      # MODEL_KEY: models/model.joblib
 
-      # ml_fraud:
-      #   build: ./41_ml_fraud
-      #   container_name: caf_ml_fraud
-      #   ports:
-      #     - "9002:9002"
-
-      # ============================================================
-      # LLM 서비스
-      # # ============================================================
-      # llm_category:
-      #   build: ./50_llm_category
-      #   container_name: caf_llm_category
-      #   ports:
-      #     - "9100:9100"
-
-      # llm_analysis:
-      #   build: ./51_llm_analysis
-      #   container_name: caf_llm_analysis
-      #   ports:
-      #     - "9102:9101"
+  # ============================================================
+  # LLM 서비스
+  # ============================================================
+  llm_analysis:
+    build: ./51_llm_analysis
+    container_name: caf_llm_analysis
+    ports:
+      - "9102:9102"
+    environment:
+      GEMINI_API_KEY: ${GEMINI_API_KEY}

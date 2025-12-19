@@ -38,7 +38,8 @@ class DashboardSummary(BaseModel):
     average_transaction: float
     transaction_count: int
     top_category: str
-    month_over_month_change: float
+    month_over_month_change: float  # 거래액 증가율
+    transaction_count_mom_change: float  # 거래 건수 증가율
     data_source: str = "DB"
 
 
@@ -78,7 +79,8 @@ class AnalysisResponse(BaseModel):
 def get_mock_summary() -> DashboardSummary:
     return DashboardSummary(
         total_spending=1250000, average_transaction=25000, transaction_count=50,
-        top_category="외식", month_over_month_change=-5.2, data_source="[MOCK]"
+        top_category="외식", month_over_month_change=-5.2, 
+        transaction_count_mom_change=-3.8, data_source="[MOCK]"
     )
 
 def get_mock_category_breakdown() -> List[CategoryBreakdown]:
@@ -111,19 +113,35 @@ def get_mock_insights() -> List[SpendingInsight]:
 @router.get("/summary", response_model=DashboardSummary)
 async def get_dashboard_summary(
     user_id: Optional[int] = None,
+    year: Optional[int] = None,
+    month: Optional[int] = None,
     db: AsyncSession = Depends(get_db)
 ):
     """대시보드 요약 통계"""
     try:
         now = datetime.now()
-        this_month_start = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+        
+        # year/month가 지정되면 해당 월, 아니면 현재 월
+        if year and month:
+            this_month_start = datetime(year, month, 1, 0, 0, 0)
+        else:
+            this_month_start = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+        
+        # 다음 달 1일 (해당 월의 마지막까지)
+        if this_month_start.month == 12:
+            next_month_start = this_month_start.replace(year=this_month_start.year + 1, month=1)
+        else:
+            next_month_start = this_month_start.replace(month=this_month_start.month + 1)
         
         # 이번 달 통계
         query = select(
             func.coalesce(func.sum(Transaction.amount), 0).label('total'),
             func.coalesce(func.avg(Transaction.amount), 0).label('avg'),
             func.count(Transaction.id).label('count')
-        ).where(Transaction.transaction_time >= this_month_start)
+        ).where(
+            Transaction.transaction_time >= this_month_start,
+            Transaction.transaction_time < next_month_start
+        )
         
         if user_id:
             query = query.where(Transaction.user_id == user_id)
@@ -140,21 +158,70 @@ async def get_dashboard_summary(
             SELECT c.name, SUM(t.amount) as cat_total
             FROM transactions t
             LEFT JOIN categories c ON t.category_id = c.id
-            WHERE t.transaction_time >= :start_date
+            WHERE t.transaction_time >= :start_date AND t.transaction_time < :end_date
             GROUP BY c.name
             ORDER BY cat_total DESC
             LIMIT 1
         """)
-        cat_result = await db.execute(cat_query, {"start_date": this_month_start})
+        cat_result = await db.execute(cat_query, {
+            "start_date": this_month_start,
+            "end_date": next_month_start
+        })
         cat_row = cat_result.fetchone()
         top_category = cat_row[0] if cat_row else "없음"
+        
+        # 전월 대비 증감률 계산
+        last_month_start = (this_month_start - timedelta(days=1)).replace(day=1)
+        last_month_end = this_month_start - timedelta(seconds=1)
+        
+        prev_query = select(
+            func.coalesce(func.sum(Transaction.amount), 0).label('prev_total')
+        ).where(
+            Transaction.transaction_time >= last_month_start,
+            Transaction.transaction_time <= last_month_end
+        )
+        
+        if user_id:
+            prev_query = prev_query.where(Transaction.user_id == user_id)
+        
+        prev_result = await db.execute(prev_query)
+        prev_row = prev_result.fetchone()
+        prev_total = float(prev_row.prev_total) if prev_row.prev_total else 0
+        
+        # 전월 거래 건수
+        prev_count_query = select(
+            func.count(Transaction.id).label('prev_count')
+        ).where(
+            Transaction.transaction_time >= last_month_start,
+            Transaction.transaction_time <= last_month_end
+        )
+        
+        if user_id:
+            prev_count_query = prev_count_query.where(Transaction.user_id == user_id)
+        
+        prev_count_result = await db.execute(prev_count_query)
+        prev_count_row = prev_count_result.fetchone()
+        prev_count = prev_count_row.prev_count if prev_count_row.prev_count else 0
+        
+        # MoM 변화율 계산 - 거래액
+        if prev_total > 0:
+            mom_change = ((total - prev_total) / prev_total) * 100
+        else:
+            mom_change = 0.0 if total == 0 else 100.0
+        
+        # MoM 변화율 계산 - 거래 건수
+        if prev_count > 0:
+            count_mom_change = ((count - prev_count) / prev_count) * 100
+        else:
+            count_mom_change = 0.0 if count == 0 else 100.0
         
         return DashboardSummary(
             total_spending=total,
             average_transaction=avg,
             transaction_count=count,
             top_category=top_category or "없음",
-            month_over_month_change=0.0,  # 간단화
+            month_over_month_change=round(mom_change, 1),
+            transaction_count_mom_change=round(count_mom_change, 1),
             data_source="DB (AWS RDS)"
         )
         
@@ -167,11 +234,23 @@ async def get_dashboard_summary(
 async def get_category_breakdown(
     user_id: Optional[int] = None,
     months: int = 1,
+    year: Optional[int] = None,
+    month: Optional[int] = None,
     db: AsyncSession = Depends(get_db)
 ):
     """카테고리별 소비 분석"""
     try:
-        start_date = datetime.now() - timedelta(days=30 * months)
+        # year/month가 지정되면 해당 월부터, 아니면 현재부터
+        if year and month:
+            end_date = datetime(year, month, 1, 0, 0, 0)
+            if end_date.month == 12:
+                end_date = end_date.replace(year=end_date.year + 1, month=1)
+            else:
+                end_date = end_date.replace(month=end_date.month + 1)
+        else:
+            end_date = datetime.now()
+        
+        start_date = end_date - timedelta(days=30 * months)
         
         query = text("""
             SELECT c.name as category, 
@@ -251,12 +330,14 @@ async def get_spending_insights(
 @router.get("/full", response_model=AnalysisResponse)
 async def get_full_analysis(
     user_id: Optional[int] = None,
+    year: Optional[int] = None,
+    month: Optional[int] = None,
     db: AsyncSession = Depends(get_db)
 ):
     """전체 분석 데이터"""
     try:
-        summary = await get_dashboard_summary(user_id, db)
-        categories = await get_category_breakdown(user_id, 1, db)
+        summary = await get_dashboard_summary(user_id, year, month, db)
+        categories = await get_category_breakdown(user_id, 1, year, month, db)
         trends = await get_monthly_trend(user_id, 6, db)
         
         return AnalysisResponse(

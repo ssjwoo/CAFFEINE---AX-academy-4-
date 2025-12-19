@@ -22,11 +22,15 @@ export default function Dashboard() {
   const [tableData, setTableData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [dataSource, setDataSource] = useState('');
+  const [selectedMonth, setSelectedMonth] = useState<{ year: number; month: number }>(() => {
+    const now = new Date();
+    return { year: now.getFullYear(), month: now.getMonth() + 1 };
+  });
 
   const fetchDashboardData = async () => {
     try {
       setLoading(true);
-      const analysis = await getFullAnalysis();
+      const analysis = await getFullAnalysis(selectedMonth.year, selectedMonth.month);
       setDataSource(analysis.data_source || 'DB');
 
       const summary = analysis.summary;
@@ -34,10 +38,10 @@ export default function Dashboard() {
         {
           title: '총 거래 건수',
           value: summary.transaction_count.toLocaleString() + '건',
-          trend: `${summary.month_over_month_change > 0 ? '+' : ''}${summary.month_over_month_change.toFixed(1)}% 전월 대비`,
+          trend: `${summary.transaction_count_mom_change > 0 ? '+' : ''}${summary.transaction_count_mom_change.toFixed(1)}% 전월 대비`,
           icon: ShoppingCart,
           color: 'text-blue-600',
-          trendColor: summary.month_over_month_change > 0 ? 'text-green-500' : 'text-red-500'
+          trendColor: summary.transaction_count_mom_change > 0 ? 'text-green-500' : 'text-red-500'
         },
         {
           title: '총 거래액',
@@ -103,7 +107,7 @@ export default function Dashboard() {
 
   useEffect(() => {
     fetchDashboardData();
-  }, []);
+  }, [selectedMonth]);
 
   if (loading) {
     return (
@@ -124,6 +128,25 @@ export default function Dashboard() {
           <p className="text-gray-500 mt-1">전체 서비스 현황을 한눈에 확인하세요</p>
         </div>
         <div className="flex items-center gap-3">
+          <select
+            value={`${selectedMonth.year}-${selectedMonth.month.toString().padStart(2, '0')}`}
+            onChange={(e) => {
+              const [year, month] = e.target.value.split('-').map(Number);
+              setSelectedMonth({ year, month });
+            }}
+            className="px-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            {Array.from({ length: 6 }, (_, i) => {
+              const d = new Date(2025, 6 + i, 1); // 7월부터 12월까지
+              const y = d.getFullYear();
+              const m = d.getMonth() + 1;
+              return (
+                <option key={`${y}-${m}`} value={`${y}-${m.toString().padStart(2, '0')}`}>
+                  {y}년 {m}월
+                </option>
+              );
+            })}
+          </select>
           <span className={`text-sm px-3 py-1 rounded-full ${dataSource.includes('DB') ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'
             }`}>
             {dataSource.includes('DB') ? '🟢 실시간 DB' : '🟡 ' + dataSource}

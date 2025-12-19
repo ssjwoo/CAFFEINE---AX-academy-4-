@@ -28,7 +28,7 @@ class Settings(BaseSettings):
     local_db_password: str = Field("caffeineapprds", alias="LOCAL_DB_PASSWORD")
 
     # App 설정
-    app_port: int = Field(8081, alias="APP_PORT")
+    app_port: int = Field(8001, alias="APP_PORT")
     app_host: str = Field("localhost", alias="APP_HOST")
 
     # JWT 설정

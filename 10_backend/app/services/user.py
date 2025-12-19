@@ -7,14 +7,12 @@ from app.db.schema.user import UserCreate, UserUpdate, LoginHistoryCreate
 
 #회원가입
 async def register_user(db: AsyncSession, user_data: UserCreate):
-    # 중복 이메일 체크
     existing_email = await user_crud.get_user_by_email(db, user_data.email)
     if existing_email:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
             detail="Email already registered"
         )
-
     return await user_crud.create_user(db, user_data)
 
 #로그인
@@ -30,14 +28,10 @@ async def login_user(
     if not user:
         return None
 
-    # 토큰 발급
     access_token = create_access_token({"sub": str(user.id), "email": user.email})
     refresh_token = create_refresh_token({"sub": str(user.id), "email": user.email})
 
-    # 로그인 시간 업데이트
     await user_crud.update_user_login_timestamp(db, user.id)
-
-    # 로그인 이력 기록
     await user_crud.create_login_history(
         db,
         LoginHistoryCreate(
@@ -55,20 +49,16 @@ async def login_user(
         "refresh_token": refresh_token,
     }
 
-#유저 정보 조회(개인)
+#유저 정보 조회
 async def get_user(db: AsyncSession, email: str):
     user = await user_crud.get_user_by_email(db, email)
     if not user:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="User not found"
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
     return user
 
 #모든 유저 정보 조회
 async def get_all_users(db: AsyncSession):
-    users = await user_crud.get_all_users(db)
-    return users
+    return await user_crud.get_all_users(db)
 
 #유저 업데이트
 async def update_user(db: AsyncSession, user_id: int, user_data: UserUpdate):
@@ -89,6 +79,7 @@ async def update_user(db: AsyncSession, user_id: int, user_data: UserUpdate):
         budget_limit=user_data.budget_limit,
         budget_alert_enabled=user_data.budget_alert_enabled,
         birth_date=user_data.birth_date,
+        is_active=user_data.is_active,
     )
 
     if not updated_user:
@@ -96,7 +87,6 @@ async def update_user(db: AsyncSession, user_id: int, user_data: UserUpdate):
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"User with id {user_id} not found"
         )
-
     return updated_user
 
 #유저 삭제

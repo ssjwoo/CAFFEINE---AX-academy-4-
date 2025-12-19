@@ -48,27 +48,21 @@ async def create_user(db: AsyncSession, user: UserCreate) -> User:
 
     hashed_pw = hash_password(user.password)
     
-    # birth_date 파싱 (문자열 -> date)
-    birth_date_parsed = None
-    if user.birth_date:
-        from datetime import datetime
-        try:
-            birth_date_parsed = datetime.strptime(user.birth_date, "%Y-%m-%d").date()
-        except ValueError:
-            pass
-    
     db_user = User(
         email=user.email,
         password_hash=hashed_pw,
         name=user.name,
         nickname=user.nickname,
         phone=user.phone,
+        birth_date=user.birth_date,
         role="USER",
-        group_id=user.group_id,
-        status=user.status or "ACTIVE",
+        is_active=True, # Default to True
+        is_superuser=False, # Default to False
         social_provider=user.social_provider,
         social_id=user.social_id,
-        birth_date=birth_date_parsed,
+        group_id=user.group_id,
+        status=user.status or "ACTIVE",
+        push_token=user.push_token,
     )
     db.add(db_user)
     await db.commit()
@@ -89,7 +83,8 @@ async def update_user(
     push_token: Optional[str] = None,
     budget_limit: Optional[int] = None,
     budget_alert_enabled: Optional[bool] = None,
-    birth_date: Optional[str] = None,
+    birth_date: Optional[Any] = None,
+    is_active: Optional[bool] = None,
 ) -> Optional[User]:
     
     #유저ID로 유저 조회
@@ -117,8 +112,9 @@ async def update_user(
     if budget_alert_enabled is not None:
         user_obj.budget_alert_enabled = budget_alert_enabled
     if birth_date is not None:
-        from datetime import datetime
-        user_obj.birth_date = datetime.strptime(birth_date, "%Y-%m-%d")
+        user_obj.birth_date = birth_date
+    if is_active is not None:
+        user_obj.is_active = is_active
 
     await db.commit()
     await db.refresh(user_obj)

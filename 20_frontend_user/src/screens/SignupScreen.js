@@ -17,15 +17,15 @@ export default function SignupScreen({ navigation }) {
     const [loading, setLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-    
+
     // 생년월일 입력 state (6자리 YYMMDD)
     const [birthDateInput, setBirthDateInput] = useState('');
 
     // 회원가입 버튼
     const handleSignup = async () => {
         // Validation
-        if (isEmpty(name) || isEmpty(email) || isEmpty(password) || isEmpty(confirmPassword)) {
-            alert('모든 필드를 입력해주세요.');
+        if (isEmpty(name) || isEmpty(email) || isEmpty(password) || isEmpty(confirmPassword) || isEmpty(birthDateInput)) {
+            alert('⚠️ 모든 필드를 입력해주세요.');
             return;
         }
 
@@ -50,24 +50,25 @@ export default function SignupScreen({ navigation }) {
             return;
         }
 
-        // 생년월일 변환 (선택 입력)
-        let birthDate = null;
+        // 생년월일 변환 (YYYY-MM-DD 형식으로 변환하여 서버 전송)
+        let birthDateFormatted = null;
         if (birthDateInput && birthDateInput.length === 6) {
             const yy = birthDateInput.substring(0, 2);
             const mm = birthDateInput.substring(2, 4);
             const dd = birthDateInput.substring(4, 6);
             const year = parseInt(yy) > 50 ? `19${yy}` : `20${yy}`;
-            birthDate = `${year}-${mm}-${dd}`;
+            birthDateFormatted = `${year}-${mm}-${dd}`;
         }
 
         setLoading(true);
-        const result = await signup(name, email, password, birthDate);
+        const result = await signup(name, email, password, birthDateFormatted);
         setLoading(false);
 
         if (result.success) {
-            // 회원가입 성공 → 로그인 페이지로 이동
-            alert('회원가입이 완료되었습니다!\n로그인해주세요.');
-            navigation.navigate('Login');
+            alert('회원가입이 완료되었습니다!');
+            // AuthContext에서 자동 로그인을 시도하므로, 메인으로 이동하거나 
+            // 가입 후 상태 변경에 따라 자동으로 화면이 전환될 수 있음.
+            // 여기서는 성공 메시지만 띄움.
         } else {
             alert(result.error);
         }
@@ -76,12 +77,12 @@ export default function SignupScreen({ navigation }) {
     // 카카오 회원가입 버튼
     const KAKAO_REST_API_KEY = 'fa925a6646f9491a77eb9c8fd6537a21';
     const REDIRECT_URI = 'http://localhost:8081/auth/kakao/signup/callback';
-    
+
     const handleKakaoSignup = async () => {
         try {
             const encodedRedirectUri = encodeURIComponent(REDIRECT_URI);
             const kakaoAuthUrl = `https://kauth.kakao.com/oauth/authorize?client_id=${KAKAO_REST_API_KEY}&redirect_uri=${encodedRedirectUri}&response_type=code`;
-            
+
             if (Platform.OS === 'web') {
                 window.location.href = kakaoAuthUrl;
             } else {
@@ -102,18 +103,17 @@ export default function SignupScreen({ navigation }) {
             <KeyboardAvoidingView
                 behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
                 style={styles.keyboardView}>
-                <ScrollView 
+                <ScrollView
                     contentContainerStyle={styles.scrollContent}
                     showsVerticalScrollIndicator={false}>
-                    
+
                     {/* Logo Section */}
                     <View style={styles.logoSection}>
-                        <Image 
-                            source={require('../../assets/images/caffeine_logo.png')} 
+                        <Image
+                            source={require('../../assets/images/caffeine_logo.png')}
                             style={styles.logoImage}
                             resizeMode="contain"
                         />
-                        {/* Caffeine */}
                         <Text style={styles.appName}>Caffeine</Text>
                         <Text style={styles.tagline}>새로운 계정 만들기</Text>
                     </View>
@@ -146,6 +146,24 @@ export default function SignupScreen({ navigation }) {
                             />
                         </View>
 
+                        {/* 생년월일 입력 */}
+                        <View style={styles.inputContainer}>
+                            <Text style={[styles.label, { color: colors.textSecondary }]}>생년월일</Text>
+                            <TextInput
+                                style={styles.birthInput}
+                                placeholder="000212"
+                                placeholderTextColor="#9E9E9E"
+                                value={birthDateInput}
+                                onChangeText={(text) => {
+                                    const numOnly = text.replace(/[^0-9]/g, '').slice(0, 6);
+                                    setBirthDateInput(numOnly);
+                                }}
+                                keyboardType="number-pad"
+                                maxLength={6}
+                            />
+                            <Text style={styles.birthHint}>예: 000212 (2000년 2월 12일)</Text>
+                        </View>
+
                         {/* Password Input */}
                         <View style={styles.inputContainer}>
                             <View style={styles.passwordWrapper}>
@@ -158,8 +176,8 @@ export default function SignupScreen({ navigation }) {
                                     secureTextEntry={!showPassword}
                                     autoCapitalize="none"
                                 />
-                                <TouchableOpacity 
-                                    onPress={() => setShowPassword(!showPassword)} 
+                                <TouchableOpacity
+                                    onPress={() => setShowPassword(!showPassword)}
                                     style={styles.eyeButton}>
                                     <Text style={styles.eyeIcon}>
                                         {showPassword ? '👁' : '👁‍🗨'}
@@ -181,32 +199,14 @@ export default function SignupScreen({ navigation }) {
                                     secureTextEntry={!showConfirmPassword}
                                     autoCapitalize="none"
                                 />
-                                <TouchableOpacity 
-                                    onPress={() => setShowConfirmPassword(!showConfirmPassword)} 
+                                <TouchableOpacity
+                                    onPress={() => setShowConfirmPassword(!showConfirmPassword)}
                                     style={styles.eyeButton}>
                                     <Text style={styles.eyeIcon}>
                                         {showConfirmPassword ? '👁' : '👁‍🗨'}
                                     </Text>
                                 </TouchableOpacity>
                             </View>
-                        </View>
-
-                        {/* 생년월일 입력 (선택사항) */}
-                        <View style={styles.inputContainer}>
-                            <Text style={[styles.label, { color: colors.textSecondary }]}>생년월일 (선택)</Text>
-                            <TextInput
-                                style={styles.birthInput}
-                                placeholder="000212"
-                                placeholderTextColor="#9E9E9E"
-                                value={birthDateInput}
-                                onChangeText={(text) => {
-                                    const numOnly = text.replace(/[^0-9]/g, '').slice(0, 6);
-                                    setBirthDateInput(numOnly);
-                                }}
-                                keyboardType="number-pad"
-                                maxLength={6}
-                            />
-                            <Text style={styles.birthHint}>예: 000212 (2000년 2월 12일)</Text>
                         </View>
 
                         {/* Signup Button */}
@@ -266,7 +266,7 @@ export default function SignupScreen({ navigation }) {
                     </View>
                 </ScrollView>
             </KeyboardAvoidingView>
-        </LinearGradient>
+        </LinearGradient >
     );
 }
 
@@ -282,27 +282,9 @@ const styles = StyleSheet.create({
         padding: 24,
         paddingTop: 40,
     },
-
-    // Logo Section
     logoSection: {
         alignItems: 'center',
         marginBottom: 24,
-    },
-    logoContainer: {
-        width: 120,
-        height: 120,
-        justifyContent: 'center',
-        alignItems: 'center',
-        marginBottom: 12,
-        backgroundColor: '#FFFFFF',
-        borderRadius: 26,
-    },
-    logoShadow: {
-        shadowColor: '#0EA5E9',
-        shadowOffset: { width: 0, height: 6 },
-        shadowOpacity: 0.15,
-        shadowRadius: 12,
-        elevation: 6,
     },
     logoImage: {
         width: 100,
@@ -312,7 +294,6 @@ const styles = StyleSheet.create({
     appName: {
         fontSize: 32,
         fontWeight: '800',
-        fontFamily: 'Inter_700Bold',
         color: '#2563EB',
         marginBottom: 8,
         marginTop: 12,
@@ -320,12 +301,9 @@ const styles = StyleSheet.create({
     },
     tagline: {
         fontSize: 14,
-        fontFamily: 'Inter_400Regular',
         color: '#2563EB',
         fontWeight: '500',
     },
-
-    // Signup Card
     signupCard: {
         backgroundColor: '#fff',
         borderRadius: 20,
@@ -339,8 +317,6 @@ const styles = StyleSheet.create({
         width: '100%',
         alignSelf: 'center',
     },
-
-    // Input Styles
     inputContainer: {
         marginBottom: 16,
     },
@@ -383,8 +359,6 @@ const styles = StyleSheet.create({
         marginTop: 6,
         marginLeft: 4,
     },
-
-    // Signup Button
     signupButton: {
         paddingVertical: 16,
         borderRadius: 16,
@@ -401,8 +375,6 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         color: '#fff',
     },
-
-    // Login Section
     loginSection: {
         flexDirection: 'row',
         justifyContent: 'center',
@@ -417,8 +389,6 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         color: '#2563EB',
     },
-
-    // Terms Footer
     termsSection: {
         marginTop: 24,
         alignItems: 'center',
@@ -434,8 +404,6 @@ const styles = StyleSheet.create({
         color: '#9E9E9E',
         textDecorationLine: 'underline',
     },
-
-    // Divider
     dividerContainer: {
         flexDirection: 'row',
         alignItems: 'center',
@@ -451,8 +419,6 @@ const styles = StyleSheet.create({
         fontSize: 12,
         color: '#9CA3AF',
     },
-
-    // Kakao Button
     kakaoButton: {
         flexDirection: 'row',
         alignItems: 'center',
@@ -470,8 +436,6 @@ const styles = StyleSheet.create({
         fontWeight: '600',
         color: '#3C1E1E',
     },
-    
-    // 생년월일 입력 스타일
     label: {
         fontSize: 13,
         marginBottom: 6,
