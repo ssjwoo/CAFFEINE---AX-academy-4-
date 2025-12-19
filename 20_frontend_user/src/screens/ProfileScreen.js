@@ -155,7 +155,11 @@ export default function ProfileScreen({ navigation }) {
             await AsyncStorage.removeItem('transactions_cache');
             await AsyncStorage.removeItem('last_sync_time');
             alert('✅ 캐시가 삭제되었습니다!');
-            if (typeof window !== 'undefined') window.location.reload();
+
+            // 대시보드로 이동하여 변경사항 즉시 확인
+            if (navigation) {
+                navigation.navigate('대시보드');
+            }
         } catch (error) {
             alert('캐시 삭제 중 오류가 발생했습니다.');
         }

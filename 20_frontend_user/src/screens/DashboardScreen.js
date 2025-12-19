@@ -22,18 +22,18 @@ const CATEGORY_ICON = {
     '식비': { icon: 'coffee', color: '#F59E0B' },
     '식료품': { icon: 'shopping-bag', color: '#84CC16' },
     '카페': { icon: 'coffee', color: '#92400E' },
-    
+
     // 생활 
     '생활': { icon: 'home', color: '#8B5CF6' },
     '주유': { icon: 'droplet', color: '#06B6D4' },
     '교통': { icon: 'truck', color: '#3B82F6' },
     '공과금': { icon: 'zap', color: '#6366F1' },
-    
+
     // 쇼핑 
     '쇼핑': { icon: 'shopping-bag', color: '#EC4899' },
     '마트': { icon: 'shopping-cart', color: '#EF4444' },
     '편의점': { icon: 'package', color: '#10B981' },
-    
+
     // 여가/기타
     '여가': { icon: 'music', color: '#14B8A6' },
     '의료': { icon: 'heart', color: '#F43F5E' },
@@ -76,7 +76,7 @@ export default function DashboardScreen({ navigation }) {
     const [tooltip, setTooltip] = useState(null);
     const [predictedTransaction, setPredictedTransaction] = useState(null);
     const [couponReceived, setCouponReceived] = useState(false);
-    
+
     // 생년월일 모달 state (카카오 로그인 사용자)
     const [showBirthModal, setShowBirthModal] = useState(false);
     const [birthDateInput, setBirthDateInput] = useState('');  // 6자리 YYMMDD
@@ -110,7 +110,7 @@ export default function DashboardScreen({ navigation }) {
 
         const totalSpending = txns.reduce((sum, t) => sum + Math.abs(t.amount), 0);
         const avgTransaction = totalSpending / txns.length;
-        
+
         // 카테고리별 집계
         const categoryMap = {};
         txns.forEach(t => {
@@ -126,7 +126,7 @@ export default function DashboardScreen({ navigation }) {
         const mostUsedCategoryPercent = Math.round((mostUsedCategoryAmount / totalSpending) * 100);
 
         // 가장 비싼 거래 찾기
-        const maxTransaction = txns.reduce((max, t) => 
+        const maxTransaction = txns.reduce((max, t) =>
             Math.abs(t.amount) > Math.abs(max.amount) ? t : max, txns[0]);
 
         // 자주 가는 가맹점 찾기
@@ -161,7 +161,7 @@ export default function DashboardScreen({ navigation }) {
 
         const categoryMap = {};
         let total = 0;
-        
+
         txns.forEach(t => {
             const cat = t.category || '기타';
             if (!categoryMap[cat]) categoryMap[cat] = 0;
@@ -187,10 +187,10 @@ export default function DashboardScreen({ navigation }) {
         const monthlyMap = {};
         txns.forEach(t => {
             let date = t.date?.split(' ')[0] || t.date || '';
-            
+
             // 다양한 날짜 형식 처리
             let month = null;
-            
+
             // YYYY-MM-DD 형식
             if (date.match(/^\d{4}-\d{2}/)) {
                 month = date.substring(0, 7);
@@ -209,7 +209,7 @@ export default function DashboardScreen({ navigation }) {
                     }
                 }
             }
-            
+
             if (month && month.length >= 7) {
                 if (!monthlyMap[month]) monthlyMap[month] = 0;
                 monthlyMap[month] += Math.abs(t.amount);
@@ -226,20 +226,20 @@ export default function DashboardScreen({ navigation }) {
         if (sortedData.length < 3) {
             const now = new Date();
             const months = [];
-            
+
             // 최근 6개월 생성
             for (let i = 5; i >= 0; i--) {
                 const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
                 const monthStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
                 months.push(monthStr);
             }
-            
+
             // 기존 데이터를 맵으로 변환
             const existingMap = {};
             sortedData.forEach(item => {
                 existingMap[item.month] = item.total_amount;
             });
-            
+
             // 6개월 데이터 생성 (없으면 0)
             return months.map(month => ({
                 month,
@@ -256,6 +256,11 @@ export default function DashboardScreen({ navigation }) {
             setSummary(calculateSummary(transactions));
             setCategoryData(calculateCategoryData(transactions));
             setMonthlyData(calculateMonthlyData(transactions));
+        } else {
+            // 거래 데이터가 없을 때는 명시적으로 초기화
+            setSummary(null);
+            setCategoryData([]);
+            setMonthlyData([]);
         }
     }, [transactions]);
 
@@ -271,7 +276,7 @@ export default function DashboardScreen({ navigation }) {
             alert('이미 쿠폰을 받으셨습니다!');
             return;
         }
-        
+
         try {
             // API 호출하여 쿠폰 발급
             const { issueCoupon } = await import('../api/coupons');
@@ -279,7 +284,7 @@ export default function DashboardScreen({ navigation }) {
                 predictedTransaction?.merchant,
                 predictedTransaction?.couponDiscount
             );
-            
+
             if (result.success) {
                 setCouponReceived(true);
                 alert(`쿠폰 발급 완료!\n\n${predictedTransaction?.merchant}에서 사용 가능한\n${formatCurrency(predictedTransaction?.couponDiscount)} 할인 쿠폰이 발급되었습니다!`);
@@ -298,18 +303,18 @@ export default function DashboardScreen({ navigation }) {
             alert('생년월일 6자리를 입력해주세요. (예: 000212)');
             return;
         }
-        
+
         // YYMMDD -> YYYY-MM-DD 변환
         const yy = birthDateInput.substring(0, 2);
         const mm = birthDateInput.substring(2, 4);
         const dd = birthDateInput.substring(4, 6);
         const year = parseInt(yy) > 50 ? `19${yy}` : `20${yy}`;  // 50 이상이면 1900년대
         const birthDate = `${year}-${mm}-${dd}`;
-        
+
         try {
             const { updateUserProfile } = await import('../api/users');
             await updateUserProfile({ birth_date: birthDate });
-            
+
             // AsyncStorage의 user 객체도 업데이트
             const AsyncStorage = (await import('@react-native-async-storage/async-storage')).default;
             const storedUser = await AsyncStorage.getItem('user');
@@ -317,7 +322,7 @@ export default function DashboardScreen({ navigation }) {
                 const updatedUser = { ...JSON.parse(storedUser), birth_date: birthDate };
                 await AsyncStorage.setItem('user', JSON.stringify(updatedUser));
             }
-            
+
             setShowBirthModal(false);
             alert('생년월일이 저장되었습니다!');
         } catch (error) {
@@ -382,8 +387,8 @@ export default function DashboardScreen({ navigation }) {
             colors={colors.screenGradient}
             style={styles.gradientContainer}
         >
-            <ScrollView 
-                ref={scrollViewRef} 
+            <ScrollView
+                ref={scrollViewRef}
                 style={styles.container}
                 showsVerticalScrollIndicator={false}
                 refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.tabBarActive} />}
@@ -394,7 +399,7 @@ export default function DashboardScreen({ navigation }) {
                         <Text style={[styles.userName, { color: colors.text }]}>{user?.name || '사용자'}님의 소비현황</Text>
                     </View>
                     <View style={styles.headerButtons}>
-                        <TouchableOpacity 
+                        <TouchableOpacity
                             style={styles.profileButton}
                             onPress={() => navigation?.navigate('프로필')}
                         >
@@ -405,7 +410,7 @@ export default function DashboardScreen({ navigation }) {
                                 <Feather name="user" size={20} color="#FFFFFF" />
                             </LinearGradient>
                         </TouchableOpacity>
-                        <TouchableOpacity 
+                        <TouchableOpacity
                             style={styles.settingsButton}
                             onPress={() => navigation?.navigate('설정')}
                         >
@@ -492,7 +497,7 @@ export default function DashboardScreen({ navigation }) {
                 {/* AI Prediction Banner */}
                 {predictedTransaction && (
                     <FadeInView style={styles.predictionBanner} delay={200}>
-                        <TouchableOpacity 
+                        <TouchableOpacity
                             style={styles.predictionCard}
                             activeOpacity={0.8}
                             onPress={handleGetCoupon}
@@ -517,7 +522,7 @@ export default function DashboardScreen({ navigation }) {
 
                 {/* Quick Actions */}
                 <FadeInView style={styles.quickActions} delay={300}>
-                    <TouchableOpacity 
+                    <TouchableOpacity
                         style={styles.quickActionItem}
                         onPress={() => navigation?.navigate('거래내역')}
                     >
@@ -526,7 +531,7 @@ export default function DashboardScreen({ navigation }) {
                         </View>
                         <Text style={[styles.quickActionLabel, { color: colors.text }]}>거래내역</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity 
+                    <TouchableOpacity
                         style={styles.quickActionItem}
                         onPress={() => navigation?.navigate('쿠폰함')}
                     >
@@ -535,7 +540,7 @@ export default function DashboardScreen({ navigation }) {
                         </View>
                         <Text style={[styles.quickActionLabel, { color: colors.text }]}>쿠폰함</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity 
+                    <TouchableOpacity
                         style={styles.quickActionItem}
                         onPress={() => navigation?.navigate('분석')}
                     >
@@ -544,7 +549,7 @@ export default function DashboardScreen({ navigation }) {
                         </View>
                         <Text style={[styles.quickActionLabel, { color: colors.text }]}>분석</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity 
+                    <TouchableOpacity
                         style={styles.quickActionItem}
                         onPress={() => navigation?.navigate('더보기', { openChat: true })}
                     >
@@ -557,7 +562,7 @@ export default function DashboardScreen({ navigation }) {
 
                 {/* Anomaly Alert */}
                 <FadeInView style={styles.alertContainer} delay={350}>
-                    <TouchableOpacity 
+                    <TouchableOpacity
                         style={styles.alertCard}
                         onPress={() => navigation?.navigate('거래내역')}
                         activeOpacity={0.8}
@@ -679,7 +684,7 @@ export default function DashboardScreen({ navigation }) {
                         <Text style={[styles.modalDesc, { color: colors.textSecondary }]}>
                             연령대별 소비 분석을 위해{'\n'}생년월일을 입력해주세요
                         </Text>
-                        
+
                         <View style={styles.birthInputContainer}>
                             <TextInput
                                 style={styles.birthInput}
@@ -696,7 +701,7 @@ export default function DashboardScreen({ navigation }) {
                             />
                             <Text style={styles.birthHint}>예: 000212 (2000년 2월 12일)</Text>
                         </View>
-                        
+
                         <View style={styles.modalBtnRow}>
                             <TouchableOpacity
                                 style={[styles.modalBtn, styles.modalBtnSecondary]}
@@ -723,7 +728,7 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
     },
-    
+
     // Header
     header: {
         flexDirection: 'row',
@@ -1181,7 +1186,7 @@ const styles = StyleSheet.create({
         fontWeight: '700',
         color: '#2563EB',
     },
-    
+
     // 생년월일 모달 스타일
     modalOverlay: {
         flex: 1,
