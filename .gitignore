@@ -67,3 +67,5 @@ admin_app_dashboard.py
 .zip
 .log
 audit.log
+
+.pid
