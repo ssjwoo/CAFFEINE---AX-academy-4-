@@ -1,12 +1,12 @@
 import { apiClient } from './baseClient';
 
-// Analysis API
+// Analysis API (Admin)
 export async function getFullAnalysis(year?: number, month?: number) {
     const params = new URLSearchParams();
     if (year) params.append('year', year.toString());
     if (month) params.append('month', month.toString());
     const queryString = params.toString();
-    return apiClient.get(`/api/analysis/full${queryString ? '?' + queryString : ''}`);
+    return apiClient.get(`/api/analysis/admin/full${queryString ? '?' + queryString : ''}`);
 }
 
 export async function getDashboardStats() {

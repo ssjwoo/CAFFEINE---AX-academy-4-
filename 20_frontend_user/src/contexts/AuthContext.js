@@ -56,12 +56,12 @@ export const AuthProvider = ({ children }) => {
                 await AsyncStorage.setItem('refreshToken', refresh_token);
                 await AsyncStorage.setItem('authToken', access_token);
 
-                const userResponse = await fetch(`${API_BASE_URL}/users/me`, {
-                    headers: { 'Authorization': `Bearer ${tokenData.access_token}` },
+                const userResponse = await apiClient.get('/users/me', {
+                    headers: { 'Authorization': `Bearer ${access_token}` },
                 });
 
-                if (userResponse.ok) {
-                    const userData = await userResponse.json();
+                if (userResponse.data) {
+                    const userData = userResponse.data;
 
                     // 이전 사용자 캐시 삭제 (다른 사용자 데이터 격리)
                     const prevUserJson = await AsyncStorage.getItem('user');

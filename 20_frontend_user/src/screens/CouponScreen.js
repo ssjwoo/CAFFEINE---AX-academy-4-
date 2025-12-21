@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { View, Text, FlatList, StyleSheet, TouchableOpacity, TextInput, ScrollView } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Feather } from '@expo/vector-icons';
+import { useFocusEffect } from '@react-navigation/native';
 import { useTheme } from '../contexts/ThemeContext';
 import { formatCurrency } from '../utils/currency';
 import EmptyState from '../components/EmptyState';
@@ -38,7 +39,7 @@ export default function CouponScreen({ route }) {
             setLoading(true);
             const { getCoupons } = await import('../api/coupons');
             const data = await getCoupons();
-            
+
             // API 응답을 화면에 맞는 형식으로 변환
             const formattedCoupons = data.map(coupon => ({
                 id: coupon.id,
@@ -53,7 +54,7 @@ export default function CouponScreen({ route }) {
                 daysLeft: calculateDaysLeft(coupon.valid_until),
                 usedDate: coupon.used_at?.split('T')[0]
             }));
-            
+
             setCoupons(formattedCoupons);
         } catch (error) {
             console.error('쿠폰 로드 실패:', error);
@@ -64,9 +65,12 @@ export default function CouponScreen({ route }) {
         }
     };
 
-    React.useEffect(() => {
-        loadCoupons();
-    }, []);
+    // 화면에 포커스될 때마다 쿠폰 목록 새로고침
+    useFocusEffect(
+        useCallback(() => {
+            loadCoupons();
+        }, [])
+    );
 
     // AI 예측 쿠폰이 전달되면 새로고침
     React.useEffect(() => {
@@ -109,12 +113,12 @@ export default function CouponScreen({ route }) {
             setSelectedCouponId(null);
             return;
         }
-        
+
         if (selectedCouponId !== null) {
             alert('⚠️ 쿠폰은 한 번에 1개만 선택 가능합니다!\n\n현재 선택된 쿠폰을 먼저 해제하거나 사용해주세요.');
             return;
         }
-        
+
         setSelectedCouponId(coupon.id);
     };
 
@@ -123,17 +127,17 @@ export default function CouponScreen({ route }) {
         try {
             const { useCoupon } = await import('../api/coupons');
             const result = await useCoupon(coupon.id);
-            
+
             if (result.success) {
                 alert(`${coupon.merchant} 쿠폰 사용!\n\n할인 금액: ${formatCurrency(coupon.discount)}\n\n다음 소비에 자동 적용됩니다.`);
-                
+
                 // 쿠폰 상태를 used로 변경
-                setCoupons(prev => prev.map(c => 
-                    c.id === coupon.id 
+                setCoupons(prev => prev.map(c =>
+                    c.id === coupon.id
                         ? { ...c, status: 'used', usedDate: new Date().toISOString().split('T')[0] }
                         : c
                 ));
-                
+
                 // 선택 상태 초기화
                 setSelectedCouponId(null);
             }

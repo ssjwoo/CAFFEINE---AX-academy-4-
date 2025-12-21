@@ -1,5 +1,3 @@
-version: "3.9"
-
 services:
 
   # ============================================================
@@ -7,20 +5,19 @@ services:
   # ============================================================
   backend:
     build: ./10_backend
-    # image: caffeine-backend:latest
     container_name: caf_backend
+    env_file:
+      - .env
     environment:
-      # AWS RDS 연결
-      DB_HOST: caffeine-database.c58og6ke6t36.ap-northeast-2.rds.amazonaws.com
-      DB_USER: postgres
-      DB_PASSWORD: caffeineapprds
-      DB_PORT: 5432
-      DB_NAME: postgres
-      # App
-      SECRET_KEY: your-super-secret-key-change-in-production
-      # Gmail SMTP
+      DB_HOST: ${DB_HOST}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_PORT: ${DB_PORT}
+      DB_NAME: ${DB_NAME}
+      SECRET_KEY: ${SECRET_KEY}
       GMAIL_ADDRESS: ${GMAIL_ADDRESS}
       GMAIL_APP_PASSWORD: ${GMAIL_APP_PASSWORD}
+      DEVELOPMENT_MODE: ${DEVELOPMENT_MODE}
     ports:
       - "8001:8000"
     volumes:
@@ -49,6 +46,7 @@ services:
       - "80:80"
     depends_on:
       - backend
+
   # ============================================================
   # LLM 서비스
   # ============================================================
