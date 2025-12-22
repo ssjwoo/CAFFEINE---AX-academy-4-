@@ -3,7 +3,6 @@ import { View, Text, ScrollView, StyleSheet, TouchableOpacity, TextInput, Keyboa
 import { LinearGradient } from 'expo-linear-gradient';
 import { Feather } from '@expo/vector-icons';
 import { useTheme } from '../contexts/ThemeContext';
-import { useAISettings } from '../contexts/AISettingsContext';
 import { useTransactions } from '../contexts/TransactionContext';
 import FadeInView from '../components/FadeInView';
 import { useChatbot } from '../hooks/useChatbot';
@@ -14,7 +13,6 @@ const DEFAULT_BUDGET = 1000000;
 // 잠깐만AI 챗봇
 export default function MoreScreen({ navigation, route }) {
     const { colors } = useTheme();
-    const { aiEnabled, toggleAI } = useAISettings();
     const { transactions } = useTransactions();
 
     // 챗봇 훅 사용
@@ -101,7 +99,7 @@ export default function MoreScreen({ navigation, route }) {
             answer: '더보기 → 프로필 → 거래 데이터 초기화에서 모든 데이터를 삭제할 수 있습니다. 이 작업은 되돌릴 수 없으니 신중하게 결정해주세요.'
         }
     ];
-    
+
     // 예산 저장 버튼
     const handleSaveBudget = () => {
         // TODO: 백엔드 연결 시 저장 API 호출
@@ -190,22 +188,6 @@ export default function MoreScreen({ navigation, route }) {
                     </View>
                 </View>
 
-                {/* AI On/Off 토글 */}
-                <View style={[styles.levelSelector, { backgroundColor: colors.cardBackground }]}>
-                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                        <Text style={[styles.levelLabel, { color: colors.text, fontWeight: '600' }]}>🤖 잠깐만 AI</Text>
-                        <Text style={[styles.levelLabel, { color: colors.textSecondary, marginLeft: 8 }]}>
-                            {aiEnabled ? '거래마다 평가' : '비활성화'}
-                        </Text>
-                    </View>
-                    <Switch
-                        value={aiEnabled}
-                        onValueChange={toggleAI}
-                        trackColor={{ false: '#E5E7EB', true: '#6366F1' }}
-                        thumbColor={'#FFFFFF'}
-                        ios_backgroundColor="#E5E7EB"
-                    />
-                </View>
 
                 {/* 메시지 리스트 */}
                 <ScrollView

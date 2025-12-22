@@ -8,6 +8,19 @@ import { useTheme } from '../contexts/ThemeContext';
 import { useTransactions } from '../contexts/TransactionContext';
 import EmptyState from '../components/EmptyState';
 import AddTransactionModal from '../components/AddTransactionModal';
+
+// 카테고리 매핑 (구 카테고리명 → 신 카테고리명)
+const mapCategory = (category) => {
+    const mapping = {
+        '식비': '외식',
+        '여가': '생활',
+        '공과금': '생활',
+        '의료': '생활',
+        '카페': '외식',
+    };
+    return mapping[category] || category;
+};
+
 import { formatCurrency } from '../utils/currency';
 import { EMPTY_MESSAGES } from '../constants';
 
@@ -226,7 +239,7 @@ export default function TransactionScreen({ navigation }) {
                 <Text style={s.amount}>{formatCurrency(item.amount)}</Text>
             </View>
             <View style={s.transactionDetails}>
-                <Text style={[s.category, { color: colors.textSecondary }]}>{item.category} | {item.date}</Text>
+                <Text style={[s.category, { color: colors.textSecondary }]}>{mapCategory(item.category)} | {item.date}</Text>
             </View>
             {
                 item.notes ? (

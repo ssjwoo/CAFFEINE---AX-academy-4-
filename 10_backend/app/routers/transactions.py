@@ -68,9 +68,11 @@ class TransactionCreate(BaseModel):
     """거래 추가 요청"""
     amount: float
     category: str
-    merchant_name: str
+    merchant_name: Optional[str] = None
+    merchant: Optional[str] = None  # 일괄 생성 호환용
     description: Optional[str] = None
     transaction_date: Optional[str] = None  # ISO format: 2025-12-16T10:30:00
+    currency: Optional[str] = "KRW"  # 일괄 생성 호환용
 
 class TransactionBulkCreate(BaseModel):
     """거래 일괄 생성 요청 스키마"""
@@ -267,6 +269,11 @@ async def create_transaction(
     - transaction_date: 거래 시각 ISO format (선택, 기본값: 현재 시각)
     """
     try:
+        # merchant_name과 merchant 둘 다 지원 (일괄 생성 호환)
+        merchant = data.merchant_name or data.merchant
+        if not merchant:
+            raise HTTPException(status_code=422, detail="merchant_name 또는 merchant 필드가 필요합니다")
+
         # 카테고리 조회
         cat_query = select(Category).where(Category.name == data.category)
         cat_result = await db.execute(cat_query)
@@ -291,12 +298,12 @@ async def create_transaction(
         new_tx = Transaction(
             user_id=user_id,
             amount=data.amount,
-            merchant_name=data.merchant_name,
+            merchant_name=merchant,
             description=data.description,
             category_id=category.id if category else None,
             transaction_time=tx_time,
             status="completed",
-            currency="KRW"
+            currency=data.currency or "KRW"
         )
 
         db.add(new_tx)

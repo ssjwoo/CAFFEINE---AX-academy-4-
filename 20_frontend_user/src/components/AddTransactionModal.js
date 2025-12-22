@@ -16,13 +16,12 @@ import { Feather } from '@expo/vector-icons';
 import { useTransactions } from '../contexts/TransactionContext';
 
 const CATEGORIES = [
-    { name: '식비', icon: 'coffee', color: '#F59E0B' },
+    { name: '외식', icon: 'coffee', color: '#F59E0B' },
+    { name: '식료품', icon: 'shopping-cart', color: '#10B981' },
     { name: '쇼핑', icon: 'shopping-bag', color: '#EC4899' },
     { name: '교통', icon: 'navigation', color: '#3B82F6' },
-    { name: '여가', icon: 'music', color: '#10B981' },
-    { name: '공과금', icon: 'zap', color: '#8B5CF6' },
-    { name: '의료', icon: 'heart', color: '#EF4444' },
-    { name: '카페', icon: 'coffee', color: '#6366F1' },
+    { name: '생활', icon: 'home', color: '#8B5CF6' },
+    { name: '주유', icon: 'zap', color: '#EF4444' },
     { name: '기타', icon: 'more-horizontal', color: '#6B7280' },
 ];
 
@@ -31,14 +30,14 @@ export default function AddTransactionModal({ visible, onClose, onSuccess }) {
     const [amount, setAmount] = useState('');
     const [merchantName, setMerchantName] = useState('');
     const [description, setDescription] = useState('');
-    const [selectedCategory, setSelectedCategory] = useState('식비');
+    const [selectedCategory, setSelectedCategory] = useState('외식');
     const [isLoading, setIsLoading] = useState(false);
 
     const resetForm = () => {
         setAmount('');
         setMerchantName('');
         setDescription('');
-        setSelectedCategory('식비');
+        setSelectedCategory('외식');
     };
 
     const handleSubmit = async () => {

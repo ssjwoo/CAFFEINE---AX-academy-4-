@@ -3,7 +3,8 @@
  * 챗봇 상태 관리 및 메시지 처리 로직을 캡슐화
  */
 
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { sendChatMessage, getErrorMessage } from '../api/chatbot';
 import { buildSpendingHistory } from '../utils/spendingAnalyzer';
 
@@ -41,6 +42,39 @@ export const useChatbot = ({ transactions = [], budget = 1000000 } = {}) => {
     const messageIdRef = useRef(1);
 
     /**
+     * 캐시에서 대화 내역 불러오기
+     */
+    useEffect(() => {
+        const loadHistory = async () => {
+            try {
+                const cached = await AsyncStorage.getItem('chatbot_history');
+                if (cached) {
+                    const history = JSON.parse(cached);
+                    setMessages(history);
+                    setChatStarted(true);
+                    // ID 카운터 업데이트
+                    const maxId = Math.max(...history.map(m => m.id || 0));
+                    messageIdRef.current = maxId + 1;
+                }
+            } catch (error) {
+                console.log('Chat history load failed:', error);
+            }
+        };
+        loadHistory();
+    }, []);
+
+    /**
+     * 메시지 변경시 캐시에 저장
+     */
+    useEffect(() => {
+        if (messages.length > 0) {
+            AsyncStorage.setItem('chatbot_history', JSON.stringify(messages)).catch(err => {
+                console.log('Chat history save failed:', err);
+            });
+        }
+    }, [messages]);
+
+    /**
      * 다음 메시지 ID 생성
      */
     const getNextMessageId = useCallback(() => {
@@ -60,12 +94,18 @@ export const useChatbot = ({ transactions = [], budget = 1000000 } = {}) => {
     /**
      * 챗봇 종료/리셋
      */
-    const endChat = useCallback(() => {
+    const endChat = useCallback(async () => {
         setChatStarted(false);
         setMessages([]);
         setIsTyping(false);
         setError(null);
         messageIdRef.current = 1;
+        // 캐시 삭제
+        try {
+            await AsyncStorage.removeItem('chatbot_history');
+        } catch (error) {
+            console.log('Chat history clear failed:', error);
+        }
     }, []);
 
     /**

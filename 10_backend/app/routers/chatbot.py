@@ -22,11 +22,52 @@ router = APIRouter(
 class ChatMessage(BaseModel):
     message: str
     naggingLevel: str
+    type: Optional[str] = "chat"
     history: Optional[List[dict]] = []
 
 class ChatResponse(BaseModel):
     reply: str
     mood: Optional[str] = "neutral"
+
+
+def get_alarm_persona(level: str, spending_context: str = "") -> str:
+    """거래 추가 시 알람용 독설가 AI 페르소나"""
+    return f"""
+You are sending a short Korean text message about this purchase. Do NOT explain or introduce yourself. Just write the message directly.
+
+# Tone by Amount
+- **5,000원 이하**: Very gentle. Example: "꼭 필요한 것만 산거 맞지?","잘하자","아껴쓰자"
+- **5,000-15,000원**: Friendly concern. Example: "이것도 아껴야해","이 돈이면 넷플릭스가 한 달"
+- **15,000-30,000원**: Light sarcasm. Example: "다음달엔 라면만 먹게?"
+- **30,000-50,000원**: Strong sarcasm. Example: "월급날이야?","생일이야?","혹시 내가 모르는 사이에 연봉 협상 다시 했니?"
+- **50,000원 이상**: Maximum roast. Example: "빌 게이츠야?,"기부천사","미쳤어?"
+
+# Rules
+- Korean only (반말)
+- Mention amount and item
+- 3 or 4 sentences
+- Sound like a real text from a friend
+
+{spending_context}
+"""
+
+
+def get_chatbot_persona(spending_context: str = "") -> str:
+    """대화형 챗봇용 소비 상담 AI 페르소나"""
+    return f"""
+Role: 사용자의 소비를 분석하고 개선 팁을 제공하는 친절한 재무 상담 AI
+Tone: 친근하고 공감적이며, 실질적인 조언 제공,반말로 대답
+
+Instruction:
+1. 사용자의 소비 패턴을 분석하여 구체적으로 피드백
+2. 다음 소비를 어떻게 잘 할 수 있는지 실용적인 팁을 제공
+3. 예산 관리, 절약 방법, 스마트한 소비 전략을 제안
+4. 이모지를 사용하지 말 것 (NO emojis)
+
+[사용자의 실제 소비내역]
+{spending_context}
+"""
+
 
 
 async def get_user_spending_context(db: AsyncSession, user_id: int) -> str:
@@ -83,7 +124,10 @@ async def get_user_spending_context(db: AsyncSession, user_id: int) -> str:
             for tx in recent_txs
         ]
         recent_text = "\n".join(tx_lines) if recent_txs else "  (데이터 없음)"
-        
+
+        # 다음 예상 소비 카테고리 (ML 기반)
+        predicted_category = categories[0].name if categories else "기타"
+
         context = f"""
 [사용자 소비내역 - 최근 30일]
 - 총 지출: {int(total_amount):,}원
@@ -95,6 +139,9 @@ async def get_user_spending_context(db: AsyncSession, user_id: int) -> str:
 
 [최근 거래 5건]
 {recent_text}
+
+[AI 예측 - 다음 소비]
+- 예상 카테고리: {predicted_category}
 """
         return context
         
@@ -103,7 +150,7 @@ async def get_user_spending_context(db: AsyncSession, user_id: int) -> str:
         return "(소비내역 조회 실패)"
 
 
-async def call_llm_api(message: str, level: str, spending_context: str = "") -> str:
+async def call_llm_api(message: str, level: str, spending_context: str = "", is_alarm: bool = False) -> str:
     api_key = os.getenv("GEMINI_API_KEY")
 
     if not api_key:
@@ -111,26 +158,22 @@ async def call_llm_api(message: str, level: str, spending_context: str = "") -> 
 
     url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={api_key}"
 
-    system_instruction = f"""
-    당신은 사용자의 소비 습관을 분석하는 '절약 잔소리 꾼'입니다.
-    잔소리 강도는 '{level}'입니다.
-
-    [강도 가이드]
-    - 상: 매우 강하게 비난, 반말 (예: "야! 너 미쳤어?")
-    - 중: 논리적 설명, 대안 제시, 반말
-    - 하: 부드럽게 회유
-
-    [중요] 아래는 사용자의 실제 소비내역입니다:
-    {spending_context}
-
-    구체적인 데이터를 언급하며 2-3문장으로 답변하세요.
-    """
+    # 타입에 따른 페르소나 선택
+    if is_alarm:
+        system_instruction = get_alarm_persona(level, spending_context)
+        # 알림용: 거래 정보 포함 + 직접 응답 유도
+        text_content = f"{system_instruction}\n\n거래정보: {message}"
+    else:
+        system_instruction = get_chatbot_persona(spending_context)
+        # 챗봇용: 대화형 형식 유지
+        text_content = f"{system_instruction}\n\n사용자: {message}\n답변:"
 
     payload = {
         "contents": [{
-            "parts": [{"text": f"{system_instruction}\n\n사용자: {message}\n답변:"}]
+            "parts": [{"text": text_content}]
         }]
     }
+
 
     async with httpx.AsyncClient() as client:
         try:
@@ -162,13 +205,18 @@ async def get_optional_user(db: AsyncSession, request: Request) -> Optional[User
 async def chat(request: ChatMessage, db: AsyncSession = Depends(get_db), http_request: Request = None):
     try:
         user = await get_optional_user(db, http_request)
-        
-        if user:
+        if request.type == "alarm":
+            # 알림(잔소리)인 경우 통계 컨텍스트 제외 (현재 거래에만 집중)
+            spending_context = ""
+            is_alarm = True
+        elif user:
             spending_context = await get_user_spending_context(db, user.id)
+            is_alarm = False
         else:
             spending_context = await get_user_spending_context(db, 1)  # 테스트용: 기본 user_id=1
+            is_alarm = False
         
-        reply = await call_llm_api(request.message, request.naggingLevel, spending_context)
+        reply = await call_llm_api(request.message, request.naggingLevel, spending_context, is_alarm)
         return {"reply": reply, "mood": "neutral"}
 
     except HTTPException as he:

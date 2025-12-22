@@ -14,6 +14,9 @@ import DashboardScreen from './src/screens/DashboardScreen';
 import TransactionScreen from './src/screens/TransactionScreen';
 import CouponScreen from './src/screens/CouponScreen';
 import ProfileScreen from './src/screens/ProfileScreen';
+import MoreScreen from './src/screens/MoreScreen';
+import AnalysisScreen from './src/screens/AnalysisScreen';
+import SettingsScreen from './src/screens/SettingsScreen';
 import LoginScreen from './src/screens/LoginScreen';
 import SignupScreen from './src/screens/SignupScreen';
 
@@ -25,7 +28,7 @@ const TabBarIcon = ({ name, focused }) => {
     '대시보드': '📊',
     '거래내역': '💳',
     '쿠폰함': '🎟️',
-    '프로필': '👤'
+    '더보기': '⚙️'
   };
   return <Text style={{ fontSize: 24, opacity: focused ? 1 : 0.5 }}>{icons[name] || ''}</Text>;
 };
@@ -56,7 +59,7 @@ function MainTabs() {
       <Tab.Screen name="대시보드" component={DashboardScreen} />
       <Tab.Screen name="거래내역" component={TransactionScreen} />
       <Tab.Screen name="쿠폰함" component={CouponScreen} />
-      <Tab.Screen name="프로필" component={ProfileScreen} />
+      <Tab.Screen name="더보기" component={MoreScreen} />
     </Tab.Navigator>
   );
 }
@@ -94,7 +97,41 @@ function AppContent() {
   return (
     <NavigationContainer>
       <StatusBar style={isDarkMode ? 'light' : 'auto'} />
-      {user ? <MainTabs /> : <AuthStack />}
+      {user ? (
+        <Stack.Navigator screenOptions={{ headerShown: false }}>
+          <Stack.Screen name="MainTabs" component={MainTabs} />
+          <Stack.Screen
+            name="분석"
+            component={AnalysisScreen}
+            options={{
+              headerShown: true,
+              headerTitle: '지출 분석',
+              headerStyle: { backgroundColor: colors.cardBackground },
+              headerTintColor: colors.text,
+            }}
+          />
+          <Stack.Screen
+            name="프로필"
+            component={ProfileScreen}
+            options={{
+              headerShown: true,
+              headerTitle: '프로필',
+              headerStyle: { backgroundColor: colors.cardBackground },
+              headerTintColor: colors.text,
+            }}
+          />
+          <Stack.Screen
+            name="설정"
+            component={SettingsScreen}
+            options={{
+              headerShown: true,
+              headerTitle: '앱 설정',
+              headerStyle: { backgroundColor: colors.cardBackground },
+              headerTintColor: colors.text,
+            }}
+          />
+        </Stack.Navigator>
+      ) : <AuthStack />}
     </NavigationContainer>
   );
 }

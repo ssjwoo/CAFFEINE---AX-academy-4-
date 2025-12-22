@@ -1,0 +1,40 @@
+
+# GET /api/chat/history - 대화 내역 조회 엔드포인트
+@router.get("/history")
+async def get_chat_history(
+    db: AsyncSession = Depends(get_db),
+    http_request: Request = None
+):
+    """
+    사용자의 챗봇 대화 내역 조회 (최근 50개)
+    """
+    try:
+        user = await get_optional_user(db, http_request)
+        
+        if not user:
+            # 인증되지 않은 경우 빈 배열 반환
+            return {"history": []}
+        
+        # 최근 50개 대화 조회
+        query = select(ChatHistory).where(
+            ChatHistory.user_id == user.id
+        ).order_by(ChatHistory.created_at.asc()).limit(50)
+        
+        result = await db.execute(query)
+        messages = result.scalars().all()
+        
+        # 응답 형식 변환
+        history = [
+            {
+                "role": msg.role,
+                "message": msg.message,
+                "created_at": msg.created_at.isoformat() if msg.created_at else None
+            }
+            for msg in messages
+        ]
+        
+        return {"history": history}
+        
+    except Exception as e:
+        print(f"History retrieval error: {e}")
+        return {"history": []}

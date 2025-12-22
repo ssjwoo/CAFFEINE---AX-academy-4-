@@ -3,7 +3,7 @@ import { Platform } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const LOCAL_BASE_URL = "http://localhost:8001";  // 로컬 개발 (Docker backend port)
-const PROD_BASE_URL = "https://d26uyg5darllja.cloudfront.net/api";
+const PROD_BASE_URL = "https://d26uyg5darllja.cloudfront.net";  // 프로덕션 (백엔드 라우터가 /users, /auth 등으로 정의됨)
 
 // 환경 판별: 웹에서 localhost면 로컬, 그 외(앱 포함)는 프로덕션
 const isLocal = 

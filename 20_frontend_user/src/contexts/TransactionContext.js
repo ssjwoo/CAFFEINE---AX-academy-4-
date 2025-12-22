@@ -3,7 +3,6 @@ import React, { createContext, useState, useContext, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getTransactions, updateTransactionNote as apiUpdateNote, createTransactionsBulk, deleteAllTransactions, createTransaction, deleteTransaction, evaluateTransaction } from '../api';
 import { predictNextTransaction } from '../api/ml';
-import { useAISettings } from './AISettingsContext';
 import { useToast } from './ToastContext';
 import { filterMonthlyTransactions, calculateTotalSpent, analyzeCategoryBreakdown } from '../utils/spendingAnalyzer';
 
@@ -14,7 +13,6 @@ export const TransactionProvider = ({ children }) => {
     const [transactions, setTransactions] = useState([]);
     const [loading, setLoading] = useState(false);
     const [lastSyncTime, setLastSyncTime] = useState(null);
-    const { aiEnabled } = useAISettings();  // AI 설정 가져오기
     const { showToast } = useToast();  // Toast 알림 함수
 
     // 앱 시작 시 캐시 로드 (캐시 있으면 서버 호출 생략)
@@ -183,46 +181,41 @@ export const TransactionProvider = ({ children }) => {
             // 즉시 성공 반환 (모달을 빠르게 닫기 위해)
             const successResult = { success: true, transaction: formattedTx };
 
+
             // AI 평가를 백그라운드에서 비동기 실행 (await 없이)
-            if (aiEnabled) {
-                (async () => {
-                    try {
-                        // 소비 내역 요약 계산 (유틸리티 사용)
-                        const monthlyTransactions = filterMonthlyTransactions(updated);
-                        const totalSpent = calculateTotalSpent(monthlyTransactions);
+            // AI 평가는 항상 활성화됨
+            (async () => {
+                try {
+                    // 소비 내역 요약 계산 (유틸리티 사용)
+                    const monthlyTransactions = filterMonthlyTransactions(updated);
+                    const totalSpent = calculateTotalSpent(monthlyTransactions);
 
-                        // 같은 카테고리 지출 계산
-                        const categoryBreakdown = analyzeCategoryBreakdown(monthlyTransactions);
-                        const categoryData = categoryBreakdown[formattedTx.category] || { count: 0, total: 0 };
+                    // 같은 카테고리 지출 계산
+                    const categoryBreakdown = analyzeCategoryBreakdown(monthlyTransactions);
+                    const categoryData = categoryBreakdown[formattedTx.category] || { count: 0, total: 0 };
 
-                        // LLM API 호출 (리팩토링된 API 사용)
-                        const evaluationResult = await evaluateTransaction({
-                            transaction: {
-                                merchant_name: formattedTx.merchant,
-                                amount: formattedTx.amount,
-                                category: formattedTx.category
-                            },
-                            budget: 1000000,  // 100만원 하드코딩
-                            spendingHistory: {
-                                total: totalSpent,
-                                category_total: categoryData.total,
-                                category_count: categoryData.count
-                            }
-                        });
-
-                        if (evaluationResult.success && evaluationResult.message) {
-                            console.log('✅ AI 평가:', evaluationResult.message);
-
-                            // Toast 알림 표시 (모달이 완전히 닫힌 후)
-                            setTimeout(() => {
-                                showToast(evaluationResult.message, 6000);  // 6초 동안 표시
-                            }, 1000);
+                    // LLM API 호출 (리팩토링된 API 사용)
+                    const evaluationResult = await evaluateTransaction({
+                        transaction: {
+                            merchant_name: formattedTx.merchant,
+                            amount: formattedTx.amount,
+                            category: formattedTx.category
                         }
-                    } catch (evalError) {
-                        console.error('AI 평가 실패:', evalError);
+                        // naggingLevel은 기본값 '중' 사용
+                    });
+
+                    if (evaluationResult.success && evaluationResult.message) {
+                        console.log('✅ AI 평가:', evaluationResult.message);
+
+                        // Toast 알림 표시 (모달이 완전히 닫힌 후)
+                        setTimeout(() => {
+                            showToast(evaluationResult.message, 6000);  // 6초 동안 표시
+                        }, 1000);
                     }
-                })();
-            }
+                } catch (evalError) {
+                    console.error('AI 평가 실패:', evalError);
+                }
+            })();
 
             return successResult;
         } catch (error) {

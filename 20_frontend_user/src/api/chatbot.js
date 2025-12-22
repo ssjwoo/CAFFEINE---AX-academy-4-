@@ -8,12 +8,13 @@ import { apiClient } from './client';
  * @param {Array} params.history - 이전 대화 내역
  * @returns {Promise<Object>} AI 응답
  */
-export const sendChatMessage = async ({ message, naggingLevel = '중', history = [] }) => {
+export const sendChatMessage = async ({ message, naggingLevel = '중', history = [], type = 'chat' }) => {
     try {
         const response = await apiClient.post('/api/chat', {
             message,
             naggingLevel,
-            history
+            history,
+            type
         });
 
         return {
@@ -37,8 +38,8 @@ export const sendChatMessage = async ({ message, naggingLevel = '중', history =
  */
 export const evaluateTransaction = async ({ transaction, naggingLevel = '중' }) => {
     try {
-        const message = `이 거래 어때?:\n${transaction.merchant_name}에서 ${transaction.amount}원 결제함.`;
-        return await sendChatMessage({ message, naggingLevel });
+        const message = `이 거래 어때?:\n${transaction.merchant_name}에서 ${transaction.amount}원 결제함. 카테고리: ${transaction.category}`;
+        return await sendChatMessage({ message, naggingLevel, type: 'alarm' });
     } catch (error) {
         console.error('AI 평가 실패:', error);
         return {
