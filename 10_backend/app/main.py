@@ -126,20 +126,20 @@ async def health(request: Request):
 # 라우터 등록
 from app.routers import ml, analysis, transactions, user, auth, coupons, settings, reports, anomalies, user_analytics, analytics_demographics
 
-# 라우터 포함
-app.include_router(ml.router)
-app.include_router(analysis.router)
-app.include_router(transactions.router)
-app.include_router(user.router)
-app.include_router(auth.router)
-app.include_router(coupons.router)
+# 라우터 포함 (모든 라우터에 /api 접두사 추가)
+app.include_router(ml.router, prefix="/api")
+app.include_router(analysis.router, prefix="/api")
+app.include_router(transactions.router, prefix="/api")
+app.include_router(user.router, prefix="/api")
+app.include_router(auth.router, prefix="/api")
+app.include_router(coupons.router, prefix="/api")
 
 # 관리자/분석 라우터 추가
-app.include_router(user_analytics.router)
-app.include_router(analytics_demographics.router)
-app.include_router(settings.router)
-app.include_router(reports.router)
-app.include_router(anomalies.router)
+app.include_router(user_analytics.router, prefix="/api")
+app.include_router(analytics_demographics.router, prefix="/api")
+app.include_router(settings.router, prefix="/api")
+app.include_router(reports.router, prefix="/api")
+app.include_router(anomalies.router, prefix="/api")
 
 # CORS 설정을 가장 마지막에 추가하여 outermost 레이어로 만듦
 app.add_middleware(
