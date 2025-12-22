@@ -56,20 +56,26 @@ export const AuthProvider = ({ children }) => {
                 await AsyncStorage.setItem('refreshToken', refresh_token);
                 await AsyncStorage.setItem('authToken', access_token);
 
-                // 사용자 정보 가져오기 (/users/me)
                 const userResponse = await apiClient.get('/users/me', {
-                    headers: {
-                        'Authorization': `Bearer ${access_token}`
-                    }
+                    headers: { 'Authorization': `Bearer ${access_token}` },
                 });
 
-                const userData = userResponse.data;
-                await AsyncStorage.setItem('user', JSON.stringify(userData));
+                if (userResponse.data) {
+                    const userData = userResponse.data;
 
-                // State 업데이트
-                setUser(userData);
+                    // 이전 사용자 캐시 삭제 (다른 사용자 데이터 격리)
+                    const prevUserJson = await AsyncStorage.getItem('user');
+                    const prevUser = prevUserJson ? JSON.parse(prevUserJson) : null;
+                    if (prevUser?.id && prevUser.id !== userData.id) {
+                        // 다른 사용자로 로그인한 경우 이전 캐시 삭제
+                        await AsyncStorage.removeItem(`transactions_cache_${prevUser.id}`);
+                        await AsyncStorage.removeItem(`last_sync_time_${prevUser.id}`);
+                    }
 
-                return { success: true };
+                    await AsyncStorage.setItem('user', JSON.stringify(userData));
+                    setUser(userData);
+                    return { success: true };
+                }
             }
 
             return { success: false, error: '로그인에 실패했습니다.' };
@@ -146,14 +152,91 @@ export const AuthProvider = ({ children }) => {
         await AsyncStorage.removeItem('last_sync_time');
 
         setUser(null);
-    };
 
-    // 카카오 로그인 (필요시 사용)
+        // 페이지 새로고침으로 모든 React state 초기화
+        if (typeof window !== 'undefined') {
+            window.location.reload();
+        }
+    };
+    // 카카오 로그인
     const kakaoLogin = async (code) => {
-        // ... 생략 가능하나 일단 유지
-        return { success: false, error: '현재 지원되지 않습니다.' };
+        try {
+            const response = await fetch(`${API_BASE_URL}/auth/kakao`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ code }),
+            });
+            // 카카오 로그인 응답 처리
+            if (response.ok) {
+                const data = await response.json();
+                const userData = {
+                    id: data.user?.id || Date.now(),
+                    name: data.user?.nickname || '카카오 사용자',
+                    email: data.user?.email || 'kakao@user.com',
+                    avatar: data.user?.profile_image || 'https://via.placeholder.com/100?text=K',
+                    provider: 'kakao',
+                    birth_date: data.user?.birth_date || null,
+                };
+                // 로컬 스토리지에 사용자 정보 저장
+                await AsyncStorage.setItem('user', JSON.stringify(userData));
+                if (data.access_token) {
+                    await AsyncStorage.setItem('authToken', data.access_token);
+                }
+                if (data.refresh_token) {
+                    await AsyncStorage.setItem('refreshToken', data.refresh_token);
+                }
+                // 로컬 스토리지에 사용자 정보 저장
+                setUser(userData);
+                return { success: true };
+            } else {
+                const errorData = await response.json().catch(() => ({}));
+                return { success: false, error: errorData.detail || '카카오 로그인에 실패했습니다.' };
+            }
+        } catch (error) {
+            console.error('카카오 로그인 오류:', error);
+            return { success: false, error: '네트워크 오류가 발생했습니다.' };
+        }
     };
 
+    // 카카오 회원가입
+    const kakaoSignup = async (code) => {
+        try {
+            const response = await fetch(`${API_BASE_URL}/auth/kakao/signup`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ code }),
+            });
+            // 카카오 회원가입 응답 처리
+            if (response.ok) {
+                const data = await response.json();
+                const userData = {
+                    id: data.user?.id || Date.now(),
+                    name: data.user?.nickname || '카카오 사용자',
+                    email: data.user?.email || 'kakao@user.com',
+                    avatar: data.user?.profile_image || 'https://via.placeholder.com/100?text=K',
+                    provider: 'kakao',
+                };
+                // 로컬 스토리지에 사용자 정보 저장
+                await AsyncStorage.setItem('user', JSON.stringify(userData));
+                if (data.access_token) {
+                    await AsyncStorage.setItem('authToken', data.access_token);
+                }
+                if (data.refresh_token) {
+                    await AsyncStorage.setItem('refreshToken', data.refresh_token);
+                }
+                // 로컬 스토리지에 사용자 정보 저장
+                setUser(userData);
+                return { success: true };
+            } else {
+                const errorData = await response.json().catch(() => ({}));
+                return { success: false, error: errorData.detail || '카카오 회원가입에 실패했습니다.' };
+            }
+        } catch (error) {
+            console.error('카카오 회원가입 오류:', error);
+            return { success: false, error: '네트워크 오류가 발생했습니다.' };
+        }
+    };
+    // AuthContext.Provider - 사용자 인증 상태 제공
     return (
         <AuthContext.Provider value={{ user, loading, login, signup, logout, kakaoLogin }}>
             {children}

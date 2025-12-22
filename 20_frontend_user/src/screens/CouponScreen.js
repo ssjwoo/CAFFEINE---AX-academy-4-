@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { View, Text, FlatList, StyleSheet, TouchableOpacity, TextInput, ScrollView } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Feather } from '@expo/vector-icons';
+import { useFocusEffect } from '@react-navigation/native';
 import { useTheme } from '../contexts/ThemeContext';
 import { formatCurrency } from '../utils/currency';
 import EmptyState from '../components/EmptyState';
@@ -64,9 +65,12 @@ export default function CouponScreen({ route }) {
         }
     };
 
-    React.useEffect(() => {
-        loadCoupons();
-    }, []);
+    // 화면에 포커스될 때마다 쿠폰 목록 새로고침
+    useFocusEffect(
+        useCallback(() => {
+            loadCoupons();
+        }, [])
+    );
 
     // AI 예측 쿠폰이 전달되면 새로고침
     React.useEffect(() => {

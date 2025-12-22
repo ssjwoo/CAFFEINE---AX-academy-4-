@@ -191,8 +191,8 @@ async def send_report_email(
         # SMTP 설정 확인
         smtp_host = os.getenv("SMTP_HOST", "smtp.gmail.com")
         smtp_port = int(os.getenv("SMTP_PORT", "587"))
-        smtp_user = os.getenv("SMTP_USER", "")
-        smtp_password = os.getenv("SMTP_PASSWORD", "")
+        smtp_user = os.getenv("GMAIL_ADDRESS", "")
+        smtp_password = os.getenv("GMAIL_APP_PASSWORD", "")
         smtp_from = os.getenv("SMTP_FROM", smtp_user)
 
         if not smtp_user or not smtp_password:

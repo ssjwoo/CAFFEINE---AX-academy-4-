@@ -2,25 +2,34 @@
 소비 분석 API (Analysis Router)
 
 2025-12-10: AWS RDS PostgreSQL 연동 완료
+2025-12-21: 서비스 레이어 분리 리팩토링
 
-RDS 스키마:
-- transactions.category_id → categories.id (FK 관계)  
-- transactions.merchant_name (가맹점명)
-- transactions.transaction_time (거래 시간)
+라우터는 HTTP 요청/응답만 처리
+비즈니스 로직은 services/analysis_service.py에서 담당
 """
 
-from fastapi import APIRouter, HTTPException, Depends
-from pydantic import BaseModel
+from fastapi import APIRouter, Depends, Query
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, func, text
 from typing import Optional, List
-from datetime import datetime, timedelta
-import logging
 
 from app.db.database import get_db
-from app.db.model.transaction import Transaction, Category
+from app.services.analysis import (
+    # 스키마
+    DashboardSummary,
+    CategoryBreakdown,
+    MonthlyTrend,
+    SpendingInsight,
+    AnalysisResponse,
+    # 사용자용 서비스 함수
+    get_user_summary,
+    get_user_categories,
+    get_user_trends,
+    get_user_full_analysis,
+    get_mock_insights,
+    # 관리자용 서비스 함수
+    get_admin_full_analysis,
+)
 
-logger = logging.getLogger(__name__)
 
 router = APIRouter(
     prefix="/api/analysis",
@@ -30,297 +39,45 @@ router = APIRouter(
 
 
 # ============================================================
-# Pydantic 스키마
-# ============================================================
-
-class DashboardSummary(BaseModel):
-    total_spending: float
-    average_transaction: float
-    transaction_count: int
-    top_category: str
-    month_over_month_change: float  # 거래액 증가율
-    transaction_count_mom_change: float  # 거래 건수 증가율
-    data_source: str = "DB"
-
-
-class CategoryBreakdown(BaseModel):
-    category: str
-    total_amount: float
-    transaction_count: int
-    percentage: float
-
-
-class MonthlyTrend(BaseModel):
-    month: str
-    total_amount: float
-    transaction_count: int
-
-
-class SpendingInsight(BaseModel):
-    insight_type: str
-    title: str
-    description: str
-    category: Optional[str] = None
-    amount: Optional[float] = None
-
-
-class AnalysisResponse(BaseModel):
-    summary: DashboardSummary
-    category_breakdown: List[CategoryBreakdown]
-    monthly_trend: List[MonthlyTrend]
-    insights: List[SpendingInsight]
-    data_source: str = "DB"
-
-
-# ============================================================
-# Mock 데이터
-# ============================================================
-
-def get_mock_summary() -> DashboardSummary:
-    return DashboardSummary(
-        total_spending=1250000, average_transaction=25000, transaction_count=50,
-        top_category="외식", month_over_month_change=-5.2, 
-        transaction_count_mom_change=-3.8, data_source="[MOCK]"
-    )
-
-def get_mock_category_breakdown() -> List[CategoryBreakdown]:
-    return [
-        CategoryBreakdown(category="외식", total_amount=450000, transaction_count=18, percentage=36.0),
-        CategoryBreakdown(category="교통", total_amount=280000, transaction_count=12, percentage=22.4),
-        CategoryBreakdown(category="쇼핑", total_amount=220000, transaction_count=8, percentage=17.6),
-    ]
-
-def get_mock_monthly_trend() -> List[MonthlyTrend]:
-    return [
-        MonthlyTrend(month="2025-10", total_amount=1320000, transaction_count=52),
-        MonthlyTrend(month="2025-11", total_amount=1180000, transaction_count=47),
-        MonthlyTrend(month="2025-12", total_amount=1250000, transaction_count=50),
-    ]
-
-def get_mock_insights() -> List[SpendingInsight]:
-    return [
-        SpendingInsight(insight_type="warning", title="외식비 주의", 
-                       description="이번 달 외식비가 전월 대비 15% 증가했습니다.", category="외식"),
-        SpendingInsight(insight_type="tip", title="다음 소비 예측",
-                       description="AI 분석 결과, 다음 결제는 '외식' 카테고리일 확률이 78%입니다.", category="외식"),
-    ]
-
-
-# ============================================================
-# API 엔드포인트
+# 사용자용 API 엔드포인트
 # ============================================================
 
 @router.get("/summary", response_model=DashboardSummary)
-async def get_dashboard_summary(
-    user_id: Optional[int] = None,
-    year: Optional[int] = None,
-    month: Optional[int] = None,
+async def api_get_dashboard_summary(
+    user_id: int = Query(..., description="사용자 ID (필수)"),
+    year: Optional[int] = Query(None, description="연도"),
+    month: Optional[int] = Query(None, description="월"),
     db: AsyncSession = Depends(get_db)
 ):
     """대시보드 요약 통계"""
-    try:
-        now = datetime.now()
-        
-        # year/month가 지정되면 해당 월, 아니면 현재 월
-        if year and month:
-            this_month_start = datetime(year, month, 1, 0, 0, 0)
-        else:
-            this_month_start = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
-        
-        # 다음 달 1일 (해당 월의 마지막까지)
-        if this_month_start.month == 12:
-            next_month_start = this_month_start.replace(year=this_month_start.year + 1, month=1)
-        else:
-            next_month_start = this_month_start.replace(month=this_month_start.month + 1)
-        
-        # 이번 달 통계
-        query = select(
-            func.coalesce(func.sum(Transaction.amount), 0).label('total'),
-            func.coalesce(func.avg(Transaction.amount), 0).label('avg'),
-            func.count(Transaction.id).label('count')
-        ).where(
-            Transaction.transaction_time >= this_month_start,
-            Transaction.transaction_time < next_month_start
-        )
-        
-        if user_id:
-            query = query.where(Transaction.user_id == user_id)
-        
-        result = await db.execute(query)
-        row = result.fetchone()
-        
-        total = float(row.total) if row.total else 0
-        avg = float(row.avg) if row.avg else 0
-        count = row.count or 0
-        
-        # 최다 카테고리 (JOIN 사용)
-        cat_query = text("""
-            SELECT c.name, SUM(t.amount) as cat_total
-            FROM transactions t
-            LEFT JOIN categories c ON t.category_id = c.id
-            WHERE t.transaction_time >= :start_date AND t.transaction_time < :end_date
-            GROUP BY c.name
-            ORDER BY cat_total DESC
-            LIMIT 1
-        """)
-        cat_result = await db.execute(cat_query, {
-            "start_date": this_month_start,
-            "end_date": next_month_start
-        })
-        cat_row = cat_result.fetchone()
-        top_category = cat_row[0] if cat_row else "없음"
-        
-        # 전월 대비 증감률 계산
-        last_month_start = (this_month_start - timedelta(days=1)).replace(day=1)
-        last_month_end = this_month_start - timedelta(seconds=1)
-        
-        prev_query = select(
-            func.coalesce(func.sum(Transaction.amount), 0).label('prev_total')
-        ).where(
-            Transaction.transaction_time >= last_month_start,
-            Transaction.transaction_time <= last_month_end
-        )
-        
-        if user_id:
-            prev_query = prev_query.where(Transaction.user_id == user_id)
-        
-        prev_result = await db.execute(prev_query)
-        prev_row = prev_result.fetchone()
-        prev_total = float(prev_row.prev_total) if prev_row.prev_total else 0
-        
-        # 전월 거래 건수
-        prev_count_query = select(
-            func.count(Transaction.id).label('prev_count')
-        ).where(
-            Transaction.transaction_time >= last_month_start,
-            Transaction.transaction_time <= last_month_end
-        )
-        
-        if user_id:
-            prev_count_query = prev_count_query.where(Transaction.user_id == user_id)
-        
-        prev_count_result = await db.execute(prev_count_query)
-        prev_count_row = prev_count_result.fetchone()
-        prev_count = prev_count_row.prev_count if prev_count_row.prev_count else 0
-        
-        # MoM 변화율 계산 - 거래액
-        if prev_total > 0:
-            mom_change = ((total - prev_total) / prev_total) * 100
-        else:
-            mom_change = 0.0 if total == 0 else 100.0
-        
-        # MoM 변화율 계산 - 거래 건수
-        if prev_count > 0:
-            count_mom_change = ((count - prev_count) / prev_count) * 100
-        else:
-            count_mom_change = 0.0 if count == 0 else 100.0
-        
-        return DashboardSummary(
-            total_spending=total,
-            average_transaction=avg,
-            transaction_count=count,
-            top_category=top_category or "없음",
-            month_over_month_change=round(mom_change, 1),
-            transaction_count_mom_change=round(count_mom_change, 1),
-            data_source="DB (AWS RDS)"
-        )
-        
-    except Exception as e:
-        logger.warning(f"DB 연결 실패: {e}")
-        return get_mock_summary()
+    return await get_user_summary(db, user_id, year, month)
 
 
 @router.get("/categories", response_model=List[CategoryBreakdown])
-async def get_category_breakdown(
-    user_id: Optional[int] = None,
-    months: int = 1,
-    year: Optional[int] = None,
-    month: Optional[int] = None,
+async def api_get_category_breakdown(
+    user_id: int = Query(..., description="사용자 ID (필수)"),
+    months: int = Query(1, description="분석 개월 수"),
+    year: Optional[int] = Query(None, description="연도"),
+    month: Optional[int] = Query(None, description="월"),
     db: AsyncSession = Depends(get_db)
 ):
     """카테고리별 소비 분석"""
-    try:
-        # year/month가 지정되면 해당 월부터, 아니면 현재부터
-        if year and month:
-            end_date = datetime(year, month, 1, 0, 0, 0)
-            if end_date.month == 12:
-                end_date = end_date.replace(year=end_date.year + 1, month=1)
-            else:
-                end_date = end_date.replace(month=end_date.month + 1)
-        else:
-            end_date = datetime.now()
-        
-        start_date = end_date - timedelta(days=30 * months)
-        
-        query = text("""
-            SELECT c.name as category, 
-                   SUM(t.amount) as total, 
-                   COUNT(t.id) as count
-            FROM transactions t
-            LEFT JOIN categories c ON t.category_id = c.id
-            WHERE t.transaction_time >= :start_date
-            GROUP BY c.name
-            ORDER BY total DESC
-        """)
-        
-        result = await db.execute(query, {"start_date": start_date})
-        rows = result.fetchall()
-        
-        grand_total = sum(float(row[1]) for row in rows) if rows else 1
-        
-        categories = []
-        for row in rows:
-            total_amount = float(row[1])
-            categories.append(CategoryBreakdown(
-                category=row[0] or "기타",
-                total_amount=total_amount,
-                transaction_count=row[2],
-                percentage=round((total_amount / grand_total) * 100, 1)
-            ))
-        
-        return categories if categories else get_mock_category_breakdown()
-        
-    except Exception as e:
-        logger.warning(f"DB 연결 실패: {e}")
-        return get_mock_category_breakdown()
+    return await get_user_categories(db, user_id, months, year, month)
 
 
 @router.get("/monthly-trend", response_model=List[MonthlyTrend])
-async def get_monthly_trend(
-    user_id: Optional[int] = None,
-    months: int = 6,
+async def api_get_monthly_trend(
+    user_id: int = Query(..., description="사용자 ID (필수)"),
+    months: int = Query(6, description="조회 개월 수"),
     db: AsyncSession = Depends(get_db)
 ):
     """월별 지출 추이"""
-    try:
-        query = text("""
-            SELECT TO_CHAR(transaction_time, 'YYYY-MM') as month,
-                   SUM(amount) as total,
-                   COUNT(id) as count
-            FROM transactions
-            GROUP BY TO_CHAR(transaction_time, 'YYYY-MM')
-            ORDER BY month DESC
-            LIMIT :limit
-        """)
-        
-        result = await db.execute(query, {"limit": months})
-        rows = result.fetchall()
-        
-        trends = [
-            MonthlyTrend(month=row[0], total_amount=float(row[1]), transaction_count=row[2])
-            for row in rows
-        ]
-        
-        return list(reversed(trends)) if trends else get_mock_monthly_trend()
-        
-    except Exception as e:
-        logger.warning(f"DB 연결 실패: {e}")
-        return get_mock_monthly_trend()
+    return await get_user_trends(db, user_id, months)
 
 
 @router.get("/insights", response_model=List[SpendingInsight])
-async def get_spending_insights(
-    user_id: Optional[int] = None,
+async def api_get_spending_insights(
+    user_id: int = Query(..., description="사용자 ID (필수)"),
     db: AsyncSession = Depends(get_db)
 ):
     """AI 기반 소비 인사이트 (현재 Mock)"""
@@ -328,31 +85,26 @@ async def get_spending_insights(
 
 
 @router.get("/full", response_model=AnalysisResponse)
-async def get_full_analysis(
-    user_id: Optional[int] = None,
-    year: Optional[int] = None,
-    month: Optional[int] = None,
+async def api_get_full_analysis(
+    user_id: int = Query(..., description="사용자 ID (필수)"),
     db: AsyncSession = Depends(get_db)
 ):
-    """전체 분석 데이터"""
-    try:
-        summary = await get_dashboard_summary(user_id, year, month, db)
-        categories = await get_category_breakdown(user_id, 1, year, month, db)
-        trends = await get_monthly_trend(user_id, 6, db)
-        
-        return AnalysisResponse(
-            summary=summary,
-            category_breakdown=categories,
-            monthly_trend=trends,
-            insights=get_mock_insights(),
-            data_source="DB (AWS RDS)"
-        )
-    except Exception as e:
-        logger.warning(f"DB 연결 실패: {e}")
-        return AnalysisResponse(
-            summary=get_mock_summary(),
-            category_breakdown=get_mock_category_breakdown(),
-            monthly_trend=get_mock_monthly_trend(),
-            insights=get_mock_insights(),
-            data_source="[MOCK]"
-        )
+    """전체 분석 데이터 (사용자용)"""
+    return await get_user_full_analysis(db, user_id)
+
+
+# ============================================================
+# 관리자용 API 엔드포인트
+# ============================================================
+
+@router.get("/admin/full", response_model=AnalysisResponse)
+async def api_get_admin_full_analysis(
+    year: Optional[int] = Query(None, description="분석 연도"),
+    month: Optional[int] = Query(None, description="분석 월"),
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    관리자용 전체 분석 데이터 (관리자 제외 모든 사용자 합계)
+    user_id 없이 호출 가능
+    """
+    return await get_admin_full_analysis(db, year, month)
