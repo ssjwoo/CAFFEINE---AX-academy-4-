@@ -1,7 +1,9 @@
 {
   "family": "caffeine_ecs_task_family",
   "networkMode": "awsvpc",
-  "requiresCompatibilities": ["FARGATE"],
+  "requiresCompatibilities": [
+    "FARGATE"
+  ],
   "cpu": "1024",
   "memory": "2048",
   "executionRoleArn": "arn:aws:iam::864785582947:role/caffeine-ecs-task-role",
@@ -16,6 +18,64 @@
           "containerPort": 8000,
           "hostPort": 8000,
           "protocol": "tcp"
+        }
+      ],
+      "environment": [
+        {
+          "name": "DB_HOST",
+          "value": "${DB_HOST}"
+        },
+        {
+          "name": "DB_PORT",
+          "value": "${DB_PORT}"
+        },
+        {
+          "name": "DB_NAME",
+          "value": "${DB_NAME}"
+        },
+        {
+          "name": "DB_USER",
+          "value": "${DB_USER}"
+        },
+        {
+          "name": "DB_PASSWORD",
+          "value": "${DB_PASSWORD}"
+        },
+        {
+          "name": "SECRET_KEY",
+          "value": "${SECRET_KEY}"
+        },
+        {
+          "name": "ALGORITHM",
+          "value": "HS256"
+        },
+        {
+          "name": "ACCESS_TOKEN_EXPIRE_MINUTES",
+          "value": "30"
+        },
+        {
+          "name": "GMAIL_ADDRESS",
+          "value": "${GMAIL_ADDRESS}"
+        },
+        {
+          "name": "GMAIL_APP_PASSWORD",
+          "value": "${GMAIL_APP_PASSWORD}"
+        },
+        {
+          "name": "KAKAO_REST_API_KEY",
+          "value": "${KAKAO_REST_API_KEY}"
+        },
+        {
+          "name": "KAKAO_REDIRECT_URI",
+          "value": "${KAKAO_REDIRECT_URI}"
+        },
+        {
+          "name": "GEMINI_API_KEY",
+          "value": "${GEMINI_API_KEY}"
+        },
+        {
+          "name": "DEVELOPMENT_MODE",
+          "value": "false"
         }
       ],
       "logConfiguration": {

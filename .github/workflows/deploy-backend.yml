@@ -42,6 +42,20 @@ jobs:
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG 10_backend
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
 
+      - name: Fill in secrets in task definition
+        run: |
+          sed -i 's|\${DB_HOST}|${{ secrets.DB_HOST }}|g' ecs-task-definition.json
+          sed -i 's|\${DB_PORT}|${{ secrets.DB_PORT }}|g' ecs-task-definition.json
+          sed -i 's|\${DB_NAME}|${{ secrets.DB_NAME }}|g' ecs-task-definition.json
+          sed -i 's|\${DB_USER}|${{ secrets.DB_USER }}|g' ecs-task-definition.json
+          sed -i 's|\${DB_PASSWORD}|${{ secrets.DB_PASSWORD }}|g' ecs-task-definition.json
+          sed -i 's|\${SECRET_KEY}|${{ secrets.SECRET_KEY }}|g' ecs-task-definition.json
+          sed -i 's|\${GMAIL_ADDRESS}|${{ secrets.GMAIL_ADDRESS }}|g' ecs-task-definition.json
+          sed -i 's|\${GMAIL_APP_PASSWORD}|${{ secrets.GMAIL_APP_PASSWORD }}|g' ecs-task-definition.json
+          sed -i 's|\${KAKAO_REST_API_KEY}|${{ secrets.KAKAO_REST_API_KEY }}|g' ecs-task-definition.json
+          sed -i 's|\${KAKAO_REDIRECT_URI}|${{ secrets.KAKAO_REDIRECT_URI }}|g' ecs-task-definition.json
+          sed -i 's|\${GEMINI_API_KEY}|${{ secrets.GEMINI_API_KEY }}|g' ecs-task-definition.json
+
       - name: Update ECS task definition
         id: task-def
         uses: aws-actions/amazon-ecs-render-task-definition@v1
