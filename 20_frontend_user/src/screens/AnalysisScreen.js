@@ -157,7 +157,8 @@ export default function AnalysisScreen({ navigation }) {
             r: '6',
             strokeWidth: '2',
             stroke: '#2563EB'
-        }
+        },
+        formatYLabel: (value) => Number(value).toLocaleString(),
     };
 
     // 데이터가 없을 때 화면
@@ -247,6 +248,7 @@ export default function AnalysisScreen({ navigation }) {
                                     bezier
                                     style={styles.chart}
                                     fromZero
+                                    formatYLabel={(value) => Number(value).toLocaleString()}
                                 />
                             );
                         })()}

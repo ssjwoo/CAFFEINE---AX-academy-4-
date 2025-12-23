@@ -37,8 +37,28 @@ export default function LoginScreen({ navigation }) {
     };
 
     // 구글 로그인 버튼
-    const handleGoogleLogin = () => {
-        alert('Google 로그인 기능은 준비 중입니다.');
+    const GOOGLE_CLIENT_ID = '26373490884-huo98c2cgja8r265nmchqkj85sl0j22u.apps.googleusercontent.com';
+    const GOOGLE_REDIRECT_URI = 'http://localhost:8081/auth/google/callback';
+    
+    const handleGoogleLogin = async () => {
+        try {
+            setLoading(true);
+            // 구글 OAuth 인증 URL
+            const encodedRedirectUri = encodeURIComponent(GOOGLE_REDIRECT_URI);
+            const googleAuthUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${GOOGLE_CLIENT_ID}&redirect_uri=${encodedRedirectUri}&response_type=code&scope=email%20profile`;
+            
+            // 웹 브라우저에서 구글 로그인 페이지 열기
+            if (Platform.OS === 'web') {
+                window.location.href = googleAuthUrl;
+            } else {
+                await Linking.openURL(googleAuthUrl);
+            }
+        } catch (error) {
+            console.error('구글 로그인 오류:', error);
+            alert('구글 로그인 중 오류가 발생했습니다.');
+        } finally {
+            setLoading(false);
+        }
     };
 
     // 카카오 로그인 버튼

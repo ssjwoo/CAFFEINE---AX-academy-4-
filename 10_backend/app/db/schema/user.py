@@ -57,6 +57,23 @@ class UserUpdate(BaseModel):
     budget_alert_enabled: Optional[bool] = None
     is_active: Optional[bool] = None
 
+    # 생년월일 파싱
+    @field_validator('birth_date', mode='before')
+    @classmethod
+    def parse_birth_date(cls, v):
+        if isinstance(v, str):
+            if not v:
+                return None
+            try:
+                # 20020202 형식 처리
+                if len(v) == 8 and v.isdigit():
+                    return datetime.strptime(v, '%Y%m%d')
+                # YYYY-MM-DD 형식 처리
+                return datetime.strptime(v, '%Y-%m-%d')
+            except ValueError:
+                raise ValueError("생년월일 형식이 올바르지 않습니다. (YYYY-MM-DD 또는 YYYYMMDD)")
+        return v
+
 # 응답
 class UserResponse(UserBase):
     id: int

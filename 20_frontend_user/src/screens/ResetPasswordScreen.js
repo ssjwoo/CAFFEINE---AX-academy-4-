@@ -38,7 +38,7 @@ export default function ResetPasswordScreen({ navigation }) {
         
         // 인증 코드 발송
         try {
-            await apiClient.post('/auth/request-password-reset', { email });
+            await apiClient.post('/api/auth/request-password-reset', { email });
             Alert.alert('발송 완료', '인증 코드가 이메일로 발송되었습니다.\n이메일을 확인해주세요.');
             setStep(2);  // 2단계로 이동
         } catch (error) {
@@ -62,7 +62,7 @@ export default function ResetPasswordScreen({ navigation }) {
         
         // 인증 코드 확인
         try {
-            await apiClient.post('/auth/verify-reset-code', { email, code });
+            await apiClient.post('/api/auth/verify-reset-code', { email, code });
             setStep(3);  // 3단계로 이동
         } catch (error) {
             console.error('인증 코드 확인 오류:', error);
@@ -91,7 +91,7 @@ export default function ResetPasswordScreen({ navigation }) {
         
         // 비밀번호 변경 
         try {
-            await apiClient.post('/auth/reset-password', { 
+            await apiClient.post('/api/auth/reset-password', { 
                 email, 
                 code, 
                 new_password: newPassword 
@@ -112,7 +112,7 @@ export default function ResetPasswordScreen({ navigation }) {
     const handleResendCode = async () => {
         setLoading(true);
         try {
-            await apiClient.post('/auth/request-password-reset', { email });
+            await apiClient.post('/api/auth/request-password-reset', { email });
             Alert.alert('발송 완료', '인증 코드가 다시 발송되었습니다.');
         } catch (error) {
             Alert.alert('오류', '인증 코드 재발송에 실패했습니다.');

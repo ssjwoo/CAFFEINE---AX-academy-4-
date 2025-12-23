@@ -121,12 +121,23 @@ async def update_user(
 
 #유저 삭제
 async def delete_user(db: AsyncSession, user_id: int) -> bool:
+    from sqlalchemy import delete as sql_delete
+    from app.db.model.transaction import Transaction, UserCoupon
+    
     result = await db.execute(select(User).where(User.id == user_id))
     user = result.scalar_one_or_none()
 
     if user is None:
         return False
 
+    # 관련 데이터 먼저 삭제
+    # 1. 거래내역 삭제
+    await db.execute(sql_delete(Transaction).where(Transaction.user_id == user_id))
+    
+    # 2. 사용자 쿠폰 삭제
+    await db.execute(sql_delete(UserCoupon).where(UserCoupon.user_id == user_id))
+    
+    # 3. 사용자 삭제
     await db.delete(user)
     await db.commit()
     return True

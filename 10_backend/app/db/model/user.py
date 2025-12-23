@@ -26,7 +26,7 @@ class User(Base):
     # 앱 관련
     push_token = Column(String(255), nullable=True)  # 앱 푸시 토큰 (Expo)
     budget_limit = Column(BigInteger, default=0, nullable=True)  # 월 예산 설정액
-    budget_alert_enabled = Column(Boolean, default=True, nullable=False)  # 예산 초과 알림 활성화
+    budget_alert_enabled = Column(Boolean, default=False, nullable=False)  # 예산 초과 알림 활성화 (기본: 비활성화)
 
     # 소셜 로그인
     social_provider = Column(String(20), nullable=True)  # LOCAL/GOOGLE/KAKAO/NAVER

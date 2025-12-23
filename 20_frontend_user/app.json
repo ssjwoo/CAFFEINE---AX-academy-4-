@@ -1,10 +1,17 @@
 {
   "expo": {
-    "name": "caffeine-app",
+    "name": "Caffeine",
     "slug": "caffeine-app",
     "version": "1.0.0",
+    "plugins": [
+      "expo-font"
+    ],
     "web": {
+      "name": "Caffeine",
+      "shortName": "Caffeine",
+      "favicon": "./assets/favicon.png",
       "bundler": "metro"
-    }
+    },
+    "icon": "./assets/icon.png"
   }
 }

@@ -6,21 +6,21 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useTheme } from '../contexts/ThemeContext';
 import { useAuth } from '../contexts/AuthContext';
 import { useTransactions } from '../contexts/TransactionContext';
+import { apiClient } from '../api/client';
 
 const { width: screenWidth } = Dimensions.get('window');
 
+// 프로필
 export default function ProfileScreen({ navigation }) {
     const { colors } = useTheme();
     const { user, logout } = useAuth();
     const { saveTransactions, clearTransactions, loading: syncLoading } = useTransactions();
-    const [infoModalVisible, setInfoModalVisible] = useState(false);
-    const [infoContent, setInfoContent] = useState({ title: '', content: '' });
-    // ⭐ 동기화 진행 상태
+    // 동기화 진행 상태
     const [syncModalVisible, setSyncModalVisible] = useState(false);
     const [syncProgress, setSyncProgress] = useState('');
     const spinValue = useRef(new Animated.Value(0)).current;
 
-    // ⭐ 회전 애니메이션
+    // 회전 애니메이션
     useEffect(() => {
         if (syncModalVisible) {
             Animated.loop(
@@ -156,37 +156,36 @@ export default function ProfileScreen({ navigation }) {
             await AsyncStorage.removeItem('last_sync_time');
             alert('✅ 캐시가 삭제되었습니다!');
 
-            // 대시보드로 이동하여 변경사항 즉시 확인
-            if (navigation) {
-                navigation.navigate('대시보드');
-            }
+            // 대시보드로 이동 + 완전 새로고침
+            navigation?.reset({
+                index: 0,
+                routes: [{ name: 'MainTabs' }],
+            });
         } catch (error) {
             alert('캐시 삭제 중 오류가 발생했습니다.');
         }
-    };
-
-    const handleAppInfo = () => {
-        setInfoContent({
-            title: 'ℹ️ 앱 정보',
-            content: `Caffeine - 금융 관리 앱\n버전: 1.0.0`
-        });
-        setInfoModalVisible(true);
-    };
-
-    const handleTermsOfService = () => {
-        setInfoContent({ title: '📋 이용약관', content: `이용약관 내용...` });
-        setInfoModalVisible(true);
-    };
-
-    const handlePrivacyPolicy = () => {
-        setInfoContent({ title: '🔒 개인정보 처리방침', content: `개인정보 처리방침 내용...` });
-        setInfoModalVisible(true);
     };
 
     const handleLogout = async () => {
         if (confirm('정말 로그아웃 하시겠습니까?')) {
             await logout();
             alert('로그아웃되었습니다.');
+        }
+    };
+
+    // 회원탈퇴 핸들러 (백엔드 연동)
+    const handleDeleteAccount = async () => {
+        if (!confirm('정말 회원탈퇴를 진행하시겠습니까?\n\n⚠️ 모든 데이터가 영구적으로 삭제됩니다.')) {
+            return;
+        }
+
+        try {
+            await apiClient.delete('/api/users/me');
+            await logout();
+            alert('회원탈퇴가 완료되었습니다.\n이용해 주셔서 감사합니다.');
+        } catch (error) {
+            console.error('회원탈퇴 실패:', error);
+            alert('회원탈퇴 중 오류가 발생했습니다.');
         }
     };
 
@@ -229,14 +228,11 @@ export default function ProfileScreen({ navigation }) {
                     </View>
                 </View>
 
+                {/* 비밀번호 변경 */}
                 <View style={styles.section}>
-                    <Text style={[styles.sectionTitle, { color: colors.textSecondary }]}>정보</Text>
+                    <Text style={[styles.sectionTitle, { color: colors.textSecondary }]}>계정</Text>
                     <View style={[styles.card, { backgroundColor: colors.cardBackground }]}>
-                        <MenuItem icon="ℹ️" title="앱 정보" onPress={handleAppInfo} />
-                        <View style={[styles.divider, { backgroundColor: colors.border }]} />
-                        <MenuItem icon="📋" title="이용약관" onPress={handleTermsOfService} />
-                        <View style={[styles.divider, { backgroundColor: colors.border }]} />
-                        <MenuItem icon="🔒" title="개인정보 처리방침" onPress={handlePrivacyPolicy} />
+                        <MenuItem icon="🔑" title="비밀번호 변경" subtitle="새로운 비밀번호로 변경" onPress={() => navigation.navigate('PasswordChange')} />
                     </View>
                 </View>
 
@@ -244,18 +240,12 @@ export default function ProfileScreen({ navigation }) {
                     <Text style={styles.logoutText}>로그아웃</Text>
                 </TouchableOpacity>
 
-                <Modal transparent={true} visible={infoModalVisible} animationType="slide">
-                    <View style={styles.modalOverlay}>
-                        <View style={[styles.modalContent, { backgroundColor: colors.cardBackground }]}>
-                            <View style={styles.modalHandle} />
-                            <Text style={[styles.modalTitle, { color: colors.text }]}>{infoContent.title}</Text>
-                            <ScrollView style={styles.modalScroll}><Text style={[styles.modalText, { color: colors.text }]}>{infoContent.content}</Text></ScrollView>
-                            <TouchableOpacity style={styles.modalButton} onPress={() => setInfoModalVisible(false)}>
-                                <LinearGradient colors={['#2563EB', '#1D4ED8']} style={styles.modalButtonGradient}><Text style={styles.modalButtonText}>닫기</Text></LinearGradient>
-                            </TouchableOpacity>
-                        </View>
-                    </View>
-                </Modal>
+                {/* 구분선 */}
+                <View style={styles.accountDivider} />
+
+                <TouchableOpacity style={styles.deleteAccountButton} onPress={handleDeleteAccount} activeOpacity={0.8}>
+                    <Text style={styles.deleteAccountText}>회원탈퇴</Text>
+                </TouchableOpacity>
 
                 <Modal transparent={true} visible={syncModalVisible} animationType="fade">
                     <View style={styles.syncModalOverlay}>
@@ -298,6 +288,9 @@ const styles = StyleSheet.create({
     divider: { height: 1, marginLeft: 74 },
     logoutButton: { marginHorizontal: 20, marginTop: 32, padding: 16, backgroundColor: '#FEE2E2', borderRadius: 16, alignItems: 'center', borderWidth: 1, borderColor: '#FECACA' },
     logoutText: { fontSize: 16, fontWeight: '600', color: '#DC2626' },
+    accountDivider: { height: 1, backgroundColor: '#E5E7EB', marginHorizontal: 40, marginVertical: 20 },
+    deleteAccountButton: { marginHorizontal: 20, padding: 16, backgroundColor: 'transparent', borderRadius: 16, alignItems: 'center', borderWidth: 1, borderColor: '#E5E7EB' },
+    deleteAccountText: { fontSize: 14, fontWeight: '500', color: '#9CA3AF' },
     modalOverlay: { flex: 1, backgroundColor: 'rgba(0, 0, 0, 0.5)', justifyContent: 'flex-end' },
     modalContent: { borderTopLeftRadius: 24, borderTopRightRadius: 24, padding: 24, maxHeight: '80%' },
     modalHandle: { width: 40, height: 4, backgroundColor: '#E5E7EB', borderRadius: 2, alignSelf: 'center', marginBottom: 20 },

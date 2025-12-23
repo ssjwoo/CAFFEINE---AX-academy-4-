@@ -96,7 +96,8 @@ export default function DashboardScreen({ navigation }) {
         useCallback(() => {
             // 데이터가 로드되고, 카카오 사용자이고, 생년월일이 없으면 모달 표시
             if (transactions && transactions.length > 0 && !transactionLoading) {
-                if (user?.provider === 'kakao' && !user?.birth_date) {
+                // 소셜 로그인(카카오/구글) 사용자이고, 생년월일이 없으면 모달 표시
+                if ((user?.provider === 'kakao' || user?.provider === 'google') && !user?.birth_date) {
                     // 약간의 지연으로 화면 전환 후 모달 표시
                     const timer = setTimeout(() => setShowBirthModal(true), 500);
                     return () => clearTimeout(timer);
@@ -614,6 +615,7 @@ export default function DashboardScreen({ navigation }) {
                                     withInnerLines={true}
                                     withOuterLines={false}
                                     withVerticalLines={false}
+                                    formatYLabel={(value) => Math.round(Number(value)).toString()}
                                     onDataPointClick={(data) => {
                                         const amount = (data.value * 10000).toFixed(0);
                                         const monthLabel = getMonthLabel(monthlyData[data.index]?.month);

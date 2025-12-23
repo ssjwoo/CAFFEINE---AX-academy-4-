@@ -74,7 +74,7 @@ export default function TransactionScreen({ navigation }) {
 
 
             // predict-next API 호출 (전체 이력 기반)
-            const response = await apiClient.post('/ml/predict-next', formData, {
+            const response = await apiClient.post('/api/ml/predict-next', formData, {
                 headers: { 'Content-Type': 'multipart/form-data' }
             });
 

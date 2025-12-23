@@ -8,8 +8,12 @@ from datetime import datetime
 import os
 from dotenv import load_dotenv
 
-# 환경 변수 로드
-load_dotenv()
+from pathlib import Path
+
+# 환경 변수 로드 (프로젝트 루트의 .env.local 및 백엔드 폴더의 .env 모두 로드)
+project_root = Path(__file__).resolve().parent.parent.parent  # /home/jj/proct
+load_dotenv(project_root / ".env.local")  # 프로젝트 루트의 .env.local
+load_dotenv()  # 현재 디렉토리 또는 상위의 .env (override=False가 기본값)
 
 # 로거 설정 (라이트 Audit 로그)
 logging.basicConfig(
@@ -42,11 +46,6 @@ app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 # CORS 설정 (Cross-Origin Resource Sharing)
 CLOUDFRONT_URL = "https://d26uyg5darllja.cloudfront.net"
-CUSTOM_DOMAINS = [
-    "https://caffeineai.net",
-    "https://admin.caffeineai.net",
-    "https://api.caffeineai.net",
-]
 
 LOCAL_ORIGINS = [
     "http://localhost:3000",
@@ -70,7 +69,16 @@ LOCAL_ORIGINS = [
     "http://127.0.0.1:19006"
 ]
 
-allowed_origins = LOCAL_ORIGINS + [CLOUDFRONT_URL] + CUSTOM_DOMAINS
+allowed_origins = LOCAL_ORIGINS + [CLOUDFRONT_URL]
+
+# CORS 설정 (가장 먼저 추가하여 OPTIONS preflight 요청 처리)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=allowed_origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 # 보안 헤더 미들웨어
@@ -129,31 +137,29 @@ async def health(request: Request):
     }
 
 # 라우터 등록
-from app.routers import ml, analysis, transactions, user, auth, coupons, settings, reports, anomalies, user_analytics, analytics_demographics
+from app.routers import ml, analysis, transactions, user, coupons, settings, reports, anomalies, user_analytics, analytics_demographics, chatbot
+from app.routers.auth import kakao_router, google_router, password_router
 
-# 라우터 포함 (모든 라우터에 /api 접두사 추가)
-app.include_router(ml.router, prefix="/api")
-app.include_router(analysis.router, prefix="/api")
-app.include_router(transactions.router, prefix="/api")
-app.include_router(user.router, prefix="/api")
-app.include_router(auth.router, prefix="/api")
-app.include_router(coupons.router, prefix="/api")
+# 라우터 포함
+# 이미 자체적으로 /api prefix를 가진 라우터: prefix 없이 등록
+app.include_router(transactions.router)       # prefix="/api/transactions" 이미 있음
+app.include_router(analysis.router)           # prefix="/api/analysis" 이미 있음
+app.include_router(anomalies.router)          # prefix="/api/anomalies" 이미 있음
+app.include_router(user_analytics.router)     # prefix="/api/admin/users" 이미 있음
+app.include_router(analytics_demographics.router)  # prefix="/api/analytics/demographics" 이미 있음
+app.include_router(settings.router)           # prefix="/api/admin/settings" 이미 있음
+app.include_router(reports.router)            # prefix="/api/admin/reports" 이미 있음
+app.include_router(chatbot.router)            # prefix="/api/chat" 이미 있음
 
-# 관리자/분석 라우터 추가
-app.include_router(user_analytics.router, prefix="/api")
-app.include_router(analytics_demographics.router, prefix="/api")
-app.include_router(settings.router, prefix="/api")
-app.include_router(reports.router, prefix="/api")
-app.include_router(anomalies.router, prefix="/api")
+# /api prefix가 없는 라우터: /api 추가
+app.include_router(ml.router, prefix="/api")      # prefix="/ml"
+app.include_router(user.router, prefix="/api")    # prefix="/users"
+app.include_router(coupons.router, prefix="/api") # prefix="/coupons"
 
-# CORS 설정을 가장 마지막에 추가하여 outermost 레이어로 만듦
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=allowed_origins,
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+# auth 분리된 라우터들 등록 (prefix="/auth" 이미 있음 → /api 추가)
+app.include_router(kakao_router, prefix="/api")    # 카카오 로그인
+app.include_router(google_router, prefix="/api")   # 구글 로그인
+app.include_router(password_router, prefix="/api") # 비밀번호 재설정/아이디찾기/회원탈퇴
 
 
 # 시작 / 종료 이벤트

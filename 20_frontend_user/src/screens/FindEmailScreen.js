@@ -12,27 +12,27 @@ export default function FindEmailScreen({ navigation }) {
     
     // 상태 관리
     const [name, setName] = useState('');           // 이름 입력
-    const [phone, setPhone] = useState('');         // 전화번호 입력
+    const [birthDate, setBirthDate] = useState(''); // 생년월일 입력 (YYYY-MM-DD)
     const [loading, setLoading] = useState(false);  // 로딩 상태
     const [result, setResult] = useState(null);     // 조회 결과
     
-    // 전화번호 포맷팅 (010-1234-5678 형식)
-    const formatPhone = (text) => {
+    // 생년월일 포맷팅 (YYYY-MM-DD 형식)
+    const formatBirthDate = (text) => {
         const cleaned = text.replace(/\D/g, '');
         let formatted = cleaned;
         
-        if (cleaned.length >= 4 && cleaned.length < 8) {
-            formatted = cleaned.slice(0, 3) + '-' + cleaned.slice(3);
-        } else if (cleaned.length >= 8) {
-            formatted = cleaned.slice(0, 3) + '-' + cleaned.slice(3, 7) + '-' + cleaned.slice(7, 11);
+        if (cleaned.length >= 5 && cleaned.length < 7) {
+            formatted = cleaned.slice(0, 4) + '-' + cleaned.slice(4);
+        } else if (cleaned.length >= 7) {
+            formatted = cleaned.slice(0, 4) + '-' + cleaned.slice(4, 6) + '-' + cleaned.slice(6, 8);
         }
         
         return formatted;
     };
     
-    // 전화번호 입력 버튼
-    const handlePhoneChange = (text) => {
-        setPhone(formatPhone(text));
+    // 생년월일 입력 핸들러
+    const handleBirthDateChange = (text) => {
+        setBirthDate(formatBirthDate(text));
     };
     
     // 이메일 찾기 버튼
@@ -42,8 +42,8 @@ export default function FindEmailScreen({ navigation }) {
             Alert.alert('알림', '이름을 입력해주세요.');
             return;
         }
-        if (!phone.trim()) {
-            Alert.alert('알림', '전화번호를 입력해주세요.');
+        if (!birthDate.trim() || birthDate.length < 10) {
+            Alert.alert('알림', '생년월일을 정확히 입력해주세요. (YYYY-MM-DD)');
             return;
         }
         
@@ -51,9 +51,9 @@ export default function FindEmailScreen({ navigation }) {
         setResult(null);
         
         try {
-            const response = await apiClient.post('/auth/find-email', {
+            const response = await apiClient.post('/api/auth/find-email', {
                 name: name.trim(),
-                phone: phone.replace(/-/g, '')  // 하이픈 제거하여 전송
+                birth_date: birthDate  // YYYY-MM-DD 형식
             });
             
             setResult(response.data);
@@ -98,7 +98,7 @@ export default function FindEmailScreen({ navigation }) {
                             가입된 이메일 찾기
                         </Text>
                         <Text style={[styles.infoSubtitle, { color: colors.textSecondary }]}>
-                            회원가입 시 입력한 이름과 전화번호를{'\n'}입력해주세요.
+                            회원가입 시 입력한 이름과 생년월일을{'\n'}입력해주세요.
                         </Text>
                     </View>
                     
@@ -122,10 +122,10 @@ export default function FindEmailScreen({ navigation }) {
                             />
                         </View>
                         
-                        {/* 전화번호 입력 */}
+                        {/* 생년월일 입력 */}
                         <View style={styles.inputContainer}>
                             <Text style={[styles.inputLabel, { color: colors.textSecondary }]}>
-                                전화번호
+                                생년월일
                             </Text>
                             <TextInput
                                 style={[styles.input, { 
@@ -133,12 +133,12 @@ export default function FindEmailScreen({ navigation }) {
                                     borderColor: colors.border,
                                     backgroundColor: colors.background 
                                 }]}
-                                placeholder="010-1234-5678"
+                                placeholder="1990-01-15"
                                 placeholderTextColor={colors.textSecondary}
-                                value={phone}
-                                onChangeText={handlePhoneChange}
-                                keyboardType="phone-pad"
-                                maxLength={13}
+                                value={birthDate}
+                                onChangeText={handleBirthDateChange}
+                                keyboardType="number-pad"
+                                maxLength={10}
                             />
                         </View>
                         

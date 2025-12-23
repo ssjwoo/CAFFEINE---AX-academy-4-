@@ -12,7 +12,7 @@ const isLocal =
   typeof window !== "undefined" &&
   window.location?.hostname?.includes("localhost");
 
-const API_BASE_URL = isLocal ? LOCAL_BASE_URL : PROD_BASE_URL;
+export const API_BASE_URL = isLocal ? LOCAL_BASE_URL : PROD_BASE_URL;
 
 // API Client - Axios 인스턴스
 export const apiClient = axios.create({

@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Platform } from 'react-native';
-import { apiClient } from '../api/client';
+import { apiClient, API_BASE_URL } from '../api/client';
 
 const AuthContext = createContext();
 
@@ -13,6 +13,7 @@ export const useAuth = () => {
     return context;
 };
 
+// AuthProvider
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -42,7 +43,10 @@ export const AuthProvider = ({ children }) => {
             params.append('username', email);
             params.append('password', password);
 
-            const response = await apiClient.post('/users/login', params, {
+
+
+            const response = await apiClient.post('/api/users/login', params, {
+
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded'
                 }
@@ -56,7 +60,10 @@ export const AuthProvider = ({ children }) => {
                 await AsyncStorage.setItem('refreshToken', refresh_token);
                 await AsyncStorage.setItem('authToken', access_token);
 
-                const userResponse = await apiClient.get('/users/me', {
+
+
+                const userResponse = await apiClient.get('/api/users/me', {
+
                     headers: { 'Authorization': `Bearer ${access_token}` },
                 });
 
@@ -101,7 +108,10 @@ export const AuthProvider = ({ children }) => {
     const signup = async (name, email, password, birthDate) => {
         try {
             // 실제 백엔드 API 호출
-            const response = await apiClient.post('/users/signup', {
+
+
+            const response = await apiClient.post('/api/users/signup', {
+
                 name: name,
                 email: email,
                 password: password,
@@ -161,7 +171,7 @@ export const AuthProvider = ({ children }) => {
     // 카카오 로그인
     const kakaoLogin = async (code) => {
         try {
-            const response = await fetch(`${API_BASE_URL}/auth/kakao`, {
+            const response = await fetch(`${API_BASE_URL}/api/auth/kakao`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ code }),
@@ -201,7 +211,7 @@ export const AuthProvider = ({ children }) => {
     // 카카오 회원가입
     const kakaoSignup = async (code) => {
         try {
-            const response = await fetch(`${API_BASE_URL}/auth/kakao/signup`, {
+            const response = await fetch(`${API_BASE_URL}/api/auth/kakao/signup`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ code }),
@@ -236,9 +246,88 @@ export const AuthProvider = ({ children }) => {
             return { success: false, error: '네트워크 오류가 발생했습니다.' };
         }
     };
+
+    // 구글 로그인
+    const googleLogin = async (code) => {
+        try {
+            const response = await fetch(`${API_BASE_URL}/api/auth/google`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ code }),
+            });
+            
+            if (response.ok) {
+                const data = await response.json();
+                const userData = {
+                    id: data.user?.id || Date.now(),
+                    name: data.user?.nickname || '구글 사용자',
+                    email: data.user?.email || 'google@user.com',
+                    avatar: data.user?.profile_image || 'https://via.placeholder.com/100?text=G',
+                    provider: 'google',
+                };
+                
+                await AsyncStorage.setItem('user', JSON.stringify(userData));
+                if (data.access_token) {
+                    await AsyncStorage.setItem('authToken', data.access_token);
+                }
+                if (data.refresh_token) {
+                    await AsyncStorage.setItem('refreshToken', data.refresh_token);
+                }
+                
+                setUser(userData);
+                return { success: true };
+            } else {
+                const errorData = await response.json().catch(() => ({}));
+                return { success: false, error: errorData.detail || '구글 로그인에 실패했습니다.' };
+            }
+        } catch (error) {
+            console.error('구글 로그인 오류:', error);
+            return { success: false, error: '네트워크 오류가 발생했습니다.' };
+        }
+    };
+
+    // 구글 회원가입
+    const googleSignup = async (code) => {
+        try {
+            const response = await fetch(`${API_BASE_URL}/api/auth/google/signup`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ code }),
+            });
+            
+            if (response.ok) {
+                const data = await response.json();
+                const userData = {
+                    id: data.user?.id || Date.now(),
+                    name: data.user?.nickname || '구글 사용자',
+                    email: data.user?.email || 'google@user.com',
+                    avatar: data.user?.profile_image || 'https://via.placeholder.com/100?text=G',
+                    provider: 'google',
+                };
+                
+                await AsyncStorage.setItem('user', JSON.stringify(userData));
+                if (data.access_token) {
+                    await AsyncStorage.setItem('authToken', data.access_token);
+                }
+                if (data.refresh_token) {
+                    await AsyncStorage.setItem('refreshToken', data.refresh_token);
+                }
+                
+                setUser(userData);
+                return { success: true };
+            } else {
+                const errorData = await response.json().catch(() => ({}));
+                return { success: false, error: errorData.detail || '구글 회원가입에 실패했습니다.' };
+            }
+        } catch (error) {
+            console.error('구글 회원가입 오류:', error);
+            return { success: false, error: '네트워크 오류가 발생했습니다.' };
+        }
+    };
+
     // AuthContext.Provider - 사용자 인증 상태 제공
     return (
-        <AuthContext.Provider value={{ user, loading, login, signup, logout, kakaoLogin }}>
+        <AuthContext.Provider value={{ user, loading, login, signup, logout, kakaoLogin, kakaoSignup, googleLogin, googleSignup }}>
             {children}
         </AuthContext.Provider>
     );
