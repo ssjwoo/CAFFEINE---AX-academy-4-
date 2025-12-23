@@ -97,7 +97,11 @@ export default function LoginScreen({ navigation }) {
                 style={styles.keyboardView}>
                 <ScrollView 
                     contentContainerStyle={styles.scrollContent}
-                    showsVerticalScrollIndicator={false}>
+                    showsVerticalScrollIndicator={false}
+                    keyboardShouldPersistTaps="handled"
+                    bounces={true}
+                    scrollEnabled={true}
+                    nestedScrollEnabled={true}>
                     
                     {/* Logo Section */}
                     <View style={styles.logoSection}>
@@ -265,6 +269,7 @@ const styles = StyleSheet.create({
         flexGrow: 1,
         padding: 24,
         paddingTop: 60,
+        paddingBottom: 80,
     },
 
     // Logo Section
