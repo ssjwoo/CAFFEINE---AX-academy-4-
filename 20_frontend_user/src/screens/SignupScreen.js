@@ -76,7 +76,17 @@ export default function SignupScreen({ navigation }) {
 
     // 카카오 회원가입 버튼
     const KAKAO_REST_API_KEY = 'fa925a6646f9491a77eb9c8fd6537a21';
-    const REDIRECT_URI = 'http://localhost:8081/auth/kakao/signup/callback';
+    // 환경에 따른 동적 REDIRECT_URI 설정
+    const getRedirectUri = () => {
+        if (Platform.OS === 'web') {
+            // 웹 환경: 현재 호스트 기반으로 동적 설정
+            const host = typeof window !== 'undefined' ? window.location.origin : 'http://localhost:8081';
+            return `${host}/auth/kakao/signup/callback`;
+        }
+        // 네이티브 앱: 프로덕션 URL 사용
+        return 'https://caffeineai.net/auth/kakao/signup/callback';
+    };
+    const REDIRECT_URI = getRedirectUri();
 
     const handleKakaoSignup = async () => {
         try {
