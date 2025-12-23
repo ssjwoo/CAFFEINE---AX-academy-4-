@@ -188,7 +188,9 @@ export default function DashboardScreen({ navigation }) {
 
         const monthlyMap = {};
         txns.forEach(t => {
-            let date = t.date?.split(' ')[0] || t.date || '';
+            // transaction_date 또는 date 필드 사용
+            let rawDate = t.transaction_date || t.date || '';
+            let date = rawDate?.split(' ')[0] || rawDate || '';
 
             // 다양한 날짜 형식 처리
             let month = null;

@@ -200,15 +200,31 @@ async def create_transactions_bulk(
                 if not category_id:
                     category_id = categories.get('기타') or (list(categories.values())[0] if categories else None)
                 
-                import random
-                try:
-                    tx_time = datetime.strptime(tx.transaction_date, "%Y-%m-%d %H:%M:%S")
-                except ValueError:
+                # 다양한 날짜 형식 파싱 시도
+                tx_time = None
+                date_formats = [
+                    "%Y-%m-%d %H:%M:%S",
+                    "%Y-%m-%d %H:%M",
+                    "%Y-%m-%d",
+                    "%Y.%m.%d %H:%M:%S",
+                    "%Y.%m.%d %H:%M",
+                    "%Y.%m.%d",
+                    "%d/%m/%Y %H:%M:%S",
+                    "%d/%m/%Y",
+                    "%m/%d/%Y %H:%M:%S",
+                    "%m/%d/%Y",
+                ]
+                for fmt in date_formats:
                     try:
-                        tx_time = datetime.strptime(tx.transaction_date, "%Y-%m-%d")
+                        tx_time = datetime.strptime(tx.transaction_date.strip(), fmt)
+                        break
                     except ValueError:
-                        days_ago = random.randint(0, 365)
-                        tx_time = datetime.now() - timedelta(days=days_ago)
+                        continue
+                
+                # 모든 형식 실패 시 현재 시간 사용 (랜덤 아님)
+                if tx_time is None:
+                    logger.warning(f"날짜 파싱 실패: {tx.transaction_date}")
+                    tx_time = datetime.now()
                 
                 insert_stmt = insert(Transaction).values(
                     user_id=data.user_id,
@@ -241,8 +257,6 @@ async def create_transactions_bulk(
         message=f"{created_count}건 생성 완료, {failed_count}건 실패"
     )
 
-# 거래 내역 상세 조회, 수정, 삭제, 이상거래 신고, 통계 등 유지...
-# (생략된 부분은 기존 Transactions.py 내용과 동일하게 유지)
 
 # 거래 내역 전체 삭제 API
 @router.delete("")

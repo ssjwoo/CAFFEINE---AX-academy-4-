@@ -154,11 +154,15 @@ export default function AnalysisScreen({ navigation }) {
         labelColor: (opacity = 1) => colors.textSecondary,
         style: { borderRadius: 16 },
         propsForDots: {
-            r: '6',
+            r: '5',
             strokeWidth: '2',
             stroke: '#2563EB'
         },
-        formatYLabel: (value) => Number(value).toLocaleString(),
+        propsForBackgroundLines: {
+            strokeDasharray: '',
+            stroke: '#E5E7EB',
+            strokeWidth: 1,
+        },
     };
 
     // 데이터가 없을 때 화면
@@ -240,18 +244,25 @@ export default function AnalysisScreen({ navigation }) {
                                 <LineChart
                                     data={{
                                         labels: chartData.map(d => d.month),
-                                        datasets: [{ data: chartData.map(d => d.amount || 0) }]
+                                        datasets: [{ 
+                                            data: chartData.map(d => (d.amount || 0) / 10000),
+                                            color: (opacity = 1) => `rgba(37, 99, 235, ${opacity})`,
+                                            strokeWidth: 3
+                                        }]
                                     }}
                                     width={width - 64}
                                     height={200}
                                     chartConfig={chartConfig}
                                     bezier
                                     style={styles.chart}
-                                    fromZero
-                                    formatYLabel={(value) => Number(value).toLocaleString()}
+                                    withInnerLines={true}
+                                    withOuterLines={false}
+                                    withVerticalLines={false}
+                                    formatYLabel={(value) => Math.round(Number(value)).toString()}
                                 />
                             );
                         })()}
+                        <Text style={[styles.chartUnit, { color: colors.textSecondary }]}>단위: 만원</Text>
                     </View>
                 </FadeInView>
 
@@ -427,5 +438,10 @@ const styles = StyleSheet.create({
         fontSize: 14,
         color: '#92400E',
         lineHeight: 20,
+    },
+    chartUnit: {
+        fontSize: 12,
+        textAlign: 'center',
+        marginTop: 8,
     },
 });
