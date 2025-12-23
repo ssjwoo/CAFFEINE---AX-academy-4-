@@ -264,6 +264,7 @@ export const AuthProvider = ({ children }) => {
                     email: data.user?.email || 'google@user.com',
                     avatar: data.user?.profile_image || 'https://via.placeholder.com/100?text=G',
                     provider: 'google',
+                    birth_date: data.user?.birth_date || null,
                 };
                 
                 await AsyncStorage.setItem('user', JSON.stringify(userData));
@@ -303,6 +304,7 @@ export const AuthProvider = ({ children }) => {
                     email: data.user?.email || 'google@user.com',
                     avatar: data.user?.profile_image || 'https://via.placeholder.com/100?text=G',
                     provider: 'google',
+                    birth_date: data.user?.birth_date || null,
                 };
                 
                 await AsyncStorage.setItem('user', JSON.stringify(userData));

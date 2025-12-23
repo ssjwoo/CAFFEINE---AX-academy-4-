@@ -38,6 +38,7 @@ class GoogleUserResponse(BaseModel):
     email: str | None = None
     profile_image: str | None = None
     provider: str = "google"
+    birth_date: str | None = None
 
 
 class GoogleLoginResponse(BaseModel):
@@ -153,7 +154,8 @@ async def google_login(payload: GoogleLoginRequest, db: DB_Dependency):
                 nickname=db_user.name,
                 email=db_user.email,
                 profile_image=profile_image,
-                provider="google"
+                provider="google",
+                birth_date=db_user.birth_date.strftime("%Y-%m-%d") if db_user.birth_date else None
             )
         )
 
@@ -240,7 +242,8 @@ async def google_signup(payload: GoogleLoginRequest, db: DB_Dependency):
                 nickname=new_user.name,
                 email=new_user.email,
                 profile_image=profile_image,
-                provider="google"
+                provider="google",
+                birth_date=new_user.birth_date.strftime("%Y-%m-%d") if new_user.birth_date else None
             )
         )
 
