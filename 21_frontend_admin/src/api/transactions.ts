@@ -21,26 +21,26 @@ export async function getTransactions(filters?: {
         });
     }
     const queryString = params.toString();
-    return apiClient.get(`/api/transactions${queryString ? '?' + queryString : ''}`);
+    return apiClient.get(`/transactions${queryString ? '?' + queryString : ''}`);
 }
 
 export async function getTransactionDetail(transactionId: number) {
-    return apiClient.get(`/api/transactions/${transactionId}`);
+    return apiClient.get(`/transactions/${transactionId}`);
 }
 
 export async function updateTransactionNote(transactionId: number, description: string) {
-    return apiClient.patch(`/api/transactions/${transactionId}/note`, { description });
+    return apiClient.patch(`/transactions/${transactionId}/note`, { description });
 }
 
 export async function reportTransactionAnomaly(transactionId: number, reason: string, severity: string = 'medium') {
-    return apiClient.post(`/api/transactions/${transactionId}/anomaly-report`, { reason, severity });
+    return apiClient.post(`/transactions/${transactionId}/anomaly-report`, { reason, severity });
 }
 
 export async function getTransactionStats(userId?: number) {
     const params = new URLSearchParams();
     if (userId) params.append('user_id', userId.toString());
     const queryString = params.toString();
-    return apiClient.get(`/api/transactions/stats/summary${queryString ? '?' + queryString : ''}`);
+    return apiClient.get(`/transactions/stats/summary${queryString ? '?' + queryString : ''}`);
 }
 
 // Anomalies API
@@ -50,13 +50,13 @@ export async function getAnomalies(status?: string, riskLevel?: string, days: nu
     if (riskLevel) params.append('risk_level', riskLevel);
     params.append('days', days.toString());
     const queryString = params.toString();
-    return apiClient.get(`/api/anomalies${queryString ? '?' + queryString : ''}`);
+    return apiClient.get(`/anomalies${queryString ? '?' + queryString : ''}`);
 }
 
 export async function approveAnomaly(anomalyId: number) {
-    return apiClient.post(`/api/anomalies/${anomalyId}/approve`, {});
+    return apiClient.post(`/anomalies/${anomalyId}/approve`, {});
 }
 
 export async function rejectAnomaly(anomalyId: number) {
-    return apiClient.post(`/api/anomalies/${anomalyId}/reject`, {});
+    return apiClient.post(`/anomalies/${anomalyId}/reject`, {});
 }

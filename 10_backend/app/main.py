@@ -131,7 +131,8 @@ async def health(request: Request):
 # 라우터 등록
 from app.routers import (
     ml, analysis, transactions, user, auth, coupons, 
-    settings, reports, anomalies, user_analytics, analytics_demographics
+    settings, reports, anomalies, user_analytics, analytics_demographics,
+    admin_transactions
 )
 from app.routers.chatbot import router as chatbot_router
 
@@ -146,6 +147,7 @@ app.include_router(coupons.router, prefix="/api")
 # 관리자/분석 라우터 추가
 app.include_router(user_analytics.router, prefix="/api")
 app.include_router(analytics_demographics.router, prefix="/api")
+app.include_router(admin_transactions.router, prefix="/api")
 app.include_router(settings.router, prefix="/api")
 app.include_router(reports.router, prefix="/api")
 app.include_router(anomalies.router, prefix="/api")

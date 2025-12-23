@@ -2,7 +2,7 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import { Download, Search, Calendar, Loader2 } from 'lucide-react';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8001';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8001/api';
 
 const CATEGORY_COLORS = {
     // Existing & Observed Categories
@@ -72,8 +72,16 @@ const AdminIntegratedAnalysis = () => {
                     params.set('end_date', endDate);
                 }
 
-                const response = await fetch(`${API_BASE_URL}/api/transactions?${params}`, {
-                    headers: { 'Content-Type': 'application/json' },
+                const token = typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null;
+                const headers = {
+                    'Content-Type': 'application/json'
+                };
+                if (token) {
+                    headers['Authorization'] = `Bearer ${token}`;
+                }
+
+                const response = await fetch(`${API_BASE_URL}/admin/transactions?${params}`, {
+                    headers,
                 });
 
                 if (!response.ok) {
@@ -88,7 +96,7 @@ const AdminIntegratedAnalysis = () => {
                     const [datePart, timePart] = tx.transaction_date.split(' ');
                     return {
                         id: tx.id,
-                        userId: `user_${String(tx.id).padStart(3, '0')}***`,
+                        userId: tx.user_id ? `user_${String(tx.user_id).padStart(3, '0')}` : `id_${tx.id}`,
                         merchant: tx.merchant,
                         category: tx.category,
                         amount: tx.amount,
@@ -129,7 +137,7 @@ const AdminIntegratedAnalysis = () => {
                 headers['Authorization'] = `Bearer ${token}`;
             }
 
-            const response = await fetch(`${API_BASE_URL}/api/analytics/demographics/consumption-by-age`, {
+            const response = await fetch(`${API_BASE_URL}/analytics/demographics/consumption-by-age`, {
                 headers
             });
             if (!response.ok) throw new Error('Failed to fetch age data');
