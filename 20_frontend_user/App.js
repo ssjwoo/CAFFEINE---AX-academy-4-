@@ -7,6 +7,7 @@ import { Text, ActivityIndicator, View, Platform } from 'react-native';
 import { ThemeProvider, useTheme } from './src/contexts/ThemeContext';
 import { AuthProvider, useAuth } from './src/contexts/AuthContext';
 import { TransactionProvider } from './src/contexts/TransactionContext';
+import { ToastProvider } from './src/contexts/ToastContext';
 import { useFonts, Inter_400Regular, Inter_600SemiBold, Inter_700Bold } from '@expo-google-fonts/inter';
 import * as SplashScreen from 'expo-splash-screen';
 
@@ -284,9 +285,11 @@ export default function App() {
     <View style={{ flex: 1 }} onLayout={onLayoutRootView}>
       <ThemeProvider>
         <AuthProvider>
-          <TransactionProvider>
-            <AppContent />
-          </TransactionProvider>
+          <ToastProvider>
+            <TransactionProvider>
+              <AppContent />
+            </TransactionProvider>
+          </ToastProvider>
         </AuthProvider>
       </ThemeProvider>
     </View>

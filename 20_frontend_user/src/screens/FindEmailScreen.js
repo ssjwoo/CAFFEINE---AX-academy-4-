@@ -51,7 +51,7 @@ export default function FindEmailScreen({ navigation }) {
         setResult(null);
         
         try {
-            const response = await apiClient.post('/api/auth/find-email', {
+            const response = await apiClient.post('/auth/find-email', {
                 name: name.trim(),
                 birth_date: birthDate  // YYYY-MM-DD 형식
             });

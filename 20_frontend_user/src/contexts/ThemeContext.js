@@ -37,11 +37,11 @@ export const ThemeProvider = ({ children }) => {
     // colors - 테마 색상
     const colors = isDarkMode ? {
         // Primary Colors
-        primary: '#9C27B0',
-        primaryDark: '#7B1FA2',
-        primaryLight: '#E1BEE7',
-        accent: '#E91E63',
-        accentLight: '#FCE4EC',
+        primary: '#3B82F6',
+        primaryDark: '#2563EB',
+        primaryLight: '#DBEAFE',
+        accent: '#60A5FA',
+        accentLight: '#EFF6FF',
 
         // Background Colors
         background: '#1a1a1a',
@@ -74,7 +74,7 @@ export const ThemeProvider = ({ children }) => {
         chartColors: ['#E91E63', '#9C27B0', '#AB47BC', '#F48FB1', '#CE93D8', '#FF80AB'],
 
         // Gradients
-        primaryGradient: ['#9C27B0', '#E91E63'],
+        primaryGradient: ['#3B82F6', '#2563EB'],
         backgroundGradient: ['#1a1a1a', '#2d2d2d'],
         screenGradient: ['#1E293B', '#0F172A', '#0F172A'],
         cardGradient: ['#1E40AF', '#1E3A8A', '#172554'],
@@ -93,11 +93,11 @@ export const ThemeProvider = ({ children }) => {
     } : {
         // 라이트 모드 색상
         // Primary Colors (보라색/마젠타 테마)
-        primary: '#9C27B0',          // 보라색
-        primaryDark: '#7B1FA2',      // 어두운 보라
-        primaryLight: '#F3E5F5',     // 밝은 보라 배경
-        accent: '#E91E63',           // 마젠타/핑크
-        accentLight: '#FCE4EC',      // 밝은 핑크
+        primary: '#3B82F6',          // 파란색
+        primaryDark: '#2563EB',      // 어두운 파란
+        primaryLight: '#DBEAFE',     // 밝은 파란 배경
+        accent: '#60A5FA',           // 밝은 파란
+        accentLight: '#EFF6FF',      // 아주 밝은 파란
 
         // Background Colors
         background: '#FAFAFA',       // 밝은 회색 배경

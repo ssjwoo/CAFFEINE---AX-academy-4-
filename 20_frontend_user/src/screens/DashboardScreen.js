@@ -373,7 +373,7 @@ export default function DashboardScreen({ navigation }) {
             <EmptyState
                 icon="📊"
                 title="연동된 거래내역이 없습니다"
-                description="프로필에서 데이터를 동기화하여\n소비 분석을 시작하세요"
+                description={"프로필에서 데이터를 동기화하여\n소비 분석을 시작하세요"}
                 actionText="동기화 하러 가기"
                 onAction={() => navigation?.navigate('프로필')}
             />
@@ -627,9 +627,12 @@ export default function DashboardScreen({ navigation }) {
                                             strokeDasharray: '',
                                             stroke: '#E5E7EB',
                                             strokeWidth: 1,
-                                        }
+                                        },
+                                        fillShadowGradient: '#3B82F6',
+                                        fillShadowGradientOpacity: 0.3,
                                     }}
                                     bezier
+                                    withShadow={true}
                                     style={styles.chart}
                                     withInnerLines={true}
                                     withOuterLines={false}

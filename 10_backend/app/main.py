@@ -130,18 +130,21 @@ async def health(request: Request):
 
 # 라우터 등록
 from app.routers import (
-    ml, analysis, transactions, user, auth, coupons, 
+    ml, analysis, transactions, user, coupons, 
     settings, reports, anomalies, user_analytics, analytics_demographics,
     admin_transactions
 )
 from app.routers.chatbot import router as chatbot_router
+from app.routers.auth import kakao_router, google_router, password_router
 
 # 라우터 포함 (모든 라우터에 /api 접두사 추가)
 app.include_router(ml.router, prefix="/api")
 app.include_router(analysis.router, prefix="/api")
 app.include_router(transactions.router, prefix="/api")
 app.include_router(user.router, prefix="/api")
-app.include_router(auth.router, prefix="/api")
+app.include_router(kakao_router, prefix="/api")      # 카카오 로그인
+app.include_router(google_router, prefix="/api")     # 구글 로그인
+app.include_router(password_router, prefix="/api")   # 비밀번호/회원탈퇴
 app.include_router(coupons.router, prefix="/api")
 
 # 관리자/분석 라우터 추가

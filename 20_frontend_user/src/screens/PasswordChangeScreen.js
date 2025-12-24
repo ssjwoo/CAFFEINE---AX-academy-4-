@@ -44,7 +44,7 @@ export default function PasswordChangeScreen({ navigation }) {
         setLoading(true);
         try {
             console.log('API 요청 전송 중...');
-            const response = await apiClient.post('/api/auth/change-password', {
+            const response = await apiClient.post('/auth/change-password', {
                 current_password: currentPassword,
                 new_password: newPassword
             });

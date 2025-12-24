@@ -181,7 +181,7 @@ export default function ProfileScreen({ navigation }) {
         }
 
         try {
-            await apiClient.delete('/api/users/me');
+            await apiClient.delete('/users/me');
             await logout();
             alert('회원탈퇴가 완료되었습니다.\n이용해 주셔서 감사합니다.');
         } catch (error) {

@@ -14,6 +14,7 @@ import {
 import { LinearGradient } from 'expo-linear-gradient';
 import { Feather } from '@expo/vector-icons';
 import { useTransactions } from '../contexts/TransactionContext';
+import { useTheme } from '../contexts/ThemeContext';
 
 const CATEGORIES = [
     { name: '외식', icon: 'coffee', color: '#F59E0B' },
@@ -26,7 +27,8 @@ const CATEGORIES = [
 ];
 
 export default function AddTransactionModal({ visible, onClose, onSuccess }) {
-    const { addTransaction } = useTransactions();  // TransactionContext 사용
+    const { addTransaction } = useTransactions();
+    const { colors, isDarkMode } = useTheme();
     const [amount, setAmount] = useState('');
     const [merchantName, setMerchantName] = useState('');
     const [description, setDescription] = useState('');
@@ -41,7 +43,6 @@ export default function AddTransactionModal({ visible, onClose, onSuccess }) {
     };
 
     const handleSubmit = async () => {
-        // 유효성 검사
         if (!amount || parseFloat(amount) <= 0) {
             alert('유효한 금액을 입력하세요.');
             return;
@@ -54,7 +55,6 @@ export default function AddTransactionModal({ visible, onClose, onSuccess }) {
         setIsLoading(true);
 
         try {
-            // TransactionContext의 addTransaction 사용 (AI 평가 포함)
             const result = await addTransaction({
                 amount: parseFloat(amount),
                 category: selectedCategory,
@@ -65,17 +65,9 @@ export default function AddTransactionModal({ visible, onClose, onSuccess }) {
 
             if (result.success) {
                 console.log('✅ 거래 추가 성공:', result.transaction);
-
-                // 폼 초기화
                 resetForm();
-
-                // 모달 즉시 닫기
                 onClose();
-
-                // 성공 콜백 호출
                 if (onSuccess) onSuccess();
-
-                // AI 평가 메시지가 없으면 기본 알림 (AI 꺼져있을 때)
                 if (!result.aiEvaluation) {
                     alert('✅ 소비 내역이 추가되었습니다!');
                 }
@@ -90,6 +82,31 @@ export default function AddTransactionModal({ visible, onClose, onSuccess }) {
         }
     };
 
+    // 동적 스타일 (다크/라이트 모드)
+    const dynamicStyles = {
+        modalContainer: {
+            backgroundColor: isDarkMode ? '#1F2937' : '#FFFFFF',
+        },
+        label: {
+            color: isDarkMode ? '#D1D5DB' : '#374151',
+        },
+        amountInput: {
+            backgroundColor: isDarkMode ? '#374151' : '#F3F4F6',
+            color: colors.primary,
+        },
+        textInput: {
+            backgroundColor: isDarkMode ? '#374151' : '#F3F4F6',
+            color: isDarkMode ? '#FFFFFF' : '#1F2937',
+        },
+        categoryButton: {
+            backgroundColor: isDarkMode ? '#374151' : '#F9FAFB',
+            borderColor: isDarkMode ? '#4B5563' : '#E5E7EB',
+        },
+        categoryText: {
+            color: isDarkMode ? '#9CA3AF' : '#6B7280',
+        },
+    };
+
     return (
         <Modal
             visible={visible}
@@ -101,15 +118,15 @@ export default function AddTransactionModal({ visible, onClose, onSuccess }) {
                 behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
                 style={styles.modalOverlay}
             >
-                <View style={styles.modalContainer}>
+                <View style={[styles.modalContainer, dynamicStyles.modalContainer]}>
                     {/* 헤더 */}
                     <LinearGradient
-                        colors={['#6366F1', '#8B5CF6']}
+                        colors={[colors.primary, colors.primaryDark]}
                         start={{ x: 0, y: 0 }}
                         end={{ x: 1, y: 1 }}
                         style={styles.header}
                     >
-                        <Text style={styles.headerTitle}>💸 소비 추가</Text>
+                        <Text style={styles.headerTitle}>💳 소비 추가</Text>
                         <TouchableOpacity onPress={onClose} style={styles.closeButton}>
                             <Feather name="x" size={24} color="white" />
                         </TouchableOpacity>
@@ -118,9 +135,9 @@ export default function AddTransactionModal({ visible, onClose, onSuccess }) {
                     <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
                         {/* 금액 입력 */}
                         <View style={styles.inputGroup}>
-                            <Text style={styles.label}>금액 (원)</Text>
+                            <Text style={[styles.label, dynamicStyles.label]}>금액 (원)</Text>
                             <TextInput
-                                style={styles.amountInput}
+                                style={[styles.amountInput, dynamicStyles.amountInput]}
                                 placeholder="0"
                                 placeholderTextColor="#9CA3AF"
                                 keyboardType="numeric"
@@ -131,9 +148,9 @@ export default function AddTransactionModal({ visible, onClose, onSuccess }) {
 
                         {/* 가맹점명 입력 */}
                         <View style={styles.inputGroup}>
-                            <Text style={styles.label}>가맹점명</Text>
+                            <Text style={[styles.label, dynamicStyles.label]}>가맹점명</Text>
                             <TextInput
-                                style={styles.textInput}
+                                style={[styles.textInput, dynamicStyles.textInput]}
                                 placeholder="예: 스타벅스 강남점"
                                 placeholderTextColor="#9CA3AF"
                                 value={merchantName}
@@ -143,13 +160,14 @@ export default function AddTransactionModal({ visible, onClose, onSuccess }) {
 
                         {/* 카테고리 선택 */}
                         <View style={styles.inputGroup}>
-                            <Text style={styles.label}>카테고리</Text>
+                            <Text style={[styles.label, dynamicStyles.label]}>카테고리</Text>
                             <View style={styles.categoryGrid}>
                                 {CATEGORIES.map((cat) => (
                                     <TouchableOpacity
                                         key={cat.name}
                                         style={[
                                             styles.categoryButton,
+                                            dynamicStyles.categoryButton,
                                             selectedCategory === cat.name && {
                                                 backgroundColor: cat.color + '30',
                                                 borderColor: cat.color,
@@ -160,11 +178,12 @@ export default function AddTransactionModal({ visible, onClose, onSuccess }) {
                                         <Feather
                                             name={cat.icon}
                                             size={20}
-                                            color={selectedCategory === cat.name ? cat.color : '#6B7280'}
+                                            color={selectedCategory === cat.name ? cat.color : (isDarkMode ? '#9CA3AF' : '#6B7280')}
                                         />
                                         <Text
                                             style={[
                                                 styles.categoryText,
+                                                dynamicStyles.categoryText,
                                                 selectedCategory === cat.name && { color: cat.color },
                                             ]}
                                         >
@@ -177,9 +196,9 @@ export default function AddTransactionModal({ visible, onClose, onSuccess }) {
 
                         {/* 메모 입력 */}
                         <View style={styles.inputGroup}>
-                            <Text style={styles.label}>메모 (선택)</Text>
+                            <Text style={[styles.label, dynamicStyles.label]}>메모 (선택)</Text>
                             <TextInput
-                                style={[styles.textInput, styles.memoInput]}
+                                style={[styles.textInput, styles.memoInput, dynamicStyles.textInput]}
                                 placeholder="간단한 메모를 입력하세요"
                                 placeholderTextColor="#9CA3AF"
                                 value={description}
@@ -196,7 +215,7 @@ export default function AddTransactionModal({ visible, onClose, onSuccess }) {
                         disabled={isLoading}
                     >
                         <LinearGradient
-                            colors={isLoading ? ['#9CA3AF', '#6B7280'] : ['#10B981', '#059669']}
+                            colors={isLoading ? ['#9CA3AF', '#6B7280'] : [colors.primary, colors.primaryDark]}
                             start={{ x: 0, y: 0 }}
                             end={{ x: 1, y: 0 }}
                             style={styles.submitGradient}
@@ -220,7 +239,6 @@ const styles = StyleSheet.create({
         justifyContent: 'flex-end',
     },
     modalContainer: {
-        backgroundColor: '#1F2937',
         borderTopLeftRadius: 24,
         borderTopRightRadius: 24,
         maxHeight: '90%',
@@ -250,24 +268,19 @@ const styles = StyleSheet.create({
     label: {
         fontSize: 14,
         fontWeight: '600',
-        color: '#D1D5DB',
         marginBottom: 8,
     },
     amountInput: {
-        backgroundColor: '#374151',
         borderRadius: 12,
         padding: 16,
         fontSize: 28,
         fontWeight: 'bold',
-        color: '#10B981',
         textAlign: 'center',
     },
     textInput: {
-        backgroundColor: '#374151',
         borderRadius: 12,
         padding: 14,
         fontSize: 16,
-        color: 'white',
     },
     memoInput: {
         height: 80,
@@ -285,13 +298,10 @@ const styles = StyleSheet.create({
         paddingHorizontal: 14,
         borderRadius: 20,
         borderWidth: 1,
-        borderColor: '#374151',
-        backgroundColor: '#374151',
     },
     categoryText: {
         marginLeft: 6,
         fontSize: 14,
-        color: '#9CA3AF',
     },
     submitButton: {
         margin: 20,

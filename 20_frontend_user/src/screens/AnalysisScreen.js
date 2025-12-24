@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { View, Text, ScrollView, StyleSheet, Dimensions, TouchableOpacity, Platform } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { LineChart, BarChart, PieChart } from 'react-native-chart-kit';
@@ -144,6 +144,27 @@ export default function AnalysisScreen({ navigation }) {
         });
     };
 
+    // 차트 데이터 생성 (대시보드와 동일한 방식)
+    const lineChartData = useMemo(() => {
+        if (!monthlyData || monthlyData.length === 0) return null;
+        
+        let chartData = [...monthlyData];
+        if (chartData.length === 1) {
+            const currentMonth = parseInt(chartData[0].month.replace('월', ''));
+            const prevMonth = currentMonth === 1 ? 12 : currentMonth - 1;
+            chartData = [{ month: `${prevMonth}월`, amount: 0 }, ...chartData];
+        }
+        
+        return {
+            labels: chartData.map(d => d.month),
+            datasets: [{
+                data: chartData.map(d => (d.amount || 0) / 10000),
+                color: (opacity = 1) => `rgba(37, 99, 235, ${opacity})`,
+                strokeWidth: 3
+            }]
+        };
+    }, [monthlyData]);
+
     // 차트 구성
     const chartConfig = {
         backgroundColor: colors.cardBackground,
@@ -153,6 +174,7 @@ export default function AnalysisScreen({ navigation }) {
         color: (opacity = 1) => `rgba(37, 99, 235, ${opacity})`,
         labelColor: (opacity = 1) => colors.textSecondary,
         style: { borderRadius: 16 },
+        useShadowColorFromDataset: true,
         propsForDots: {
             r: '5',
             strokeWidth: '2',
@@ -240,37 +262,38 @@ export default function AnalysisScreen({ navigation }) {
                 <FadeInView style={styles.section} delay={200}>
                     <Text style={[styles.sectionTitle, { color: colors.text }]}>월별 지출 추이</Text>
                     <View style={[styles.chartCard, { backgroundColor: colors.cardBackground }]}>
-                        {monthlyData.length > 0 && (() => {
-                            // 데이터가 1개일 때 차트가 깨지므로 최소 2개 이상 필요
-                            let chartData = [...monthlyData];
-                            if (chartData.length === 1) {
-                                // 이전 달 더미 데이터 추가
-                                const currentMonth = parseInt(chartData[0].month.replace('월', ''));
-                                const prevMonth = currentMonth === 1 ? 12 : currentMonth - 1;
-                                chartData = [{ month: `${prevMonth}월`, amount: 0 }, ...chartData];
-                            }
-                            return (
-                                <LineChart
-                                    data={{
-                                        labels: chartData.map(d => d.month),
-                                        datasets: [{ 
-                                            data: chartData.map(d => (d.amount || 0) / 10000),
-                                            color: (opacity = 1) => `rgba(37, 99, 235, ${opacity})`,
-                                            strokeWidth: 3
-                                        }]
-                                    }}
-                                    width={width - 64}
-                                    height={200}
-                                    chartConfig={chartConfig}
-                                    bezier
-                                    style={styles.chart}
-                                    withInnerLines={true}
-                                    withOuterLines={false}
-                                    withVerticalLines={false}
-                                    formatYLabel={(value) => Math.round(Number(value)).toString()}
-                                />
-                            );
-                        })()}
+                        {lineChartData ? (
+                            <LineChart
+                                data={lineChartData}
+                                width={width - 64}
+                                height={200}
+                                chartConfig={{
+                                    backgroundColor: colors.cardBackground,
+                                    backgroundGradientFrom: colors.cardBackground,
+                                    backgroundGradientTo: colors.cardBackground,
+                                    decimalPlaces: 0,
+                                    color: (opacity = 1) => `rgba(37, 99, 235, ${opacity})`,
+                                    labelColor: (opacity = 1) => colors.textSecondary,
+                                    style: { borderRadius: 16 },
+                                    propsForDots: { r: '5', strokeWidth: '2', stroke: '#2563EB' },
+                                    propsForBackgroundLines: {
+                                        strokeDasharray: '',
+                                        stroke: '#E5E7EB',
+                                        strokeWidth: 1,
+                                    },
+                                }}
+                                bezier
+                                style={styles.chart}
+                                withInnerLines={true}
+                                withOuterLines={false}
+                                withVerticalLines={false}
+                                formatYLabel={(value) => Math.round(Number(value)).toString()}
+                            />
+                        ) : (
+                            <View style={{ height: 200, justifyContent: 'center', alignItems: 'center' }}>
+                                <Text style={{ color: colors.textSecondary, fontSize: 14 }}>차트 데이터 준비 중...</Text>
+                            </View>
+                        )}
                         <Text style={[styles.chartUnit, { color: colors.textSecondary }]}>단위: 만원</Text>
                     </View>
                 </FadeInView>

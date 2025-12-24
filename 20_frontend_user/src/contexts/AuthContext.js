@@ -45,7 +45,7 @@ export const AuthProvider = ({ children }) => {
 
 
 
-            const response = await apiClient.post('/api/users/login', params, {
+            const response = await apiClient.post('/users/login', params, {
 
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded'
@@ -62,7 +62,7 @@ export const AuthProvider = ({ children }) => {
 
 
 
-                const userResponse = await apiClient.get('/api/users/me', {
+                const userResponse = await apiClient.get('/users/me', {
 
                     headers: { 'Authorization': `Bearer ${access_token}` },
                 });
@@ -110,7 +110,7 @@ export const AuthProvider = ({ children }) => {
             // 실제 백엔드 API 호출
 
 
-            const response = await apiClient.post('/api/users/signup', {
+            const response = await apiClient.post('/users/signup', {
 
                 name: name,
                 email: email,
@@ -171,7 +171,7 @@ export const AuthProvider = ({ children }) => {
     // 카카오 로그인
     const kakaoLogin = async (code) => {
         try {
-            const response = await fetch(`${API_BASE_URL}/api/auth/kakao`, {
+            const response = await fetch(`${API_BASE_URL}/auth/kakao`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ code }),
@@ -211,7 +211,7 @@ export const AuthProvider = ({ children }) => {
     // 카카오 회원가입
     const kakaoSignup = async (code) => {
         try {
-            const response = await fetch(`${API_BASE_URL}/api/auth/kakao/signup`, {
+            const response = await fetch(`${API_BASE_URL}/auth/kakao/signup`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ code }),
@@ -250,7 +250,7 @@ export const AuthProvider = ({ children }) => {
     // 구글 로그인
     const googleLogin = async (code) => {
         try {
-            const response = await fetch(`${API_BASE_URL}/api/auth/google`, {
+            const response = await fetch(`${API_BASE_URL}/auth/google`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ code }),
@@ -290,7 +290,7 @@ export const AuthProvider = ({ children }) => {
     // 구글 회원가입
     const googleSignup = async (code) => {
         try {
-            const response = await fetch(`${API_BASE_URL}/api/auth/google/signup`, {
+            const response = await fetch(`${API_BASE_URL}/auth/google/signup`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ code }),

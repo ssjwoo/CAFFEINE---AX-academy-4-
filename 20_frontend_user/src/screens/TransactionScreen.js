@@ -90,7 +90,7 @@ export default function TransactionScreen({ navigation }) {
 
 
             // predict-next API 호출 (전체 이력 기반)
-            const response = await apiClient.post('/api/ml/predict-next', formData, {
+            const response = await apiClient.post('/ml/predict-next', formData, {
                 headers: { 'Content-Type': 'multipart/form-data' }
             });
 
@@ -334,8 +334,11 @@ export default function TransactionScreen({ navigation }) {
                                         couponNotification.couponInfo.merchant,
                                         couponNotification.couponInfo.discount
                                     );
+                                    alert('쿠폰이 발급되었습니다!');
                                 } catch (error) {
-                                    // 중복 발급 등 에러는 무시하고 쿠폰함으로 이동
+                                    // 중복 발급 등 에러 메시지 표시
+                                    const message = error.response?.data?.detail || '쿠폰 발급에 실패했습니다.';
+                                    alert(message);
                                 }
                                 navigation.navigate('쿠폰함');
                                 setCouponNotification(null);
@@ -352,7 +355,14 @@ export default function TransactionScreen({ navigation }) {
                     renderItem={renderItem}
                     keyExtractor={item => item.id}
                     contentContainerStyle={s.listContainer}
-                    ListEmptyComponent={<EmptyState message={EMPTY_MESSAGES.TRANSACTIONS} />}
+                    ListEmptyComponent={
+                        <EmptyState 
+                            title="연동된 거래내역이 없습니다"
+                            description={"프로필에서 데이터를 동기화하여\n소비 분석을 시작하세요"}
+                            actionText="동기화 하러 가기"
+                            onAction={() => navigation.navigate('프로필')}
+                        />
+                    }
                     scrollEnabled={false}
                 />
             </ScrollView>

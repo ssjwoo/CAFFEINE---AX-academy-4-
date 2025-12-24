@@ -134,8 +134,8 @@ export default function SettingsScreen({ navigation }) {
     // 설정 아이템 컴포넌트
     const SettingItem = ({ icon, title, subtitle, value, onValueChange, type = 'switch', children }) => (
         <View style={[styles.settingItem, { backgroundColor: colors.cardBackground }]}>
-            <View style={[styles.settingIcon, { backgroundColor: colors.background }]}>
-                <Feather name={icon} size={20} color={colors.primary || '#6366F1'} />
+            <View style={[styles.settingIcon, { backgroundColor: '#DBEAFE' }]}>
+                <Feather name={icon} size={22} color="#3B82F6" />
             </View>
             <View style={styles.settingContent}>
                 <Text style={[styles.settingTitle, { color: colors.text }]}>{title}</Text>
