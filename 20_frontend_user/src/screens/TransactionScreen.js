@@ -66,8 +66,6 @@ export default function TransactionScreen({ navigation, route }) {
                 isAnomaly: true,
                 notes: `${a.riskLevel} - ${a.reason}`
             })));
-            // 한 번 진입 후 필터 파라미터 초기화하여 이후에는 일반 거래 보기로 복귀
-            navigation?.setParams({ filter: undefined });
         } catch (error) {
             console.error(error);
             setAnomalyMode(false);
