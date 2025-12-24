@@ -1,10 +1,11 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, FlatList, StyleSheet, TouchableOpacity, Modal, TextInput, Alert, Platform, ScrollView, ActivityIndicator } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Feather } from '@expo/vector-icons';
 import { apiClient } from '../api/client';
 import { getAnomalies, reportAnomaly, ignoreAnomaly } from '../api/anomalies';
+import { useFocusEffect } from '@react-navigation/native';
 import { useTheme } from '../contexts/ThemeContext';
 import { useTransactions } from '../contexts/TransactionContext';
 import EmptyState from '../components/EmptyState';
@@ -74,6 +75,23 @@ export default function TransactionScreen({ navigation, route }) {
             setAnomalyLoading(false);
         }
     };
+
+    // 화면 포커스 시 필터가 없으면 일반 거래 보기로 복귀
+    useFocusEffect(
+        useCallback(() => {
+            if (!route.params?.filter) {
+                setAnomalyMode(false);
+                setAnomalyTransactions([]);
+            }
+        }, [route.params?.filter])
+    );
+
+    // 거래 수 변동 시 이상거래 모드라면 최신 탐지 결과를 다시 가져옴
+    useEffect(() => {
+        if (anomalyMode) {
+            fetchAnomalies();
+        }
+    }, [transactions.length, anomalyMode]);
 
     // 카테고리별 쿠폰 정보 매핑
     const CATEGORY_COUPONS = {
