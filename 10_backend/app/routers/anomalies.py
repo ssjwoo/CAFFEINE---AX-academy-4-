@@ -155,7 +155,12 @@ def apply_heuristics(tx: Transaction, features: dict) -> tuple[Optional[str], Op
     # Threshold: 100x (User requested refinement)
     if features['amt_ratio'] >= 100.0:
         return ("주의", f"평균액의 {features['amt_ratio']:.1f}배")
-        
+
+    # Absolute High-Value Check (safety net)
+    # 100,000,000 이상은 평균과 무관하게 플래그
+    if float(tx.amount) >= 100_000_000:
+        return ("위험", "고액 거래 (1억 이상)")
+
     return None, None
 
 
