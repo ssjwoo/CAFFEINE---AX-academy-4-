@@ -66,6 +66,22 @@ from app.services.fraud_preprocessing import FraudPreprocessor
 fraud_model = None
 fraud_preprocessor = FraudPreprocessor()
 
+# Category absolute cutoffs for cold start (KRW)
+CATEGORY_CUTOFFS = {
+    "식비": 5_000_000,
+    "쇼핑": 9_990_000,
+    "공과금": 5_000_000,
+    "여가": 9_990_000,
+    "문화": 9_990_000,
+    "교통": 1_000_000,
+    "의료": 9_990_000,
+    "교육": 5_000_000,
+    "기타": 9_990_000,
+}
+
+# Default cutoff if category not matched
+DEFAULT_CUTOFF = 9_990_000
+
 def load_fraud_model():
     """
     Load the XGBoost Fraud Detection Model.
@@ -155,6 +171,16 @@ def apply_heuristics(tx: Transaction, features: dict) -> tuple[Optional[str], Op
     # Threshold: 100x (User requested refinement)
     if features['amt_ratio'] >= 100.0:
         return ("위험", f"평균액의 {features['amt_ratio']:.1f}배")
+
+    # Cold-start absolute cutoff by category
+    cat_name = (tx.category.name if tx.category else tx.merchant_name) or ""
+    cutoff = DEFAULT_CUTOFF
+    for key, val in CATEGORY_CUTOFFS.items():
+        if key in cat_name:
+            cutoff = val
+            break
+    if float(tx.amount) >= cutoff:
+        return ("위험", f"카테고리 컷오프 초과 ({cutoff:,.0f}원)")
 
     return None, None
 
