@@ -922,9 +922,15 @@ const styles = StyleSheet.create({
 
     // 인라인 예산 입력 스타일
     budgetInlineSection: {
-        marginTop: 8,
-        padding: 16,
-        borderRadius: 14,
+        marginTop: 12,
+        marginBottom: 20,
+        padding: 20,
+        borderRadius: 16,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.08,
+        shadowRadius: 12,
+        elevation: 4,
     },
     budgetInlineRow: {
         marginBottom: 12,

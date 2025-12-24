@@ -1,10 +1,12 @@
 import React, { useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Animated, Dimensions } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useTheme } from '../contexts/ThemeContext';
 
 
 // 빈 상태 화면을 표시하는 컴포넌트
 export default function EmptyState({ icon = '📊', title, description, actionText, onAction }) {
+    const { colors } = useTheme();
     const fadeAnim = useRef(new Animated.Value(0)).current;
     const scaleAnim = useRef(new Animated.Value(0.9)).current;
     const slideAnim = useRef(new Animated.Value(30)).current;
@@ -61,7 +63,7 @@ export default function EmptyState({ icon = '📊', title, description, actionTe
 
     return (
         <LinearGradient
-            colors={['#DBEAFE', '#EFF6FF', '#F8FAFC']}
+            colors={colors.screenGradient}
             style={styles.gradientContainer}
         >
             <Animated.View
@@ -78,15 +80,15 @@ export default function EmptyState({ icon = '📊', title, description, actionTe
             >
                 {/* Icon Container */}
                 <View style={styles.iconContainer}>
-                    <View style={styles.iconCircle}>
+                    <View style={[styles.iconCircle, { backgroundColor: colors.cardBackground }]}>
                         <Text style={styles.icon}>{icon}</Text>
                     </View>
                 </View>
 
                 {/* Text Content */}
-                <Text style={styles.title}>{title}</Text>
+                <Text style={[styles.title, { color: colors.text }]}>{title}</Text>
                 {description && (
-                    <Text style={styles.description}>{description}</Text>
+                    <Text style={[styles.description, { color: colors.textSecondary }]}>{description}</Text>
                 )}
 
                 {/* Action Button */}

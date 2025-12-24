@@ -680,7 +680,8 @@ const styles = (colors) => StyleSheet.create({
     couponCardSelected: {
         borderColor: '#10B981',
         borderWidth: 3,
-        backgroundColor: '#ECFDF5'
+        // 다크모드일 경우 투명한 녹색 배경, 라이트모드는 밝은 민트색
+        backgroundColor: colors.text === '#ffffff' ? 'rgba(16, 185, 129, 0.2)' : '#ECFDF5'
     },
     selectedBadge: {
         position: 'absolute',
