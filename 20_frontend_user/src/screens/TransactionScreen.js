@@ -48,6 +48,7 @@ export default function TransactionScreen({ navigation, route }) {
             fetchAnomalies();
         } else {
             setAnomalyMode(false);
+            setAnomalyTransactions([]);
         }
     }, [route.params?.filter]);
 
@@ -64,6 +65,8 @@ export default function TransactionScreen({ navigation, route }) {
                 isAnomaly: true,
                 notes: `${a.riskLevel} - ${a.reason}`
             })));
+            // 한 번 진입 후 필터 파라미터 초기화하여 이후에는 일반 거래 보기로 복귀
+            navigation?.setParams({ filter: undefined });
         } catch (error) {
             console.error(error);
             setAnomalyMode(false);
@@ -580,6 +583,8 @@ export default function TransactionScreen({ navigation, route }) {
                 onClose={() => setAddModalVisible(false)}
                 onSuccess={() => {
                     setAddModalVisible(false);
+                    // 새 거래 추가 시 이상거래 탐지 재실행
+                    fetchAnomalies();
                 }}
             />
 
