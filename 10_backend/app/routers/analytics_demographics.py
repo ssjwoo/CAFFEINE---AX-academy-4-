@@ -17,7 +17,7 @@ from app.routers.user import get_current_user
 from pydantic import BaseModel
 from fastapi import HTTPException, status
 
-router = APIRouter(prefix="/api/analytics/demographics", tags=["Admin - Demographics Analytics"])
+router = APIRouter(prefix="/analytics/demographics", tags=["Admin - Demographics Analytics"])
 
 
 # Schemas

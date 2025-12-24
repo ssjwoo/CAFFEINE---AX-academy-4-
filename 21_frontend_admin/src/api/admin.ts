@@ -2,25 +2,25 @@ import { apiClient } from './baseClient';
 
 // Settings API
 export async function getAdminSettings() {
-    return apiClient.get('/api/admin/settings');
+    return apiClient.get('/admin/settings');
 }
 
 export async function updateAdminSettings(settings: any) {
-    return apiClient.put('/api/admin/settings', settings);
+    return apiClient.put('/admin/settings', settings);
 }
 
 // Reports API
 export async function sendWeeklyReport() {
-    return apiClient.post('/api/admin/reports/send-weekly', {});
+    return apiClient.post('/admin/reports/send-weekly', {});
 }
 
 export async function sendMonthlyReport() {
-    return apiClient.post('/api/admin/reports/send-monthly', {});
+    return apiClient.post('/admin/reports/send-monthly', {});
 }
 
 // Users API
 export async function getAllUsers() {
-    return apiClient.get('/api/admin/users/');
+    return apiClient.get('/admin/users/');
 }
 
 export async function getCurrentUser() {
@@ -41,13 +41,13 @@ export async function deleteUser() {
 
 // User Analytics
 export async function getNewSignups(days: number = 30) {
-    return apiClient.get(`/api/admin/users/new-signups?days=${days}`);
+    return apiClient.get(`/admin/users/new-signups?days=${days}`);
 }
 
 export async function getChurnedUsers(days: number = 30) {
-    return apiClient.get(`/api/admin/users/churned?days=${days}`);
+    return apiClient.get(`/admin/users/churned?days=${days}`);
 }
 
 export async function getChurnMetrics(churnDays: number = 30, signupDays: number = 30) {
-    return apiClient.get(`/api/admin/users/stats/churn-rate?churn_days=${churnDays}&signup_days=${signupDays}`);
+    return apiClient.get(`/admin/users/stats/churn-rate?churn_days=${churnDays}&signup_days=${signupDays}`);
 }

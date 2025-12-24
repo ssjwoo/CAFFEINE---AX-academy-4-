@@ -1,5 +1,5 @@
 // Core API Client Logic
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8001";
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8001/api";
 
 interface FetchOptions extends RequestInit {
     timeout?: number;

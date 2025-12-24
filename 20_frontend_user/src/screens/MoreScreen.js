@@ -1,208 +1,50 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { View, Text, ScrollView, StyleSheet, TouchableOpacity, TextInput, KeyboardAvoidingView, Platform, Modal, Switch, Alert } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, TouchableOpacity, TextInput, KeyboardAvoidingView, Platform, Modal, Switch } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Feather } from '@expo/vector-icons';
 import { useTheme } from '../contexts/ThemeContext';
+import { useTransactions } from '../contexts/TransactionContext';
 import FadeInView from '../components/FadeInView';
-import { getUserProfile, updateUserProfile } from '../api';
+import { useChatbot } from '../hooks/useChatbot';
+
+// 상수 분리
+const DEFAULT_BUDGET = 1000000;
 
 // 잠깐만AI 챗봇
 export default function MoreScreen({ navigation, route }) {
     const { colors } = useTheme();
-    const [chatStarted, setChatStarted] = useState(false);
-    const [messages, setMessages] = useState([]);
+    const { transactions } = useTransactions();
+
+    // 챗봇 훅 사용
+    const {
+        messages,
+        isTyping,
+        chatStarted,
+        startChat,
+        endChat,
+        sendMessage,
+    } = useChatbot({ transactions, budget: DEFAULT_BUDGET });
+
     const [inputText, setInputText] = useState('');
-    const [isTyping, setIsTyping] = useState(false); // Typing Indicator State
-    const scrollViewRef = useRef();
+    const scrollViewRef = useRef(null);
     const [naggingLevel, setNaggingLevel] = useState('중');
-    const [budgetAlert, setBudgetAlert] = useState(false);
-    const [budgetLimit, setBudgetLimit] = useState('');
-
-    // 사용자 설정 로드
-    useEffect(() => {
-        loadUserSettings();
-    }, []);
-
-    const loadUserSettings = async () => {
-        try {
-            const user = await getUserProfile();
-            if (user) {
-                setBudgetAlert(user.budget_alert_enabled ?? false);
-                if (user.budget_limit) {
-                    setBudgetLimit(String(user.budget_limit));
-                }
-            }
-        } catch (error) {
-            console.error('사용자 설정 로드 실패:', error);
-        }
-    };
-
-    // 예산 알림 토글 핸들러 (백엔드 연동)
-    const handleBudgetAlertToggle = async (value) => {
-        setBudgetAlert(value);
-        try {
-            await updateUserProfile({ budget_alert_enabled: value });
-        } catch (error) {
-            console.error('예산 알림 설정 저장 실패:', error);
-        }
-    };
-
-    // 예산 저장 핸들러 (백엔드 연동)
-    const handleSaveBudgetLimit = async () => {
-        const limit = parseInt(budgetLimit.replace(/,/g, ''), 10);
-        if (isNaN(limit) || limit <= 0) {
-            if (Platform.OS === 'web') {
-                alert('올바른 금액을 입력해주세요.');
-            } else {
-                Alert.alert('알림', '올바른 금액을 입력해주세요.');
-            }
-            return;
-        }
-
-        try {
-            await updateUserProfile({ budget_limit: limit });
-            if (Platform.OS === 'web') {
-                alert(`저장 완료! 월 예산이 ${limit.toLocaleString()}원으로 설정되었습니다.`);
-            } else {
-                Alert.alert('저장 완료', `월 예산이 ${limit.toLocaleString()}원으로 설정되었습니다.`);
-            }
-        } catch (error) {
-            if (Platform.OS === 'web') {
-                alert('예산 저장 중 오류가 발생했습니다.');
-            } else {
-                Alert.alert('오류', '예산 저장 중 오류가 발생했습니다.');
-            }
-        }
-    };
-
-    // 예산 초기화 핸들러 (백엔드 연동)
-    const handleResetBudgetLimit = async () => {
-        try {
-            await updateUserProfile({ budget_limit: 0, budget_alert_enabled: false });
-            setBudgetLimit('');
-            setBudgetAlert(false);
-            if (Platform.OS === 'web') {
-                alert('예산 설정이 초기화되었습니다.');
-            } else {
-                Alert.alert('초기화 완료', '예산 설정이 초기화되었습니다.');
-            }
-        } catch (error) {
-            if (Platform.OS === 'web') {
-                alert('초기화 중 오류가 발생했습니다.');
-            } else {
-                Alert.alert('오류', '초기화 중 오류가 발생했습니다.');
-            }
-        }
-    };
 
     // 대시보드에서 "잠깐만" 버튼 누르면 바로 챗봇 시작
     useEffect(() => {
         if (route?.params?.openChat) {
             startChat();
-            // 파라미터 초기화 (뒤로가기 후 다시 올 때를 위해)
             navigation?.setParams({ openChat: false });
         }
-    }, [route?.params?.openChat]);
+    }, [route?.params?.openChat, startChat, navigation]);
 
-    // 난이도별 챗봇 응답 (잠깐만AI 스타일)
-    const getChatbotResponse = (userMessage) => {
-        const responses = {
-            '상': [
-                "🔥 또 배달 시켰어요?! 한 달에 배달비만 10만원이에요! 당장 그만두세요!",
-                "😤 카페 지출 보세요! 이러다 집 한 채 값 다 써요! 텀블러 들고 다니세요!",
-                "⚡ 충동구매 그만해요! 장바구니에 24시간 두고 다시 생각하세요! 지금 당장!",
-                "🚨 저축 비율이 뭐예요?! 급여의 30%는 무조건 저축! 오늘부터 시작!",
-                "💢 쇼핑 중독이에요?! 이번 달 쇼핑 예산 다 썼어요! 손 떼세요!",
-                "😡 외식비가 월급의 절반이에요! 도시락 싸세요! 변명 듣기 싫어요!",
-            ],
-            '중': [
-                "이번 달 카페 지출이 너무 많아요! 커피 한 잔 줄이면 한 달에 5만원 절약할 수 있어요 ☕",
-                "배달앱 사용이 잦네요. 직접 요리하면 건강도 챙기고 돈도 아낄 수 있어요! 🍳",
-                "쇼핑 지출이 평균보다 30% 높아요. 정말 필요한 건지 다시 생각해보세요 🛍️",
-                "저축 비율이 낮아요! 급여의 20%는 먼저 저축하는 습관을 들여보세요 💰",
-                "외식비가 많이 나가고 있어요. 도시락 싸가면 한 달에 20만원은 절약됩니다! 🍱",
-                "구독 서비스가 많네요. 안 쓰는 구독은 과감히 해지하세요! 📺",
-            ],
-            '하': [
-                "혹시 커피 지출을 조금 줄여보시는 건 어떨까요? 작은 변화도 도움이 돼요 😊",
-                "배달 대신 가끔 직접 요리해보시는 것도 좋을 것 같아요~ 🍳",
-                "쇼핑 전에 한 번 더 생각해보시면 좋겠어요. 천천히 결정하셔도 돼요! 💭",
-                "저축을 조금씩 시작해보시는 건 어떨까요? 부담 없이 시작해보세요 🌱",
-                "외식도 좋지만, 가끔은 집밥도 좋답니다~ 건강에도 좋아요! 🏠",
-                "지출 패턴을 한 번 돌아보시는 것도 좋을 것 같아요. 화이팅! 💪",
-            ]
-        };
-
-        const levelResponses = responses[naggingLevel] || responses['중'];
-        return levelResponses[Math.floor(Math.random() * levelResponses.length)];
-    };
-
-    // 챗봇 시작
-    const startChat = () => {
-        setChatStarted(true);
-        setMessages([
-            {
-                id: 1,
-                type: 'bot',
-                text: '안녕하세요! 저는 소비 습관 개선을 도와주는 잠깐만 AI예요 🤖\n\n궁금한 점이나 상담하고 싶은 내용을 말씀해주세요!',
-                time: new Date().toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })
-            }
-        ]);
-    };
-
-    const sendMessage = async () => {
+    // 메시지 전송 핸들러
+    const handleSendMessage = async () => {
         if (!inputText.trim()) return;
-
-        const userMessage = {
-            id: messages.length + 1,
-            type: 'user',
-            text: inputText,
-            time: new Date().toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })
-        };
-
-        setMessages(prev => [...prev, userMessage]);
+        const text = inputText;
         setInputText('');
-        setIsTyping(true); // Show typing indicator
-
-        try {
-            // Call Backend API
-            const response = await fetch('http://localhost:8001/api/chat', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    message: userMessage.text,
-                    naggingLevel: naggingLevel
-                }),
-            });
-
-            const data = await response.json();
-
-            if (response.ok) {
-                const botMessage = {
-                    id: messages.length + 2,
-                    type: 'bot',
-                    text: data.reply,
-                    time: new Date().toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })
-                };
-                setMessages(prev => [...prev, botMessage]);
-            } else {
-                throw new Error('API Error');
-            }
-        } catch (error) {
-            console.error('Chat Error:', error);
-            const errorMessage = {
-                id: messages.length + 2,
-                type: 'bot',
-                text: "죄송해요, 잠시 연결이 불안정하네요. 다시 말씀해주시겠어요? 😥",
-                time: new Date().toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })
-            };
-            setMessages(prev => [...prev, errorMessage]);
-        } finally {
-            setIsTyping(false); // Hide typing indicator
-        }
+        await sendMessage(text);
     };
+
     // 예산 설정 모달 상태
     const [budgetModalVisible, setBudgetModalVisible] = useState(false);
     const [monthlyBudget, setMonthlyBudget] = useState('0');
@@ -213,6 +55,7 @@ export default function MoreScreen({ navigation, route }) {
         '여가': '0',
         '기타': '0'
     });
+
 
     // 고객센터 Q&A 모달 상태
     const [qnaModalVisible, setQnaModalVisible] = useState(false);
@@ -260,11 +103,11 @@ export default function MoreScreen({ navigation, route }) {
     // 예산 저장 버튼
     const handleSaveBudget = () => {
         // TODO: 백엔드 연결 시 저장 API 호출
-        alert(`예산이 저장되었습니다!\n\n월 예산: ${Number(monthlyBudget).toLocaleString()}원`);
+        alert(`✅ 예산이 저장되었습니다!\n\n월 예산: ${Number(monthlyBudget).toLocaleString()}원`);
         setBudgetModalVisible(false);
     };
 
-    // 예산 초기화 버튼
+    // 예산 초기화 핸들러
     const handleResetBudget = () => {
         setMonthlyBudget('0');
         setCategoryBudgets({
@@ -276,7 +119,6 @@ export default function MoreScreen({ navigation, route }) {
         });
     };
 
-    // 메뉴 아이템
     const menuItems = [
         {
             title: '지출 분석',
@@ -287,14 +129,12 @@ export default function MoreScreen({ navigation, route }) {
             onPress: () => navigation?.navigate('분석')
         },
         {
-            title: '예산 초과 알림',
-            description: '예산 80% 도달 시 알림',
-            icon: 'alert-circle',
+            title: '예산 설정',
+            description: '월별 예산 목표 설정',
+            icon: 'target',
             color: '#8B5CF6',
             bgColor: '#EDE9FE',
-            isSwitch: true,  // Switch 타입 표시
-            value: budgetAlert,
-            onValueChange: handleBudgetAlertToggle
+            onPress: () => setBudgetModalVisible(true)
         },
         {
             title: '고객센터',
@@ -348,31 +188,6 @@ export default function MoreScreen({ navigation, route }) {
                     </View>
                 </View>
 
-                {/* 난이도 선택 UI */}
-                <View style={[styles.levelSelector, { backgroundColor: colors.cardBackground }]}>
-                    <Text style={[styles.levelLabel, { color: colors.textSecondary }]}>잠깐만 강도:</Text>
-                    <View style={styles.levelButtons}>
-                        {['하', '중', '상'].map((level) => (
-                            <TouchableOpacity
-                                key={level}
-                                style={[
-                                    styles.levelButton,
-                                    naggingLevel === level && styles.levelButtonActive,
-                                    level === '상' && naggingLevel === level && styles.levelButtonHigh,
-                                    level === '하' && naggingLevel === level && styles.levelButtonLow,
-                                ]}
-                                onPress={() => setNaggingLevel(level)}
-                            >
-                                <Text style={[
-                                    styles.levelButtonText,
-                                    naggingLevel === level && styles.levelButtonTextActive
-                                ]}>
-                                    {level === '상' ? '🔥 상' : level === '중' ? '💬 중' : '😊 하'}
-                                </Text>
-                            </TouchableOpacity>
-                        ))}
-                    </View>
-                </View>
 
                 {/* 메시지 리스트 */}
                 <ScrollView
@@ -431,7 +246,7 @@ export default function MoreScreen({ navigation, route }) {
                     />
                     <TouchableOpacity
                         style={styles.sendButton}
-                        onPress={sendMessage}
+                        onPress={handleSendMessage}
                     >
                         <LinearGradient
                             colors={['#6366F1', '#4F46E5']}
@@ -481,72 +296,21 @@ export default function MoreScreen({ navigation, route }) {
 
                 <FadeInView style={styles.menuSection} delay={100}>
                     {menuItems.map((item, index) => (
-                        <React.Fragment key={index}>
-                            <TouchableOpacity
-                                style={[styles.menuItem, { backgroundColor: colors.cardBackground }]}
-                                onPress={item.isSwitch ? undefined : item.onPress}
-                                activeOpacity={item.isSwitch ? 1 : 0.7}
-                            >
-                                <View style={[styles.menuIcon, { backgroundColor: item.bgColor }]}>
-                                    <Feather name={item.icon} size={24} color={item.color} />
-                                </View>
-                                <View style={styles.menuContent}>
-                                    <Text style={[styles.menuTitle, { color: colors.text }]}>{item.title}</Text>
-                                    <Text style={[styles.menuDesc, { color: colors.textSecondary }]}>{item.description}</Text>
-                                </View>
-                                {item.isSwitch ? (
-                                    <Switch
-                                        value={item.value}
-                                        onValueChange={item.onValueChange}
-                                        trackColor={{ false: '#E5E7EB', true: '#6366F1' }}
-                                        thumbColor={'#FFFFFF'}
-                                        ios_backgroundColor="#E5E7EB"
-                                    />
-                                ) : (
-                                    <Feather name="chevron-right" size={20} color={colors.textSecondary} />
-                                )}
-                            </TouchableOpacity>
-                            
-                            {/* 예산 입력 필드 - 예산 초과 알림(index 1) 바로 다음에 표시 */}
-                            {index === 1 && budgetAlert && (
-                                <View style={[styles.budgetInputCard, { backgroundColor: colors.cardBackground, marginBottom: 12 }]}>
-                                    <Text style={[styles.budgetInputLabel, { color: colors.text }]}>💰 월 목표 예산</Text>
-                                    <View style={styles.budgetInputRow}>
-                                        <TextInput
-                                            style={[styles.budgetInputField, { color: colors.text, borderColor: colors.border || '#E5E7EB', backgroundColor: colors.background }]}
-                                            keyboardType="numeric"
-                                            placeholder="금액 입력"
-                                            placeholderTextColor={colors.textSecondary}
-                                            value={budgetLimit}
-                                            onChangeText={(text) => {
-                                                // 숫자만 추출 후 천 단위 쉼표 추가
-                                                const numOnly = text.replace(/[^0-9]/g, '');
-                                                const formatted = numOnly.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-                                                setBudgetLimit(formatted);
-                                            }}
-                                        />
-                                        <Text style={[styles.budgetCurrency, { color: colors.text }]}>원</Text>
-                                    </View>
-                                    <View style={styles.budgetBtnRow}>
-                                        <TouchableOpacity
-                                            style={styles.budgetSaveBtn}
-                                            onPress={handleSaveBudgetLimit}
-                                        >
-                                            <Text style={styles.budgetSaveBtnText}>저장</Text>
-                                        </TouchableOpacity>
-                                        <TouchableOpacity
-                                            style={styles.budgetResetBtn}
-                                            onPress={handleResetBudgetLimit}
-                                        >
-                                            <Text style={styles.budgetResetBtnText}>초기화</Text>
-                                        </TouchableOpacity>
-                                    </View>
-                                    <Text style={[styles.budgetHelperText, { color: colors.textSecondary }]}>
-                                        예산의 80%에 도달하면 알림을 보내드립니다
-                                    </Text>
-                                </View>
-                            )}
-                        </React.Fragment>
+                        <TouchableOpacity
+                            key={index}
+                            style={[styles.menuItem, { backgroundColor: colors.cardBackground }]}
+                            onPress={item.onPress}
+                            activeOpacity={0.7}
+                        >
+                            <View style={[styles.menuIcon, { backgroundColor: item.bgColor }]}>
+                                <Feather name={item.icon} size={24} color={item.color} />
+                            </View>
+                            <View style={styles.menuContent}>
+                                <Text style={[styles.menuTitle, { color: colors.text }]}>{item.title}</Text>
+                                <Text style={[styles.menuDesc, { color: colors.textSecondary }]}>{item.description}</Text>
+                            </View>
+                            <Feather name="chevron-right" size={20} color={colors.textSecondary} />
+                        </TouchableOpacity>
                     ))}
                 </FadeInView>
 
@@ -856,73 +620,6 @@ const styles = StyleSheet.create({
         fontSize: 13,
         color: '#6B7280',
     },
-
-    // 예산 입력 필드 스타일
-    budgetInputCard: {
-        borderRadius: 16,
-        padding: 16,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.06,
-        shadowRadius: 8,
-        elevation: 3,
-    },
-    budgetInputLabel: {
-        fontSize: 16,
-        fontWeight: '600',
-        marginBottom: 12,
-    },
-    budgetInputRow: {
-        flexDirection: 'row',
-        alignItems: 'center',
-    },
-    budgetInputField: {
-        flex: 1,
-        height: 44,
-        borderWidth: 1,
-        borderRadius: 10,
-        paddingHorizontal: 14,
-        fontSize: 16,
-        marginRight: 8,
-    },
-    budgetCurrency: {
-        fontSize: 16,
-        fontWeight: '600',
-    },
-    budgetBtnRow: {
-        flexDirection: 'row',
-        marginTop: 12,
-        gap: 10,
-    },
-    budgetSaveBtn: {
-        flex: 1,
-        backgroundColor: '#6366F1',
-        paddingVertical: 12,
-        borderRadius: 10,
-        alignItems: 'center',
-    },
-    budgetSaveBtnText: {
-        color: '#FFFFFF',
-        fontSize: 14,
-        fontWeight: '600',
-    },
-    budgetResetBtn: {
-        flex: 1,
-        backgroundColor: '#FEE2E2',
-        paddingVertical: 12,
-        borderRadius: 10,
-        alignItems: 'center',
-    },
-    budgetResetBtnText: {
-        color: '#DC2626',
-        fontSize: 14,
-        fontWeight: '600',
-    },
-    budgetHelperText: {
-        fontSize: 12,
-        marginTop: 10,
-    },
-
     versionSection: {
         alignItems: 'center',
         paddingTop: 32,

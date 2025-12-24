@@ -1,7 +1,10 @@
+
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { getTransactions, updateTransactionNote as apiUpdateNote, createTransactionsBulk, deleteAllTransactions } from '../api';
+import { getTransactions, updateTransactionNote as apiUpdateNote, createTransactionsBulk, deleteAllTransactions, createTransaction, deleteTransaction, evaluateTransaction } from '../api';
 import { predictNextTransaction } from '../api/ml';
+import { useToast } from './ToastContext';
+import { filterMonthlyTransactions, calculateTotalSpent, analyzeCategoryBreakdown } from '../utils/spendingAnalyzer';
 
 const TransactionContext = createContext();
 
@@ -10,6 +13,7 @@ export const TransactionProvider = ({ children }) => {
     const [transactions, setTransactions] = useState([]);
     const [loading, setLoading] = useState(false);
     const [lastSyncTime, setLastSyncTime] = useState(null);
+    const { showToast } = useToast();  // Toast 알림 함수
 
     // 앱 시작 시 캐시 로드 (캐시 있으면 서버 호출 생략)
     useEffect(() => {
@@ -36,10 +40,10 @@ export const TransactionProvider = ({ children }) => {
             const userJson = await AsyncStorage.getItem('user');
             const user = userJson ? JSON.parse(userJson) : null;
             if (!user?.id) return false;  // 사용자 정보 없으면 캐시 없음
-            
+
             const cacheKey = `transactions_cache_${user.id}`;
             const syncKey = `last_sync_time_${user.id}`;
-            
+
             const cached = await AsyncStorage.getItem(cacheKey);
             const syncTime = await AsyncStorage.getItem(syncKey);
 
@@ -56,8 +60,10 @@ export const TransactionProvider = ({ children }) => {
         }
     };
 
-    // loadTransactionsFromServer - 서버에서 거래 데이터 가져오기
-    const loadTransactionsFromServer = async (userId = null) => {
+    /**
+     * 서버에서 거래 데이터 가져오기 (실시간 API 호출)
+     */
+    const loadTransactionsFromServer = async (userId = 1) => {
         setLoading(true);
         try {
             const response = await getTransactions({ user_id: userId, page_size: 10000 });
@@ -107,7 +113,7 @@ export const TransactionProvider = ({ children }) => {
                 uid = user?.id;
             }
             if (!uid) return;  // 사용자 정보 없으면 저장 안 함
-            
+
             const cacheKey = `transactions_cache_${uid}`;
             await AsyncStorage.setItem(cacheKey, JSON.stringify(newTransactions));
         } catch (error) {
@@ -131,7 +137,7 @@ export const TransactionProvider = ({ children }) => {
                 const userJson = await AsyncStorage.getItem('user');
                 const user = userJson ? JSON.parse(userJson) : null;
                 const currentUserId = user?.id || userId;
-                
+
                 if (currentUserId) {
                     const result = await createTransactionsBulk(currentUserId, newTransactions);
                     // 저장 완료
@@ -147,7 +153,103 @@ export const TransactionProvider = ({ children }) => {
         }
     };
 
-    // updateNote - 메모 업데이트
+    const addTransaction = async (data) => {
+        try {
+            // API 호출
+            const newTx = await createTransaction(data);
+
+            // 앱 형식으로 변환
+            const formattedTx = {
+                id: String(newTx.id),
+                merchant: newTx.merchant,
+                businessName: newTx.merchant,
+                amount: newTx.amount,
+                category: newTx.category,
+                originalCategory: newTx.category,
+                date: newTx.transaction_date || new Date().toISOString().replace('T', ' ').substring(0, 19),
+                cardType: newTx.currency === 'KRW' ? '신용' : '체크',
+                cardName: newTx.payment_method || '카드',
+                notes: newTx.description || '',
+                status: newTx.status,
+            };
+
+            // 로컬 상태 업데이트 (최신 거래가 위로 오도록)
+            const updated = [formattedTx, ...transactions];
+            setTransactions(updated);
+            await saveTransactionsToCache(updated);
+
+            // 즉시 성공 반환 (모달을 빠르게 닫기 위해)
+            const successResult = { success: true, transaction: formattedTx };
+
+
+            // AI 평가를 백그라운드에서 비동기 실행 (await 없이)
+            // AI 평가는 항상 활성화됨
+            (async () => {
+                try {
+                    // 소비 내역 요약 계산 (유틸리티 사용)
+                    const monthlyTransactions = filterMonthlyTransactions(updated);
+                    const totalSpent = calculateTotalSpent(monthlyTransactions);
+
+                    // 같은 카테고리 지출 계산
+                    const categoryBreakdown = analyzeCategoryBreakdown(monthlyTransactions);
+                    const categoryData = categoryBreakdown[formattedTx.category] || { count: 0, total: 0 };
+
+                    // LLM API 호출 (리팩토링된 API 사용)
+                    const evaluationResult = await evaluateTransaction({
+                        transaction: {
+                            merchant_name: formattedTx.merchant,
+                            amount: formattedTx.amount,
+                            category: formattedTx.category
+                        }
+                        // naggingLevel은 기본값 '중' 사용
+                    });
+
+                    if (evaluationResult.success && evaluationResult.message) {
+                        console.log('✅ AI 평가:', evaluationResult.message);
+
+                        // Toast 알림 표시 (모달이 완전히 닫힌 후)
+                        setTimeout(() => {
+                            showToast(evaluationResult.message, 6000);  // 6초 동안 표시
+                        }, 1000);
+                    }
+                } catch (evalError) {
+                    console.error('AI 평가 실패:', evalError);
+                }
+            })();
+
+            return successResult;
+        } catch (error) {
+            console.error('거래 추가 실패:', error);
+            return { success: false, error };
+        }
+    };
+
+    const removeTransaction = async (id) => {
+        try {
+            // 먼저 로컬 상태 업데이트 (UI 반응성 향상)
+            const updated = transactions.filter(t => String(t.id) !== String(id));
+            setTransactions(updated);
+            await saveTransactionsToCache(updated);
+
+            // 백엔드 API 호출 시도 (실패해도 로컬에서는 이미 삭제됨)
+            try {
+                await deleteTransaction(id);
+            } catch (apiError) {
+                // 백엔드에서 404(Not Found)인 경우 무시 - 이미 삭제되었거나 존재하지 않음
+                if (apiError.response?.status === 404) {
+                    console.log('백엔드에 해당 거래가 없음 (로컬에서만 삭제):', id);
+                } else {
+                    console.warn('백엔드 삭제 실패 (로컬에서는 삭제됨):', apiError);
+                }
+            }
+
+            return { success: true };
+        } catch (error) {
+            console.error('거래 삭제 실패:', error);
+            return { success: false, error };
+        }
+    };
+
     const updateNote = async (transactionId, note) => {
         try {
             // API 호출
@@ -183,7 +285,7 @@ export const TransactionProvider = ({ children }) => {
             try {
                 const userJson = await AsyncStorage.getItem('user');
                 const user = userJson ? JSON.parse(userJson) : null;
-                
+
                 if (user?.id) {
                     const result = await deleteAllTransactions(user.id);
                     // 삭제 완료
@@ -247,7 +349,7 @@ export const TransactionProvider = ({ children }) => {
     };
 
     // 새로고침 함수
-    const refresh = async (userId = null) => {
+    const refresh = async (userId = 1) => {
         // userId가 없으면 현재 로그인한 사용자 ID 가져오기
         let uid = userId;
         if (!uid) {
@@ -266,6 +368,8 @@ export const TransactionProvider = ({ children }) => {
             lastSyncTime,
             saveTransactions,
             updateTransactionNote: updateNote,
+            addTransaction,
+            removeTransaction,
             clearTransactions,
             predictNextPurchase,
             loadTransactionsFromServer,

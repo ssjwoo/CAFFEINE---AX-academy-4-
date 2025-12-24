@@ -12,7 +12,7 @@ import FadeInView from '../components/FadeInView';
 import AnimatedButton from '../components/AnimatedButton';
 import EmptyState from '../components/EmptyState';
 import { SkeletonStats, SkeletonChart } from '../components/SkeletonCard';
-import AddTransactionModal from '../components/AddTransactionModal';
+
 import { formatCurrency } from '../utils/currency';
 import { CHART_COLORS, ANIMATION_DELAY } from '../constants';
 
@@ -83,6 +83,20 @@ export default function DashboardScreen({ navigation }) {
     const [birthDateInput, setBirthDateInput] = useState('');  // 6자리 YYMMDD
 
     const scrollViewRef = useRef(null);
+
+    // 이번 달 거래만 필터링
+    const filterCurrentMonthTransactions = (txns) => {
+        if (!txns || txns.length === 0) return [];
+
+        const now = new Date();
+        const currentMonth = now.getMonth();
+        const currentYear = now.getFullYear();
+
+        return txns.filter(t => {
+            const txDate = new Date(t.date);
+            return txDate.getMonth() === currentMonth && txDate.getFullYear() === currentYear;
+        });
+    };
 
     // 로그인 후 거래 데이터 자동 로드
     useEffect(() => {
@@ -257,8 +271,11 @@ export default function DashboardScreen({ navigation }) {
     // 데이터 계산
     useEffect(() => {
         if (transactions && transactions.length > 0) {
-            setSummary(calculateSummary(transactions));
-            setCategoryData(calculateCategoryData(transactions));
+            // 이번 달 거래만 필터링해서 요약 및 카테고리 계산
+            const currentMonthTxns = filterCurrentMonthTransactions(transactions);
+            setSummary(calculateSummary(currentMonthTxns));
+            setCategoryData(calculateCategoryData(currentMonthTxns));
+            // 월별 추이는 전체 데이터 사용
             setMonthlyData(calculateMonthlyData(transactions));
         } else {
             // 거래 데이터가 없을 때는 명시적으로 초기화
@@ -1289,5 +1306,27 @@ const styles = StyleSheet.create({
         fontSize: 12,
         color: '#9CA3AF',
         textAlign: 'center',
+    },
+
+    // Floating Action Button
+    fab: {
+        position: 'absolute',
+        right: 24,
+        bottom: 100,
+        width: 60,
+        height: 60,
+        borderRadius: 30,
+        shadowColor: '#10B981',
+        shadowOffset: { width: 0, height: 6 },
+        shadowOpacity: 0.4,
+        shadowRadius: 12,
+        elevation: 8,
+    },
+    fabGradient: {
+        width: '100%',
+        height: '100%',
+        borderRadius: 30,
+        justifyContent: 'center',
+        alignItems: 'center',
     },
 });

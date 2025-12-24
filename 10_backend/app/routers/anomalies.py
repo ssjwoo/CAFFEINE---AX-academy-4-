@@ -19,7 +19,7 @@ from app.db.model.user import User
 logger = logging.getLogger(__name__)
 
 router = APIRouter(
-    prefix="/api/anomalies",
+    prefix="/anomalies",
     tags=["anomalies"],
     responses={404: {"description": "Not found"}},
 )

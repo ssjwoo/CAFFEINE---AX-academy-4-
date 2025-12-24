@@ -32,7 +32,7 @@ from app.services.analysis import (
 
 
 router = APIRouter(
-    prefix="/api/analysis",
+    prefix="/analysis",
     tags=["analysis"],
     responses={404: {"description": "Not found"}},
 )

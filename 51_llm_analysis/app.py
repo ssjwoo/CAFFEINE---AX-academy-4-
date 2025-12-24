@@ -1,15 +1,20 @@
 """
 Gemini 기반 소비 분석 / 절약 가이드 LLM 서비스
-2025-12-11: Google Gemini API 연동
+최적화 버전: 프롬프트 단축, 캐싱, 토큰 제한 적용
 """
 
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
-from typing import Optional, List
+from typing import Optional, List, Dict
 import google.generativeai as genai
 import os
 import logging
+import hashlib
+import json
+import time
+from functools import lru_cache
 
 # 로깅 설정
 logging.basicConfig(level=logging.INFO)
@@ -17,8 +22,8 @@ logger = logging.getLogger(__name__)
 
 app = FastAPI(
     title="Caffeine 소비 분석 AI",
-    description="Google Gemini 기반 소비 패턴 분석 및 절약 가이드 서비스",
-    version="1.0.0"
+    description="Google Gemini 기반 소비 패턴 분석 및 절약 가이드 서비스 (최적화)",
+    version="2.0.0"
 )
 
 # CORS 설정
@@ -30,87 +35,118 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# ============================================================
+# 캐시 설정 (메모리 기반)
+# ============================================================
+response_cache: Dict[str, tuple] = {}  # {hash: (response, timestamp)}
+CACHE_TTL = 300  # 5분 캐시
+
+def get_cache_key(prompt: str) -> str:
+    """프롬프트 해시 생성"""
+    return hashlib.md5(prompt.encode()).hexdigest()
+
+def get_cached_response(prompt: str) -> Optional[str]:
+    """캐시된 응답 조회"""
+    key = get_cache_key(prompt)
+    if key in response_cache:
+        response, timestamp = response_cache[key]
+        if time.time() - timestamp < CACHE_TTL:
+            logger.info("✅ 캐시 히트!")
+            return response
+        else:
+            del response_cache[key]  # 만료된 캐시 삭제
+    return None
+
+def set_cached_response(prompt: str, response: str):
+    """응답 캐시 저장"""
+    key = get_cache_key(prompt)
+    response_cache[key] = (response, time.time())
+    # 캐시 크기 제한 (최대 100개)
+    if len(response_cache) > 100:
+        oldest_key = min(response_cache, key=lambda k: response_cache[k][1])
+        del response_cache[oldest_key]
+
+# ============================================================
 # Gemini API 설정
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "AIzaSyDQ4GpW4Vs6eyYvqFi_GNevT5v9Bx50zhM")
+# ============================================================
+# docker-compose에서 GEMINI_API_KEY로 전달됨 (.env의 gemini_key에서)
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY") or os.getenv("gemini_key", "")
+if not GEMINI_API_KEY:
+    logger.warning("⚠️ GEMINI_API_KEY가 설정되지 않았습니다!")
+else:
+    logger.info(f"✅ API Key 로드됨: {GEMINI_API_KEY[:10]}...")
 genai.configure(api_key=GEMINI_API_KEY)
 
-# Gemini 모델 초기화
+# 모델 초기화 (최적화: max_output_tokens 제한)
 try:
-    model = genai.GenerativeModel('gemini-2.0-flash')
-    logger.info("✅ Gemini 모델 초기화 성공")
+    generation_config = {
+        "max_output_tokens": 200,  # 매운맛 답변을 위해 토큰 증가
+        "temperature": 0.9,        # 더 재미있는 답변
+    }
+    model = genai.GenerativeModel(
+        'gemini-2.0-flash-exp',
+        generation_config=generation_config
+    )
+    logger.info("✅ Gemini 모델 초기화 성공 (gemini-2.0-flash-exp, max_tokens=200)")
 except Exception as e:
     logger.error(f"❌ Gemini 모델 초기화 실패: {e}")
     model = None
 
 
 # ============================================================
-# 요청/응답 모델
+# 프롬프트 (매운맛 AI + 거래 내역 상세)
 # ============================================================
 
-class SpendingData(BaseModel):
-    """소비 데이터"""
-    total_amount: float  # 총 소비액
-    category_breakdown: List[dict]  # 카테고리별 소비 [{"category": "식비", "amount": 500000, "percentage": 30}]
-    monthly_trend: Optional[List[dict]] = None  # 월별 추이
-    top_merchants: Optional[List[str]] = None  # 자주 가는 가맹점
+def get_transaction_prompt(merchant: str, amount: int, category: str, 
+                          budget_pct: float, category_count: int, category_spent: int, status: str) -> str:
+    """거래 평가용 매운맛 프롬프트"""
+    return f"""당신은 '잠깐만AI', 팩트폭행 재무 트레이너야.
+
+[방금 거래]
+- {merchant}에서 {amount:,}원 씀
+- 카테고리: {category} (이번 달 {category_count}번째, 총 {category_spent:,}원)
+- 예산 {budget_pct:.0f}% 사용, 상태: {status}
+
+[규칙]
+1. 반말로 3문장 이내
+2. 이모지 절대 사용 금지
+3. 과소비면 비꼬고 풍자, 잘했으면 격하게 칭찬
+4. 구체적 숫자 언급
+
+예시:
+- 반복: "와 한달에 {merchant} {category_count}번이나 간다고? 너 덕분에 {merchant} 이번달 소고기 먹음"
+- 과소비: "{category}에 {category_spent:,}원 쓰는 거 실화? 정신 못차리지?"
+- 절약: "드디어 정신차렸구나! 잘하고 있어. 건물주 되면 나 잊지말고!"
+
+바로 조언해:"""
 
 
-class AnalysisRequest(BaseModel):
-    """분석 요청"""
-    spending_data: SpendingData
-    user_question: Optional[str] = None  # 사용자 질문 (선택)
+def get_chat_prompt(message: str, budget_pct: float, remaining: int, 
+                   tx_count: int, top_category: str, category_summary: str, recent_tx: str) -> str:
+    """챗봇용 매운맛 프롬프트 (거래 내역 포함)"""
+    return f"""당신은 '잠깐만AI', 팩트폭행하며 돈 아끼게 만드는 재무 트레이너야.
 
+[사용자 재정 현황]
+- 예산 사용: {budget_pct:.0f}% (남은 돈: {remaining:,}원)
+- 이번 달 거래: {tx_count}회
 
-class ChatRequest(BaseModel):
-    """채팅 요청"""
-    message: str
-    spending_context: Optional[SpendingData] = None
+[카테고리별 지출]
+{category_summary if category_summary else "아직 거래 없음"}
 
+[최근 거래]
+{recent_tx if recent_tx else "없음"}
 
-class AnalysisResponse(BaseModel):
-    """분석 응답"""
-    summary: str  # 요약
-    insights: List[str]  # 인사이트
-    saving_tips: List[str]  # 절약 팁
-    warning: Optional[str] = None  # 경고 (과소비 등)
+[규칙]
+1. 반말로 3문장 이내
+2. 이모지 절대 사용 금지
+3. 구체적 숫자와 거래 내역 언급해서 답변
+4. 비꼬고 풍자하되 도움되게
 
+[사용자 질문]
+{message}
 
-# ============================================================
-# 프롬프트 템플릿
-# ============================================================
+바로 답변해:"""
 
-ANALYSIS_PROMPT = """
-당신은 전문 가계부 분석가이자 절약 컨설턴트입니다.
-다음 소비 데이터를 분석하고 친절하게 조언해주세요.
-
-## 소비 데이터
-- 총 소비액: {total_amount:,}원
-- 카테고리별 소비:
-{category_breakdown}
-
-{monthly_trend}
-{top_merchants}
-
-## 요청사항
-1. 소비 패턴을 간단히 요약해주세요 (2-3문장)
-2. 주요 인사이트 3개를 알려주세요
-3. 구체적인 절약 팁 3개를 제안해주세요
-4. 과소비가 의심되면 부드럽게 경고해주세요
-
-응답은 한국어로, 친근하고 격려하는 톤으로 해주세요.
-JSON 형식이 아닌 자연스러운 문장으로 답변해주세요.
-"""
-
-CHAT_PROMPT = """
-당신은 친절한 가계부 비서 "카페인"입니다.
-사용자의 소비 관련 질문에 도움을 드립니다.
-
-{context}
-
-사용자 질문: {message}
-
-친근하고 도움이 되는 답변을 해주세요. 답변은 한국어로 해주세요.
-"""
 
 
 # ============================================================
@@ -122,121 +158,173 @@ def health_check():
     """헬스 체크"""
     return {
         "status": "ok",
-        "service": "Caffeine 소비 분석 AI",
-        "model": "gemini-2.0-flash",
-        "model_loaded": model is not None
+        "service": "Caffeine 소비 분석 AI (최적화)",
+        "model": "gemini-2.0-flash-exp",
+        "model_loaded": model is not None,
+        "cache_size": len(response_cache)
     }
 
 
-@app.post("/analyze")
-async def analyze_spending(request: AnalysisRequest):
-    """소비 데이터 분석"""
+@app.post("/evaluate")
+async def evaluate_transaction(request: dict):
+    """통합 AI 엔드포인트 - 거래 평가 및 챗봇 대화 (최적화)"""
     if model is None:
         raise HTTPException(status_code=503, detail="Gemini 모델이 초기화되지 않았습니다")
     
+    start_time = time.time()
+    
     try:
-        # 카테고리 데이터 포맷팅
-        category_text = "\n".join([
-            f"  - {item.get('category', '기타')}: {item.get('amount', 0):,}원 ({item.get('percentage', 0):.1f}%)"
-            for item in request.spending_data.category_breakdown
-        ])
+        transaction = request.get("transaction", {})
+        message = request.get("message", "")
+        budget = request.get("budget", 1000000)
+        spending_history = request.get("spending_history", {})
         
-        # 월별 추이 (있으면)
-        monthly_text = ""
-        if request.spending_data.monthly_trend:
-            monthly_text = "\n- 월별 추이:\n" + "\n".join([
-                f"  - {item.get('month', '?')}: {item.get('amount', 0):,}원"
-                for item in request.spending_data.monthly_trend
-            ])
+        # 디버깅: 받은 데이터 로깅
+        logger.info(f"📊 받은 데이터 - 예산: {budget:,}원, 지출: {spending_history.get('total', 0):,}원, 거래수: {spending_history.get('transaction_count', 0)}회")
+        logger.info(f"📊 카테고리: {list(spending_history.get('category_breakdown', {}).keys())[:3]}")
+        logger.info(f"📊 최근거래: {spending_history.get('recent_transactions', '없음')[:50]}...")
         
-        # 자주 가는 가맹점 (있으면)
-        merchants_text = ""
-        if request.spending_data.top_merchants:
-            merchants_text = f"\n- 자주 가는 곳: {', '.join(request.spending_data.top_merchants)}"
+        total_spent = spending_history.get("total", 0)
+        budget_percentage = (total_spent / budget * 100) if budget > 0 else 0
+        remaining_budget = max(0, budget - total_spent)
         
-        # 프롬프트 생성
-        prompt = ANALYSIS_PROMPT.format(
-            total_amount=request.spending_data.total_amount,
-            category_breakdown=category_text,
-            monthly_trend=monthly_text,
-            top_merchants=merchants_text
-        )
+        # 재정 상태 판단
+        if budget_percentage > 100:
+            status = "파산직전"
+        elif budget_percentage > 80:
+            status = "위험"
+        elif budget_percentage > 50:
+            status = "보통"
+        else:
+            status = "여유"
         
-        # 사용자 추가 질문이 있으면 포함
-        if request.user_question:
-            prompt += f"\n\n추가 질문: {request.user_question}"
+        # 거래 평가인 경우
+        if transaction and transaction.get("merchant_name"):
+            merchant = transaction.get("merchant_name", "?")
+            amount = transaction.get("amount", 0)
+            category = transaction.get("category", "기타")
+            category_count = spending_history.get("category_count", 1)
+            category_spent = spending_history.get("category_total", 0)
+            
+            prompt = get_transaction_prompt(
+                merchant, amount, category, 
+                budget_percentage, category_count, category_spent, status
+            )
+            req_type = "transaction"
+            logger.info(f"📝 거래 평가: {merchant} {amount:,}원")
+        
+        # 일반 대화인 경우
+        elif message:
+            tx_count = spending_history.get("transaction_count", 0)
+            category_breakdown = spending_history.get("category_breakdown", {})
+            recent_transactions = spending_history.get("recent_transactions", "")
+            
+            # TOP 카테고리 추출
+            top_category = "없음"
+            category_summary = ""
+            if category_breakdown:
+                # 카테고리별 요약 생성
+                sorted_cats = sorted(category_breakdown.items(), 
+                                    key=lambda x: x[1].get('total', 0), reverse=True)[:3]
+                category_summary = "\n".join([
+                    f"- {cat}: {info.get('count', 0)}회, {info.get('total', 0):,}원" 
+                    for cat, info in sorted_cats
+                ])
+                if sorted_cats:
+                    top_cat = sorted_cats[0]
+                    top_category = f"{top_cat[0]}({top_cat[1].get('count', 0)}회)"
+            
+            prompt = get_chat_prompt(
+                message, budget_percentage, remaining_budget, 
+                tx_count, top_category, category_summary, recent_transactions
+            )
+            req_type = "chat"
+            logger.info(f"💬 챗봇 대화: {message[:20]}...")
+        
+        else:
+            raise HTTPException(status_code=400, detail="transaction 또는 message 필수")
+        
+        # 캐시 확인
+        cached = get_cached_response(prompt)
+        if cached:
+            elapsed = time.time() - start_time
+            return {
+                "status": "success",
+                "message": cached,
+                "model": "gemini-2.0-flash-exp",
+                "type": req_type,
+                "cached": True,
+                "elapsed_ms": int(elapsed * 1000)
+            }
         
         # Gemini API 호출
         response = model.generate_content(prompt)
+        result = response.text.strip()
         
-        logger.info("✅ Gemini 분석 완료")
+        # 캐시 저장
+        set_cached_response(prompt, result)
+        
+        elapsed = time.time() - start_time
+        logger.info(f"⚡ 응답 완료: {int(elapsed * 1000)}ms")
         
         return {
             "status": "success",
-            "analysis": response.text,
-            "model": "gemini-2.0-flash"
+            "message": result,
+            "model": "gemini-2.0-flash-exp",
+            "type": req_type,
+            "cached": False,
+            "elapsed_ms": int(elapsed * 1000)
         }
         
     except Exception as e:
-        logger.error(f"❌ 분석 실패: {e}")
-        raise HTTPException(status_code=500, detail=f"분석 중 오류 발생: {str(e)}")
+        logger.error(f"❌ AI 처리 실패: {e}")
+        raise HTTPException(status_code=500, detail=f"처리 중 오류 발생: {str(e)}")
 
 
-@app.post("/chat")
-async def chat_with_assistant(request: ChatRequest):
-    """채팅형 질의응답"""
+@app.post("/evaluate/stream")
+async def evaluate_stream(request: dict):
+    """스트리밍 응답 (UX 개선)"""
     if model is None:
         raise HTTPException(status_code=503, detail="Gemini 모델이 초기화되지 않았습니다")
     
     try:
-        # 소비 컨텍스트 생성
-        context = ""
-        if request.spending_context:
-            context = f"""
-사용자의 소비 정보:
-- 총 소비: {request.spending_context.total_amount:,}원
-- 주요 카테고리: {', '.join([item.get('category', '') for item in request.spending_context.category_breakdown[:3]])}
-"""
+        message = request.get("message", "")
+        budget = request.get("budget", 1000000)
+        spending_history = request.get("spending_history", {})
         
-        prompt = CHAT_PROMPT.format(
-            context=context,
-            message=request.message
-        )
+        total_spent = spending_history.get("total", 0)
+        budget_percentage = (total_spent / budget * 100) if budget > 0 else 0
+        remaining_budget = max(0, budget - total_spent)
+        tx_count = spending_history.get("transaction_count", 0)
         
-        response = model.generate_content(prompt)
+        prompt = get_chat_prompt(message, budget_percentage, remaining_budget, tx_count, "")
         
-        return {
-            "status": "success",
-            "reply": response.text,
-            "model": "gemini-2.0-flash"
-        }
+        async def generate():
+            response = model.generate_content(prompt, stream=True)
+            for chunk in response:
+                if chunk.text:
+                    yield f"data: {json.dumps({'text': chunk.text})}\n\n"
+            yield "data: [DONE]\n\n"
+        
+        return StreamingResponse(generate(), media_type="text/event-stream")
         
     except Exception as e:
-        logger.error(f"❌ 채팅 실패: {e}")
-        raise HTTPException(status_code=500, detail=f"채팅 중 오류 발생: {str(e)}")
+        logger.error(f"스트리밍 실패: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 
-@app.post("/saving-tips")
-async def get_saving_tips(category: str = "전체"):
-    """카테고리별 절약 팁"""
-    if model is None:
-        raise HTTPException(status_code=503, detail="Gemini 모델이 초기화되지 않았습니다")
-    
-    try:
-        prompt = f"""
-'{category}' 카테고리에서 돈을 절약하는 실용적인 팁 5개를 알려주세요.
-한국의 상황에 맞는 구체적이고 실천 가능한 조언을 해주세요.
-각 팁은 1-2문장으로 간결하게 작성해주세요.
-"""
-        
-        response = model.generate_content(prompt)
-        
-        return {
-            "status": "success",
-            "category": category,
-            "tips": response.text,
-            "model": "gemini-2.0-flash"
-        }
-        
-    except Exception as e:
-        logger.error(f"❌ 팁 생성 실패: {e}")
+@app.get("/cache/stats")
+def cache_stats():
+    """캐시 통계"""
+    return {
+        "cache_size": len(response_cache),
+        "cache_keys": list(response_cache.keys())[:10],  # 최근 10개만
+        "ttl_seconds": CACHE_TTL
+    }
+
+
+@app.delete("/cache/clear")
+def clear_cache():
+    """캐시 초기화"""
+    response_cache.clear()
+    return {"status": "ok", "message": "캐시가 초기화되었습니다"}

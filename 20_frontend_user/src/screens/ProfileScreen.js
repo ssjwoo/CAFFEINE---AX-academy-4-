@@ -131,6 +131,7 @@ export default function ProfileScreen({ navigation }) {
 
             if (saveResult.success) {
                 alert(`✅ 데이터 동기화 완료!\n\n${transactions.length}건의 거래 내역이 업데이트되었습니다.`);
+                // 대시보드로 바로 이동 (스택 초기화)
                 navigation?.reset({
                     index: 0,
                     routes: [{ name: 'MainTabs' }],

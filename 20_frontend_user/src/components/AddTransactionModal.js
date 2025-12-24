@@ -13,82 +13,78 @@ import {
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Feather } from '@expo/vector-icons';
+import { useTransactions } from '../contexts/TransactionContext';
 
 const CATEGORIES = [
-    { name: '식비', icon: 'coffee', color: '#F59E0B' },
+    { name: '외식', icon: 'coffee', color: '#F59E0B' },
+    { name: '식료품', icon: 'shopping-cart', color: '#10B981' },
     { name: '쇼핑', icon: 'shopping-bag', color: '#EC4899' },
     { name: '교통', icon: 'navigation', color: '#3B82F6' },
-    { name: '여가', icon: 'music', color: '#10B981' },
-    { name: '공과금', icon: 'zap', color: '#8B5CF6' },
-    { name: '의료', icon: 'heart', color: '#EF4444' },
-    { name: '카페', icon: 'coffee', color: '#6366F1' },
+    { name: '생활', icon: 'home', color: '#8B5CF6' },
+    { name: '주유', icon: 'zap', color: '#EF4444' },
     { name: '기타', icon: 'more-horizontal', color: '#6B7280' },
 ];
 
-const API_BASE_URL = 'http://localhost:8001';
-
 export default function AddTransactionModal({ visible, onClose, onSuccess }) {
+    const { addTransaction } = useTransactions();  // TransactionContext 사용
     const [amount, setAmount] = useState('');
     const [merchantName, setMerchantName] = useState('');
     const [description, setDescription] = useState('');
-    const [selectedCategory, setSelectedCategory] = useState('식비');
+    const [selectedCategory, setSelectedCategory] = useState('외식');
     const [isLoading, setIsLoading] = useState(false);
 
     const resetForm = () => {
         setAmount('');
         setMerchantName('');
         setDescription('');
-        setSelectedCategory('식비');
+        setSelectedCategory('외식');
     };
 
     const handleSubmit = async () => {
         // 유효성 검사
         if (!amount || parseFloat(amount) <= 0) {
-            Alert.alert('오류', '유효한 금액을 입력하세요.');
+            alert('유효한 금액을 입력하세요.');
             return;
         }
         if (!merchantName.trim()) {
-            Alert.alert('오류', '가맹점명을 입력하세요.');
+            alert('가맹점명을 입력하세요.');
             return;
         }
 
         setIsLoading(true);
 
         try {
-            const response = await fetch(`${API_BASE_URL}/api/transactions`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    amount: parseFloat(amount),
-                    category: selectedCategory,
-                    merchant_name: merchantName.trim(),
-                    description: description.trim() || null,
-                    transaction_date: new Date().toISOString(),
-                }),
+            // TransactionContext의 addTransaction 사용 (AI 평가 포함)
+            const result = await addTransaction({
+                amount: parseFloat(amount),
+                category: selectedCategory,
+                merchant_name: merchantName.trim(),
+                description: description.trim() || null,
+                transaction_date: new Date().toISOString(),
             });
 
-            if (!response.ok) {
-                throw new Error(`서버 오류: ${response.status}`);
+            if (result.success) {
+                console.log('✅ 거래 추가 성공:', result.transaction);
+
+                // 폼 초기화
+                resetForm();
+
+                // 모달 즉시 닫기
+                onClose();
+
+                // 성공 콜백 호출
+                if (onSuccess) onSuccess();
+
+                // AI 평가 메시지가 없으면 기본 알림 (AI 꺼져있을 때)
+                if (!result.aiEvaluation) {
+                    alert('✅ 소비 내역이 추가되었습니다!');
+                }
+            } else {
+                throw new Error(result.error?.message || '저장 실패');
             }
-
-            const data = await response.json();
-            console.log('✅ 거래 추가 성공:', data);
-
-            Alert.alert('성공', '소비 내역이 추가되었습니다!', [
-                {
-                    text: '확인',
-                    onPress: () => {
-                        resetForm();
-                        onClose();
-                        if (onSuccess) onSuccess();
-                    },
-                },
-            ]);
         } catch (error) {
             console.error('❌ 거래 추가 실패:', error);
-            Alert.alert('오류', `저장에 실패했습니다: ${error.message}`);
+            alert(`저장에 실패했습니다: ${error.message}`);
         } finally {
             setIsLoading(false);
         }

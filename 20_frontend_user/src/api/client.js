@@ -2,9 +2,9 @@ import axios from "axios";
 import { Platform } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const LOCAL_BASE_URL = "http://localhost:8001";  // 로컬 개발 (Docker backend port)
+const LOCAL_BASE_URL = "http://localhost:8001/api";  // 로컬 개발
 // const PROD_BASE_URL = "https://d26uyg5darllja.cloudfront.net/api";  // 기존 CloudFront
-const PROD_BASE_URL = "https://api.caffeineai.net/api";
+const PROD_BASE_URL = "https://api.caffeineai.net/api";  // 프로덕션
 
 // 환경 판별: 웹에서 localhost면 로컬, 그 외(앱 포함)는 프로덕션
 const isLocal =

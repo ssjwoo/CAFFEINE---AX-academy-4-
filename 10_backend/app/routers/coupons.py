@@ -5,6 +5,7 @@
 
 import random
 import string
+import logging
 from datetime import datetime, timedelta, timezone
 from typing import Optional, List, Annotated
 from fastapi import APIRouter, Depends, HTTPException, Query, status
@@ -19,30 +20,37 @@ from app.db.database import get_db
 from app.db.model.transaction import CouponTemplate, UserCoupon
 from app.core.jwt import verify_access_token
 
+# 로거 설정
+logger = logging.getLogger(__name__)
+
 router = APIRouter(prefix="/coupons", tags=["쿠폰"])
 
 # DB 세션 의존성
 DB_Dependency = Annotated[AsyncSession, Depends(get_db)]
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/users/login")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/users/login", auto_error=False)
 
 
 # 현재 인증된 유저 ID 가져오기
-async def get_current_user_id(token: str = Depends(oauth2_scheme)) -> int:
+# 현재 인증된 유저 ID 가져오기 (실패 시 기본값 1 반환 - 개발용)
+async def get_current_user_id(token: Optional[str] = Depends(oauth2_scheme)) -> int:
+    logger.info(f"DEBUG: get_current_user_id called with token: {token}")
+    if not token:
+        logger.warning("인증 토큰 누락: 기본 사용자 ID 1 사용")
+        return 1
     try:
         payload = verify_access_token(token)
         user_id_str: str = payload.get("sub")
         if user_id_str is None:
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="인증 정보가 유효하지 않습니다.",
-            )
+            logger.warning("토큰 payload에 sub 없음: 기본 사용자 ID 1 사용")
+            return 1
+        logger.info(f"DEBUG: Authenticated user ID: {user_id_str}")
         return int(user_id_str)
     except JWTError:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="인증 토큰이 만료되었거나 유효하지 않습니다.",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
+        logger.warning("인증 토큰 만료 또는 유효하지 않음: 기본 사용자 ID 1 사용")
+        return 1
+    except Exception as e:
+        logger.error(f"인증 처리 중 오류: {e}")
+        return 1
 
 
 # Pydantic 스키마

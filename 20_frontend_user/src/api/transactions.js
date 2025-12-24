@@ -3,7 +3,7 @@ import { apiClient } from './client';
 // 거래 목록 조회
 export const getTransactions = async (params = {}) => {
     try {
-        const response = await apiClient.get('/api/transactions', { params });
+        const response = await apiClient.get('/transactions', { params });
         return response.data;
     } catch (error) {
         console.error('거래 목록 조회 실패:', error);
@@ -14,7 +14,7 @@ export const getTransactions = async (params = {}) => {
 // 거래 상세 조회
 export const getTransaction = async (id) => {
     try {
-        const response = await apiClient.get(`/api/transactions/${id}`);
+        const response = await apiClient.get(`/transactions/${id}`);
         return response.data;
     } catch (error) {
         console.error('거래 상세 조회 실패:', error);
@@ -25,7 +25,7 @@ export const getTransaction = async (id) => {
 // 거래 메모 수정
 export const updateTransactionNote = async (id, description) => {
     try {
-        const response = await apiClient.patch(`/api/transactions/${id}/note`, {
+        const response = await apiClient.patch(`/transactions/${id}/note`, {
             description
         });
         return response.data;
@@ -38,7 +38,7 @@ export const updateTransactionNote = async (id, description) => {
 // 이상거래 신고
 export const reportAnomaly = async (id, reason, severity = 'medium') => {
     try {
-        const response = await apiClient.post(`/api/transactions/${id}/anomaly-report`, {
+        const response = await apiClient.post(`/transactions/${id}/anomaly-report`, {
             reason,
             severity
         });
@@ -53,7 +53,7 @@ export const reportAnomaly = async (id, reason, severity = 'medium') => {
 export const getTransactionStats = async (userId = null) => {
     try {
         const params = userId ? { user_id: userId } : {};
-        const response = await apiClient.get('/api/transactions/stats/summary', { params });
+        const response = await apiClient.get('/transactions/stats/summary', { params });
         return response.data;
     } catch (error) {
         console.error('거래 통계 조회 실패:', error);
@@ -64,7 +64,7 @@ export const getTransactionStats = async (userId = null) => {
 // 거래 일괄 생성 (CSV 업로드용)
 export const createTransactionsBulk = async (userId, transactions) => {
     try {
-        const response = await apiClient.post('/api/transactions/bulk', {
+        const response = await apiClient.post('/transactions/bulk', {
             user_id: userId,
             transactions: transactions.map(t => ({
                 merchant: t.merchant || t.businessName,
@@ -85,9 +85,35 @@ export const createTransactionsBulk = async (userId, transactions) => {
 // 사용자의 모든 거래 삭제
 export const deleteAllTransactions = async (userId) => {
     try {
-        const response = await apiClient.delete('/api/transactions', {
+        const response = await apiClient.delete('/transactions', {
             params: { user_id: userId }
         });
+        return response.data;
+    } catch (error) {
+        console.error('거래 삭제 실패:', error);
+        throw error;
+    }
+};
+
+/**
+ * 거래 추가
+ */
+export const createTransaction = async (data) => {
+    try {
+        const response = await apiClient.post('/transactions', data);
+        return response.data;
+    } catch (error) {
+        console.error('거래 추가 실패:', error);
+        throw error;
+    }
+};
+
+/**
+ * 거래 삭제
+ */
+export const deleteTransaction = async (id) => {
+    try {
+        const response = await apiClient.delete(`/transactions/${id}`);
         return response.data;
     } catch (error) {
         console.error('거래 삭제 실패:', error);

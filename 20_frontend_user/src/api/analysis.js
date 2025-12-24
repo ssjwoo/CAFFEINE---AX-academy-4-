@@ -4,7 +4,7 @@ import { apiClient } from './client';
 export const getDashboardSummary = async (userId = null) => {
     try {
         const params = userId ? { user_id: userId } : {};
-        const response = await apiClient.get('/api/analysis/summary', { params });
+        const response = await apiClient.get('/analysis/summary', { params });
         return response.data;
     } catch (error) {
         console.error('대시보드 요약 조회 실패:', error);
@@ -17,7 +17,7 @@ export const getCategoryBreakdown = async (userId = null, months = 1) => {
     try {
         const params = { months };
         if (userId) params.user_id = userId;
-        const response = await apiClient.get('/api/analysis/categories', { params });
+        const response = await apiClient.get('/analysis/categories', { params });
         return response.data;
     } catch (error) {
         console.error('카테고리 분석 조회 실패:', error);
@@ -30,7 +30,7 @@ export const getMonthlyTrend = async (userId = null, months = 6) => {
     try {
         const params = { months };
         if (userId) params.user_id = userId;
-        const response = await apiClient.get('/api/analysis/monthly-trend', { params });
+        const response = await apiClient.get('/analysis/monthly-trend', { params });
         return response.data;
     } catch (error) {
         console.error('월별 추이 조회 실패:', error);
@@ -42,7 +42,7 @@ export const getMonthlyTrend = async (userId = null, months = 6) => {
 export const getSpendingInsights = async (userId = null) => {
     try {
         const params = userId ? { user_id: userId } : {};
-        const response = await apiClient.get('/api/analysis/insights', { params });
+        const response = await apiClient.get('/analysis/insights', { params });
         return response.data;
     } catch (error) {
         console.error('인사이트 조회 실패:', error);
@@ -54,7 +54,7 @@ export const getSpendingInsights = async (userId = null) => {
 export const getFullAnalysis = async (userId = null) => {
     try {
         const params = userId ? { user_id: userId } : {};
-        const response = await apiClient.get('/api/analysis/full', { params });
+        const response = await apiClient.get('/analysis/full', { params });
         return response.data;
     } catch (error) {
         console.error('전체 분석 조회 실패:', error);

@@ -24,7 +24,7 @@ from app.services.email_service import send_report_email
 logger = logging.getLogger(__name__)
 
 router = APIRouter(
-    prefix="/api/admin/reports",
+    prefix="/admin/reports",
     tags=["Admin Reports"]
 )
 

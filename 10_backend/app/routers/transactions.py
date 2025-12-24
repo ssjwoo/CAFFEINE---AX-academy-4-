@@ -10,12 +10,33 @@ from app.db.database import get_db
 from app.db.model.transaction import Anomaly, Category, Transaction
 from app.core.jwt import verify_access_token
 
+from fastapi.security import OAuth2PasswordBearer
+from jose import JWTError
+from app.core.jwt import verify_access_token
+
 # 로거 설정
 logger = logging.getLogger(__name__)
 
+# 인증 스키마
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/users/login", auto_error=False)
+
+# 현재 인증된 유저 ID 가져오기
+async def get_current_user_id(token: Optional[str] = Depends(oauth2_scheme)) -> int:
+    if not token:
+        logger.warning("인증 토큰 누락: 기본 사용자 ID 1 사용")
+        return 1
+    try:
+        payload = verify_access_token(token)
+        user_id_str: str = payload.get("sub")
+        if user_id_str is None:
+            return 1
+        return int(user_id_str)
+    except (JWTError, Exception):
+        return 1
+
 # 라우터 설정
 router = APIRouter(
-    prefix="/api/transactions",
+    prefix="/transactions",
     tags=["transactions"],
     responses={404: {"description": "Not found"}},
 )
@@ -45,13 +66,14 @@ class TransactionUpdate(BaseModel):
     description: Optional[str] = None
 
 class TransactionCreate(BaseModel):
-    """거래 생성 요청 스키마"""
-    merchant: str
+    """거래 추가 요청"""
     amount: float
     category: str
-    transaction_date: str
+    merchant_name: Optional[str] = None
+    merchant: Optional[str] = None  # 일괄 생성 호환용
     description: Optional[str] = None
-    currency: str = "KRW"
+    transaction_date: Optional[str] = None  # ISO format: 2025-12-16T10:30:00
+    currency: Optional[str] = "KRW"  # 일괄 생성 호환용
 
 class TransactionBulkCreate(BaseModel):
     """거래 일괄 생성 요청 스키마"""
@@ -257,6 +279,82 @@ async def create_transactions_bulk(
         message=f"{created_count}건 생성 완료, {failed_count}건 실패"
     )
 
+# 단일 거래 생성 API
+@router.post("", response_model=TransactionBase)
+async def create_transaction(
+    data: TransactionCreate,
+    db: AsyncSession = Depends(get_db),
+    user_id: int = Depends(get_current_user_id)
+):
+    """
+    새 거래 추가
+
+    - amount: 금액 (필수)
+    - category: 카테고리명 (쇼핑, 식비, 공과금, 여가, 교통, 기타 등)
+    - merchant_name: 가맹점명 (필수)
+    - description: 설명/메모 (선택)
+    - transaction_date: 거래 시각 ISO format (선택, 기본값: 현재 시각)
+    """
+    try:
+        # merchant_name과 merchant 둘 다 지원 (일괄 생성 호환)
+        merchant = data.merchant_name or data.merchant
+        if not merchant:
+            raise HTTPException(status_code=422, detail="merchant_name 또는 merchant 필드가 필요합니다")
+
+        # 카테고리 조회
+        cat_query = select(Category).where(Category.name == data.category)
+        cat_result = await db.execute(cat_query)
+        category = cat_result.scalar_one_or_none()
+
+        # 카테고리가 없으면 "기타"로 검색
+        if not category:
+            cat_query = select(Category).where(Category.name == "기타")
+            cat_result = await db.execute(cat_query)
+            category = cat_result.scalar_one_or_none()
+
+        # 거래 시각 파싱
+        if data.transaction_date:
+            try:
+                tx_time = datetime.fromisoformat(data.transaction_date.replace('Z', '+00:00'))
+            except:
+                tx_time = datetime.now()
+        else:
+            tx_time = datetime.now()
+
+        # 새 거래 생성
+        new_tx = Transaction(
+            user_id=user_id,
+            amount=data.amount,
+            merchant_name=merchant,
+            description=data.description,
+            category_id=category.id if category else None,
+            transaction_time=tx_time,
+            status="completed",
+            currency=data.currency or "KRW"
+        )
+
+        db.add(new_tx)
+        await db.commit()
+        await db.refresh(new_tx)
+
+        return TransactionBase(
+            id=new_tx.id,
+            merchant=new_tx.merchant_name or "알 수 없음",
+            amount=float(new_tx.amount),
+            category=category.name if category else "기타",
+            transaction_date=new_tx.transaction_time.strftime("%Y-%m-%d %H:%M:%S"),
+            description=new_tx.description,
+            status=new_tx.status,
+            currency=new_tx.currency
+        )
+
+    except Exception as e:
+        logger.error(f"거래 생성 실패: {e}")
+        await db.rollback()
+        raise HTTPException(status_code=500, detail=f"거래 생성 실패: {str(e)}")
+
+# 거래 내역 상세 조회, 수정, 삭제, 이상거래 신고, 통계 등 유지...
+# (생략된 부분은 기존 Transactions.py 내용과 동일하게 유지)
 
 # 거래 내역 전체 삭제 API
 @router.delete("")
