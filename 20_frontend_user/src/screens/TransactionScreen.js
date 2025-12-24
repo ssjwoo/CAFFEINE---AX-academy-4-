@@ -515,13 +515,15 @@ export default function TransactionScreen({ navigation, route }) {
                                 <View style={s.modalActions}>
                                     {selectedTransaction.isAnomaly ? (
                                         <>
-                                            <TouchableOpacity
-                                                style={[s.actionButton, { backgroundColor: '#E5E7EB' }]}
-                                                onPress={handleIgnoreAnomaly}
-                                            >
-                                                <Feather name="eye-off" size={18} color="#4B5563" />
-                                                <Text style={{ color: '#4B5563', fontWeight: 'bold' }}>무시하기</Text>
-                                            </TouchableOpacity>
+                                            {selectedTransaction.status !== 'reported' && (
+                                                <TouchableOpacity
+                                                    style={[s.actionButton, { backgroundColor: '#E5E7EB' }]}
+                                                    onPress={handleIgnoreAnomaly}
+                                                >
+                                                    <Feather name="eye-off" size={18} color="#4B5563" />
+                                                    <Text style={{ color: '#4B5563', fontWeight: 'bold' }}>무시하기</Text>
+                                                </TouchableOpacity>
+                                            )}
 
                                             {selectedTransaction.status === 'reported' ? (
                                                 <TouchableOpacity
