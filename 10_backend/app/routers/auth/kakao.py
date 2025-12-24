@@ -28,6 +28,7 @@ KAKAO_SIGNUP_REDIRECT_URI = os.getenv("KAKAO_SIGNUP_REDIRECT_URI", "http://local
 # 요청/응답 스키마
 class KakaoLoginRequest(BaseModel):
     code: str
+    redirect_uri: str | None = None
 
 
 class KakaoUserResponse(BaseModel):
@@ -91,7 +92,7 @@ async def kakao_login(payload: KakaoLoginRequest, db: DB_Dependency):
         token_data = {
             "grant_type": "authorization_code",
             "client_id": KAKAO_REST_API_KEY,
-            "redirect_uri": KAKAO_REDIRECT_URI,
+            "redirect_uri": payload.redirect_uri or KAKAO_REDIRECT_URI,
             "code": payload.code,
         }
         
@@ -181,7 +182,7 @@ async def kakao_signup(payload: KakaoLoginRequest, db: DB_Dependency):
         token_data = {
             "grant_type": "authorization_code",
             "client_id": KAKAO_REST_API_KEY,
-            "redirect_uri": KAKAO_SIGNUP_REDIRECT_URI,
+            "redirect_uri": payload.redirect_uri or KAKAO_SIGNUP_REDIRECT_URI,
             "code": payload.code,
         }
         

@@ -30,6 +30,7 @@ GOOGLE_SIGNUP_REDIRECT_URI = os.getenv("GOOGLE_SIGNUP_REDIRECT_URI", "http://loc
 # 요청/응답 스키마
 class GoogleLoginRequest(BaseModel):
     code: str
+    redirect_uri: str | None = None
 
 
 class GoogleUserResponse(BaseModel):
@@ -94,7 +95,7 @@ async def google_login(payload: GoogleLoginRequest, db: DB_Dependency):
             "code": payload.code,
             "client_id": GOOGLE_CLIENT_ID,
             "client_secret": GOOGLE_CLIENT_SECRET,
-            "redirect_uri": GOOGLE_REDIRECT_URI,
+            "redirect_uri": payload.redirect_uri or GOOGLE_REDIRECT_URI,
             "grant_type": "authorization_code"
         }
         
@@ -170,7 +171,7 @@ async def google_signup(payload: GoogleLoginRequest, db: DB_Dependency):
             "code": payload.code,
             "client_id": GOOGLE_CLIENT_ID,
             "client_secret": GOOGLE_CLIENT_SECRET,
-            "redirect_uri": GOOGLE_SIGNUP_REDIRECT_URI,
+            "redirect_uri": payload.redirect_uri or GOOGLE_SIGNUP_REDIRECT_URI,
             "grant_type": "authorization_code"
         }
         
