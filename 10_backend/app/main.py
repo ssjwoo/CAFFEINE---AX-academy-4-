@@ -150,6 +150,7 @@ app.include_router(password_router, prefix="/api")   # 비밀번호/회원탈퇴
 app.include_router(coupons.router, prefix="/api")
 
 # 관리자/분석 라우터 추가
+app.include_router(analysis.router, prefix="/api")  # /api/analysis/* 라우터 (admin/full 포함)
 app.include_router(user_analytics.router, prefix="/api")
 app.include_router(analytics_demographics.router, prefix="/api")
 app.include_router(admin_transactions.router, prefix="/api")
