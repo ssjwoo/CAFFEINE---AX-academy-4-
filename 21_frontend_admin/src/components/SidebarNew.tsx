@@ -31,7 +31,10 @@ export default function SidebarNew() {
             </div>
             <nav className="flex-1 py-6 space-y-1">
                 {menuItems.map((item) => {
-                    const isActive = pathname.startsWith(item.href) || (item.subItems && item.subItems.some(sub => pathname.startsWith(sub.href)));
+                    // 루트 경로(/)는 정확히 일치할 때만, 나머지는 startsWith로 비교
+                    const isActive = item.href === '/'
+                        ? pathname === '/' || pathname === ''
+                        : pathname.startsWith(item.href) || (item.subItems && item.subItems.some(sub => pathname.startsWith(sub.href)));
 
                     return (
                         <div key={item.name}>
