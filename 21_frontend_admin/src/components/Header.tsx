@@ -56,8 +56,13 @@ export default function Header() {
     const pathname = usePathname();
     const { user } = useAuth();
 
-    const title = pageTitles[pathname] || '대시보드';
-    const description = pageDescriptions[pathname] || '';
+    // trailing slash 제거하여 비교 (예: '/users/' → '/users')
+    const normalizedPath = pathname.endsWith('/') && pathname !== '/'
+        ? pathname.slice(0, -1)
+        : pathname;
+
+    const title = pageTitles[normalizedPath] || '대시보드';
+    const description = pageDescriptions[normalizedPath] || '';
 
     // 유저 이름의 첫 글자 (아바타 표시용)
     const userInitial = user?.name?.charAt(0).toUpperCase() || user?.email?.charAt(0).toUpperCase() || 'A';
