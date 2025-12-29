@@ -184,11 +184,14 @@ const AdminIntegratedAnalysis = () => {
             if (!categoryMap[tx.category]) categoryMap[tx.category] = 0;
             categoryMap[tx.category] += tx.amount;
         });
-        return Object.keys(categoryMap).map(category => ({
-            name: category,
-            value: categoryMap[category],
-            color: CATEGORY_COLORS[category] || CATEGORY_COLORS['기타']
-        }));
+        return Object.keys(categoryMap)
+            .map(category => ({
+                name: category,
+                value: categoryMap[category],
+                color: CATEGORY_COLORS[category] || CATEGORY_COLORS['기타']
+            }))
+            .sort((a, b) => b.value - a.value)
+            .slice(0, 7);
     }, [filteredTransactions]);
 
     const dailyData = useMemo(() => {

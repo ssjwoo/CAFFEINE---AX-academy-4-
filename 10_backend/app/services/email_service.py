@@ -109,7 +109,7 @@ EMAIL_TEMPLATE = """
 <body>
     <div class="container">
         <div class="header">
-            <h1>☕ Caffeine 소비 분석 리포트</h1>
+            <h1>Caffeine 소비 분석 리포트</h1>
             <p>{{ report_type }} 리포트 ({{ period }})</p>
         </div>
         <div class="content">

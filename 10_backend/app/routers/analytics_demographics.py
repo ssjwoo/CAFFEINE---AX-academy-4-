@@ -183,7 +183,7 @@ async def get_consumption_by_age(
             data['category_totals'].items(),
             key=lambda x: x[1],
             reverse=True
-        )[:3]
+        )[:5]
         
         top_categories = [
             CategoryAmount(category=cat, amount=amt)
