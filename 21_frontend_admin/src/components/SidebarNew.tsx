@@ -31,7 +31,7 @@ export default function SidebarNew() {
             </div>
             <nav className="flex-1 py-6 space-y-1">
                 {menuItems.map((item) => {
-                    const isActive = pathname === item.href || (item.subItems && item.subItems.some(sub => pathname === sub.href));
+                    const isActive = pathname.startsWith(item.href) || (item.subItems && item.subItems.some(sub => pathname.startsWith(sub.href)));
 
                     return (
                         <div key={item.name}>
@@ -53,7 +53,7 @@ export default function SidebarNew() {
                             {item.subItems && (
                                 <div className="bg-gray-900 border-l-4 border-indigo-500">
                                     {item.subItems.map((subItem) => {
-                                        const isSubActive = pathname === subItem.href;
+                                        const isSubActive = pathname.startsWith(subItem.href);
                                         return (
                                             <Link
                                                 key={subItem.name}

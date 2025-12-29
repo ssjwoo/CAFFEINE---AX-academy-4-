@@ -9,7 +9,7 @@ import Header from '@/components/Header';
 export default function ClientLayout({ children }: { children: React.ReactNode }) {
     const pathname = usePathname();
     const [isClient, setIsClient] = useState(false);
-    const isLoginPage = pathname === '/login';
+    const isLoginPage = pathname.startsWith('/login');
 
     useEffect(() => {
         setIsClient(true);
