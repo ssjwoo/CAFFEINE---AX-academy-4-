@@ -220,7 +220,10 @@ async def google_signup(payload: GoogleLoginRequest, db: DB_Dependency):
         new_user = UserModel(
             email=email or f"google_{google_id}@caffeine.app",
             name=nickname,
-            password_hash="",  # 소셜 로그인은 비밀번호 없음
+            nickname=nickname,
+            password_hash="SOCIAL_LOGIN",  # 소셜 로그인은 비밀번호 없음 (카카오와 동일)
+            role="USER",
+            status="ACTIVE",
             social_provider="GOOGLE",
             social_id=google_id,
             last_login_at=datetime.utcnow()

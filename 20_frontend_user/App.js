@@ -125,7 +125,7 @@ function AuthStack() {
     <Stack.Navigator
       screenOptions={{
         headerShown: false,
-        cardStyle: { backgroundColor: colors.background }
+        cardStyle: { backgroundColor: colors.background, flex: 1, overflow: 'visible' }
       }}>
       <Stack.Screen name="Login" component={LoginScreen} />
       <Stack.Screen name="Signup" component={SignupScreen} />

@@ -160,6 +160,9 @@ export const AuthProvider = ({ children }) => {
         }
         await AsyncStorage.removeItem('transactions_cache');
         await AsyncStorage.removeItem('last_sync_time');
+        
+        // 다크모드 설정 초기화 (라이트모드로 복원)
+        await AsyncStorage.removeItem('theme');
 
         setUser(null);
 
@@ -345,7 +348,7 @@ export const AuthProvider = ({ children }) => {
 
     // AuthContext.Provider - 사용자 인증 상태 제공
     return (
-        <AuthContext.Provider value={{ user, loading, login, signup, logout, kakaoLogin, kakaoSignup, googleLogin, googleSignup }}>
+        <AuthContext.Provider value={{ user, setUser, loading, login, signup, logout, kakaoLogin, kakaoSignup, googleLogin, googleSignup }}>
             {children}
         </AuthContext.Provider>
     );

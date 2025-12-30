@@ -69,7 +69,7 @@ const CATEGORY_EMOJI = {
 // 대쉬보드 화면
 export default function DashboardScreen({ navigation }) {
     const { colors } = useTheme();
-    const { user } = useAuth();
+    const { user, setUser } = useAuth();
     const { transactions, loading: transactionLoading, refresh, loadTransactionsFromServer } = useTransactions();
     const [refreshing, setRefreshing] = useState(false);
     const [summary, setSummary] = useState(null);
@@ -357,6 +357,8 @@ export default function DashboardScreen({ navigation }) {
             if (storedUser) {
                 const updatedUser = { ...JSON.parse(storedUser), birth_date: birthDate };
                 await AsyncStorage.setItem('user', JSON.stringify(updatedUser));
+                // AuthContext의 user 상태도 갱신하여 모달이 다시 안 뜨도록
+                setUser(updatedUser);
             }
 
             setShowBirthModal(false);
