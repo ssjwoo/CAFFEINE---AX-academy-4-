@@ -1,10 +1,19 @@
 from pydantic_settings import BaseSettings
 from pydantic import Field
 from pathlib import Path
+from dotenv import load_dotenv
+import os
 
 # 설정 파일 경로
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 ENV_PATH = BASE_DIR / ".env"
+ROOT_ENV_PATH = BASE_DIR.parent / ".env.local"
+
+# 환경 변수 로드
+if ROOT_ENV_PATH.exists():
+    load_dotenv(ROOT_ENV_PATH)
+if ENV_PATH.exists():
+    load_dotenv(ENV_PATH)
 
 
 class Settings(BaseSettings):
@@ -38,7 +47,7 @@ class Settings(BaseSettings):
     refresh_token_expire_days: int = Field(7, alias="REFRESH_TOKEN_EXPIRE_DAYS")
 
     class Config:
-        env_file = ENV_PATH
+        env_file = (ENV_PATH, ROOT_ENV_PATH)
         extra = "allow"
         populate_by_name = True
         case_sensitive = True

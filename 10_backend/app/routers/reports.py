@@ -9,6 +9,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 import logging
 import json
+import tempfile
+import os
 
 from app.db.database import get_db
 from app.db.model.user import User
@@ -17,7 +19,8 @@ from app.routers.user import get_current_user
 from app.services.report_service import (
     generate_weekly_report,
     generate_monthly_report,
-    format_report_html
+    format_report_html,
+    generate_report_pdf
 )
 from app.services.email_service import send_report_email
 
@@ -84,15 +87,26 @@ async def send_weekly_report_now(
         report_data = await generate_weekly_report(db)
         summary_html = format_report_html(report_data)
         
-        # 이메일 발송
+        # PDF 생성 및 첨부 발송
         period = f"{report_data['period_start']} ~ {report_data['period_end']}"
-        success, message = await send_report_email(
-            recipient_email=recipient_email,
-            subject=f"[Caffeine] Weeky Report ({period})",
-            report_type="Weekly",
-            period=period,
-            summary_html=summary_html
-        )
+        with tempfile.NamedTemporaryFile(suffix=".pdf", delete=False) as tmp:
+            pdf_path = tmp.name
+        
+        try:
+            generate_report_pdf("Weekly", report_data, pdf_path)
+            
+            # 이메일 발송 (PDF 첨부)
+            success, message = await send_report_email(
+                recipient_email=recipient_email,
+                subject=f"[Caffeine] Weeky Report ({period})",
+                report_type="Weekly",
+                period=period,
+                summary_html=summary_html,
+                attachments=[pdf_path]
+            )
+        finally:
+            if os.path.exists(pdf_path):
+                os.remove(pdf_path)
         
         logger.info(f"Weekly report processing completed: {message}")
         
@@ -100,7 +114,8 @@ async def send_weekly_report_now(
             "success": success,
             "message": message,
             "period": period,
-            "recipient": recipient_email
+            "recipient": recipient_email,
+            "has_attachment": True
         }
         
     except ValueError as e:
@@ -154,15 +169,26 @@ async def send_monthly_report_now(
         report_data = await generate_monthly_report(db)
         summary_html = format_report_html(report_data)
         
-        # 이메일 발송
+        # PDF 생성 및 첨부 발송
         period = f"{report_data['period_start']} ~ {report_data['period_end']}"
-        success, message = await send_report_email(
-            recipient_email=recipient_email,
-            subject=f"[Caffeine] Monthly Report ({period})",
-            report_type="Monthly",
-            period=period,
-            summary_html=summary_html
-        )
+        with tempfile.NamedTemporaryFile(suffix=".pdf", delete=False) as tmp:
+            pdf_path = tmp.name
+            
+        try:
+            generate_report_pdf("Monthly", report_data, pdf_path)
+            
+            # 이메일 발송 (PDF 첨부)
+            success, message = await send_report_email(
+                recipient_email=recipient_email,
+                subject=f"[Caffeine] Monthly Report ({period})",
+                report_type="Monthly",
+                period=period,
+                summary_html=summary_html,
+                attachments=[pdf_path]
+            )
+        finally:
+            if os.path.exists(pdf_path):
+                os.remove(pdf_path)
         
         logger.info(f"Monthly report processing completed: {message}")
         
@@ -170,7 +196,8 @@ async def send_monthly_report_now(
             "success": success,
             "message": message,
             "period": period,
-            "recipient": recipient_email
+            "recipient": recipient_email,
+            "has_attachment": True
         }
     
     except ValueError as e:

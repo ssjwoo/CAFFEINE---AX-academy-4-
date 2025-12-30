@@ -11,6 +11,8 @@ import logging
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 import aiosmtplib
+from email.mime.base import MIMEBase
+from email import encoders
 from jinja2 import Template
 from datetime import datetime
 
@@ -58,51 +60,89 @@ EMAIL_TEMPLATE = """
             padding: 30px;
         }
         .summary-box {
-            background-color: #f8f9fa;
-            border-left: 4px solid #667eea;
-            padding: 20px;
+            background-color: #ffffff;
+            border: 1px solid #eef2f7;
+            padding: 24px;
             margin: 20px 0;
-            border-radius: 4px;
+            border-radius: 12px;
         }
         .summary-box h2 {
-            margin: 0 0 15px 0;
-            color: #333;
-            font-size: 18px;
+            margin: 0 0 20px 0;
+            color: #1a202c;
+            font-size: 20px;
+            font-weight: 700;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+            display: inline-block;
+        }
+        .stat-grid {
+            display: grid;
+            gap: 12px;
         }
         .stat {
-            display: flex;
-            justify-content: space-between;
-            padding: 10px 0;
-            border-bottom: 1px solid #e9ecef;
-        }
-        .stat:last-child {
-            border-bottom: none;
+            display: block; /* Flex 대신 Block으로 호환성 확보 */
+            padding: 14px 20px;
+            background-color: #f8fafc;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #edf2f7;
         }
         .stat-label {
-            color: #6c757d;
+            display: inline-block;
+            color: #64748b;
             font-size: 14px;
+            font-weight: 600;
+            width: 140px;
+            vertical-align: middle;
         }
         .stat-value {
-            color: #333;
-            font-weight: 600;
-            font-size: 14px;
+            display: inline-block;
+            color: #1e293b;
+            font-weight: 800;
+            font-size: 17px;
+            text-align: right;
+            width: calc(100% - 150px);
+            vertical-align: middle;
+        }
+        .ai-insight-box {
+            margin-top: 30px;
+            padding: 24px;
+            background: linear-gradient(135deg, #fdfcfb 0%, #e2d1c3 100%);
+            border-radius: 16px;
+            border-left: 6px solid #764ba2;
+        }
+        .ai-insight-title {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            color: #4a148c;
+            font-weight: 800;
+            font-size: 18px;
+        }
+        .ai-content {
+            white-space: pre-wrap;
+            line-height: 1.8;
+            color: #2d3748;
+            font-size: 15px;
         }
         .footer {
             background-color: #f8f9fa;
-            padding: 20px;
+            padding: 30px 20px;
             text-align: center;
-            color: #6c757d;
+            color: #94a3b8;
             font-size: 12px;
+            border-top: 1px solid #e2e8f0;
         }
         .button {
             display: inline-block;
-            margin: 20px 0;
-            padding: 12px 30px;
-            background-color: #667eea;
+            margin: 25px 0;
+            padding: 14px 40px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white !important;
             text-decoration: none;
-            border-radius: 6px;
-            font-weight: 500;
+            border-radius: 50px;
+            font-weight: 600;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
         }
     </style>
 </head>
@@ -110,24 +150,26 @@ EMAIL_TEMPLATE = """
     <div class="container">
         <div class="header">
             <h1>Caffeine 소비 분석 리포트</h1>
-            <p>{{ report_type }} 리포트 ({{ period }})</p>
+            <p>{{ report_type }} 분석 Insight ({{ period }})</p>
         </div>
         <div class="content">
             <div class="summary-box">
-                <h2>Summary</h2>
-                {{ summary_html }}
+                <h2>핵심 지표 요약</h2>
+                <div class="stat-grid">
+                    {{ summary_html }}
+                </div>
             </div>
             
-            <p style="color: #6c757d; font-size: 14px; margin-top: 30px;">
-                더 자세한 분석은 관리자 대시보드에서 확인하실 수 있습니다.
+            <p style="color: #64748b; font-size: 14px; margin-top: 30px; text-align: center;">
+                ※ 위 데이터는 시스템에 의해 자동 집계된 실시간 통계입니다.
             </p>
             
             <center>
-                <a href="{{ dashboard_url }}" class="button">대시보드 열기</a>
+                <a href="{{ dashboard_url }}" class="button">상세 대시보드 확인하기</a>
             </center>
         </div>
         <div class="footer">
-            <p>이 이메일은 Caffeine 시스템에서 자동으로 발송되었습니다.</p>
+            <p>본 메일은 정보통신망법 등 관련 법률에 의거하여 발송되었습니다.</p>
             <p>© 2025 Caffeine. All rights reserved.</p>
         </div>
     </div>
@@ -142,7 +184,8 @@ async def send_report_email(
     report_type: str,
     period: str,
     summary_html: str,
-    dashboard_url: str = "http://localhost:3000"
+    dashboard_url: str = "http://localhost:3000",
+    attachments: list = None
 ):
     """
     리포트 이메일을 발송합니다.
@@ -152,8 +195,9 @@ async def send_report_email(
         subject: 이메일 제목
         report_type: 리포트 종류 ("주간" 또는 "월간")
         period: 기간 (예: "2025-12-09 ~ 2025-12-15")
-        summary_html: 요약 HTML 내용
+        summary_html: 요약 HTML 내용 (본문용)
         dashboard_url: 대시보드 URL
+        attachments: 첨부 파일 경로 리스트 (optional)
     
     Returns:
         tuple[bool, str]: (성공 여부, 결과 메시지)
@@ -209,6 +253,22 @@ async def send_report_email(
         # HTML 파트 추가
         html_part = MIMEText(html_content, "html", "utf-8")
         message.attach(html_part)
+        
+        # 첨부 파일 추가
+        if attachments:
+            for file_path in attachments:
+                if os.path.exists(file_path):
+                    part = MIMEBase("application", "octet-stream")
+                    with open(file_path, "rb") as f:
+                        part.set_payload(f.read())
+                    encoders.encode_base64(part)
+                    filename = os.path.basename(file_path)
+                    part.add_header(
+                        "Content-Disposition",
+                        f"attachment; filename={filename}",
+                    )
+                    message.attach(part)
+                    logger.info(f"Attached file: {filename}")
         
         # SMTP 서버로 전송
         await aiosmtplib.send(
