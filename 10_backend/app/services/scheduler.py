@@ -14,6 +14,7 @@ from app.db.database import get_engine
 from app.services.report_service import (
     generate_weekly_report,
     generate_monthly_report,
+    generate_daily_report,
     format_report_html
 )
 from app.services.email_service import send_report_email
@@ -70,6 +71,48 @@ async def get_report_settings(db: AsyncSession) -> dict:
     )
     
     return settings
+
+
+async def send_daily_report_job():
+    """
+    일간 리포트를 생성하고 발송하는 스케줄 작업입니다.
+    매일 오전 7시에 실행됩니다.
+    """
+    logger.info("Daily report generation started")
+    
+    db = await get_db_session()
+    try:
+        # 설정 확인
+        settings = await get_report_settings(db)
+        
+        if not settings["reports_enabled"]:
+            logger.info("Daily report is disabled.")
+            return
+        
+        if not settings["recipient_email"]:
+            logger.warning("Recipient email is not configured.")
+            return
+        
+        # 리포트 데이터 생성
+        report_data = await generate_daily_report(db)
+        summary_html = format_report_html(report_data)
+        
+        # 이메일 발송
+        period = f"{report_data['period_start']} (Daily)"
+        await send_report_email(
+            recipient_email=settings["recipient_email"],
+            subject=f"[Caffeine] Daily Report ({report_data['period_start']})",
+            report_type="Daily",
+            period=period,
+            summary_html=summary_html
+        )
+        
+        logger.info("Daily report sent successfully")
+        
+    except Exception as e:
+        logger.error(f"Failed to send daily report: {str(e)}", exc_info=True)
+    finally:
+        await db.close()
 
 
 async def send_weekly_report_job():
@@ -170,6 +213,15 @@ def start_scheduler():
     # AsyncIOScheduler 생성
     scheduler = AsyncIOScheduler()
     
+    # 일간 리포트: 매일 오전 7시
+    scheduler.add_job(
+        send_daily_report_job,
+        trigger=CronTrigger(hour=7, minute=0),
+        id="daily_report",
+        name="Send Daily Report",
+        replace_existing=True
+    )
+
     # 주간 리포트: 매주 월요일 오전 9시
     scheduler.add_job(
         send_weekly_report_job,
@@ -193,6 +245,7 @@ def start_scheduler():
     
     logger.info("=" * 60)
     logger.info("Scheduler started")
+    logger.info("  - Daily Report: Every day 07:00")
     logger.info("  - Weekly Report: Every Monday 09:00")
     logger.info("  - Monthly Report: Every 1st day of month 09:00")
     logger.info("=" * 60)

@@ -24,6 +24,7 @@ logger = logging.getLogger(__name__)
 audit_logger = logging.getLogger('audit')  # Audit 전용 로거
 
 # Rate Limiter 초기화 (slowapi)
+# Rate Limiter 초기화 (slowapi)
 limiter = Limiter(key_func=get_remote_address)
 
 # FastAPI 앱 생성
