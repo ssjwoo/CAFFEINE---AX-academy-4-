@@ -31,42 +31,29 @@ class ChatResponse(BaseModel):
 
 
 def get_alarm_persona(level: str, spending_context: str = "") -> str:
-    """거래 추가 시 알람용 독설가 AI 페르소나"""
-    return f"""
-You are sending a short Korean text message about this purchase. Do NOT explain or introduce yourself. Just write the message directly.
-
-# Tone by Amount
-- **5,000원 이하**: Very gentle. Example: "꼭 필요한 것만 산거 맞지?","잘하자","아껴쓰자"
-- **5,000-15,000원**: Friendly concern. Example: "이것도 아껴야해","이 돈이면 넷플릭스가 한 달"
-- **15,000-30,000원**: Light sarcasm. Example: "다음달엔 라면만 먹게?"
-- **30,000-50,000원**: Strong sarcasm. Example: "월급날이야?","생일이야?","혹시 내가 모르는 사이에 연봉 협상 다시 했니?"
-- **50,000원 이상**: Maximum roast. Example: "빌 게이츠야?,"기부천사","미쳤어?"
-
-# Rules
-- Korean only (반말)
-- Mention amount and item
-- 3 or 4 sentences
-- Sound like a real text from a friend
-
-{spending_context}
-"""
+    """거래 추가 시 알람용 독설가 AI 페르소나 (YAML 설정에서 로드)"""
+    from app.config import get_chatbot_prompt
+    
+    base_prompt = get_chatbot_prompt("alarm_persona")
+    if not base_prompt:
+        # Fallback: YAML 로드 실패 시 기본 프롬프트
+        base_prompt = """You are sending a short Korean text message about this purchase.
+# Rules: Korean only (반말), Mention amount and item, 3-4 sentences"""
+    
+    return f"{base_prompt}\n\n{spending_context}"
 
 
 def get_chatbot_persona(spending_context: str = "") -> str:
-    """대화형 챗봇용 소비 상담 AI 페르소나"""
-    return f"""
-Role: 사용자의 소비를 분석하고 개선 팁을 제공하는 친절한 재무 상담 AI
-Tone: 친근하고 공감적이며, 실질적인 조언 제공,반말로 대답
-
-Instruction:
-1. 사용자의 소비 패턴을 분석하여 구체적으로 피드백
-2. 다음 소비를 어떻게 잘 할 수 있는지 실용적인 팁을 제공
-3. 예산 관리, 절약 방법, 스마트한 소비 전략을 제안
-4. 이모지를 사용하지 말 것 (NO emojis)
-
-[사용자의 실제 소비내역]
-{spending_context}
-"""
+    """대화형 챗봇용 소비 상담 AI 페르소나 (YAML 설정에서 로드)"""
+    from app.config import get_chatbot_prompt
+    
+    base_prompt = get_chatbot_prompt("chatbot_persona")
+    if not base_prompt:
+        # Fallback: YAML 로드 실패 시 기본 프롬프트
+        base_prompt = """Role: 사용자의 소비를 분석하고 개선 팁을 제공하는 친절한 재무 상담 AI
+Tone: 친근하고 공감적이며, 실질적인 조언 제공, 반말로 대답"""
+    
+    return f"{base_prompt}\n\n[사용자의 실제 소비내역]\n{spending_context}"
 
 
 
@@ -151,6 +138,10 @@ async def get_user_spending_context(db: AsyncSession, user_id: int) -> str:
 
 
 async def call_llm_api(message: str, level: str, spending_context: str = "", is_alarm: bool = False) -> str:
+    """
+    Gemini API 호출 (Google Search Grounding 적용).
+    Grounding 실패 시 기본 API로 fallback합니다.
+    """
     api_key = os.getenv("GEMINI_API_KEY")
 
     if not api_key:
@@ -168,21 +159,74 @@ async def call_llm_api(message: str, level: str, spending_context: str = "", is_
         # 챗봇용: 대화형 형식 유지
         text_content = f"{system_instruction}\n\n사용자: {message}\n답변:"
 
-    payload = {
+    # Grounding 활성화된 payload (Google Search 연동 - 최신 환율/유가/뉴스 반영)
+    payload_with_grounding = {
+        "contents": [{
+            "parts": [{"text": text_content}]
+        }],
+        "tools": [{
+            "google_search": {}  # Google Search Grounding 활성화
+        }]
+    }
+    
+    # Grounding 없는 기본 payload (Fallback용)
+    payload_basic = {
         "contents": [{
             "parts": [{"text": text_content}]
         }]
     }
 
-
     async with httpx.AsyncClient() as client:
+        # 1단계: Grounding 적용 시도
         try:
-            response = await client.post(url, json=payload, headers={"Content-Type": "application/json"}, timeout=15.0)
+            print("[Chat] Attempting LLM call with Google Search Grounding...")
+            response = await client.post(
+                url, 
+                json=payload_with_grounding, 
+                headers={"Content-Type": "application/json"}, 
+                timeout=20.0  # Grounding은 시간이 더 걸릴 수 있음
+            )
+            
+            # 400 에러: Grounding 관련 문제 (검색어 오타, 서버 상태 불량 등)
+            if response.status_code == 400:
+                print(f"[Chat] Grounding failed with 400 error: {response.text}")
+                print("[Chat] Falling back to basic Gemini API without grounding...")
+                # Fallback: Grounding 없이 재시도
+                response = await client.post(
+                    url, 
+                    json=payload_basic, 
+                    headers={"Content-Type": "application/json"}, 
+                    timeout=15.0
+                )
+                if response.status_code != 200:
+                    raise HTTPException(status_code=502, detail=f"LLM Error: {response.status_code}")
+                data = response.json()
+                print("[Chat] Fallback response received")
+                return data["candidates"][0]["content"]["parts"][0]["text"]
+            
             if response.status_code != 200:
                 raise HTTPException(status_code=502, detail=f"LLM Error: {response.status_code}")
+            
             data = response.json()
+            print("[Chat] Grounding response received successfully")
             return data["candidates"][0]["content"]["parts"][0]["text"]
-        except httpx.RequestError:
+            
+        except httpx.RequestError as e:
+            print(f"[Chat] Grounding request failed: {e}, attempting fallback...")
+            # 네트워크 오류 시 Fallback 시도
+            try:
+                response = await client.post(
+                    url, 
+                    json=payload_basic, 
+                    headers={"Content-Type": "application/json"}, 
+                    timeout=15.0
+                )
+                if response.status_code == 200:
+                    data = response.json()
+                    print("[Chat] Fallback response received after network error")
+                    return data["candidates"][0]["content"]["parts"][0]["text"]
+            except:
+                pass
             raise HTTPException(status_code=503, detail="LLM Service Unavailable")
 
 

@@ -1,59 +1,290 @@
+# -*- coding: utf-8 -*-
+"""
+AI 서비스 모듈 (Vertex AI 기반)
+
+Google Vertex AI SDK를 사용하여 Gemini 모델을 호출합니다.
+Google Search Grounding을 지원하며, 실패 시 기본 API로 fallback합니다.
+
+인증 방식:
+- Vertex AI: GCP 서비스 계정 (GOOGLE_APPLICATION_CREDENTIALS)
+- Fallback: Gemini API Key (GEMINI_API_KEY)
+"""
 
 import os
-import httpx
 import logging
-from typing import Dict, Any
+import asyncio
+from typing import Dict, Any, Optional
 
 logger = logging.getLogger(__name__)
 
-async def call_gemini_api(prompt: str) -> str:
+# =============================================================================
+# Vertex AI 초기화
+# =============================================================================
+
+_vertex_ai_initialized = False
+
+def _init_vertex_ai() -> bool:
     """
-    Google Gemini API를 호출하여 텍스트 응답을 생성합니다.
-    (chatbot.py의 로직을 기반으로 재작성)
+    Vertex AI SDK 초기화.
+    GCP 프로젝트 ID와 리전이 필요합니다.
     """
+    global _vertex_ai_initialized
+    
+    if _vertex_ai_initialized:
+        return True
+    
+    try:
+        import vertexai
+        from vertexai.generative_models import GenerativeModel
+        
+        project_id = os.getenv("GCP_PROJECT_ID")
+        location = os.getenv("GCP_LOCATION", "asia-northeast3")  # 서울 리전
+        
+        if not project_id:
+            logger.warning("GCP_PROJECT_ID not set, Vertex AI unavailable")
+            return False
+        
+        vertexai.init(project=project_id, location=location)
+        _vertex_ai_initialized = True
+        logger.info(f"Vertex AI initialized: project={project_id}, location={location}")
+        return True
+        
+    except ImportError:
+        logger.warning("vertexai package not installed")
+        return False
+    except Exception as e:
+        logger.error(f"Vertex AI initialization failed: {e}")
+        return False
+
+
+# =============================================================================
+# Vertex AI로 Gemini 호출 (Google Search Grounding 지원)
+# =============================================================================
+
+async def call_vertex_ai_with_grounding(prompt: str) -> Optional[str]:
+    """
+    Vertex AI SDK를 사용하여 Gemini 모델 호출.
+    Google Search Grounding을 적용하여 최신 정보를 반영합니다.
+    
+    Args:
+        prompt: 프롬프트 텍스트
+        
+    Returns:
+        AI 응답 텍스트 또는 None (실패 시)
+    """
+    if not _init_vertex_ai():
+        return None
+    
+    try:
+        from vertexai.generative_models import GenerativeModel, Tool
+        from vertexai.preview.generative_models import grounding
+        
+        # Gemini 모델 초기화
+        model = GenerativeModel("gemini-1.5-flash")
+        
+        # Google Search Grounding 도구 설정
+        google_search_tool = Tool.from_google_search_retrieval(
+            grounding.GoogleSearchRetrieval()
+        )
+        
+        logger.info("Calling Vertex AI with Google Search Grounding...")
+        
+        # 비동기 실행을 위해 스레드풀 사용
+        loop = asyncio.get_event_loop()
+        response = await loop.run_in_executor(
+            None,
+            lambda: model.generate_content(
+                prompt,
+                tools=[google_search_tool],
+                generation_config={
+                    "temperature": 0.7,
+                    "max_output_tokens": 2048,
+                }
+            )
+        )
+        
+        result = response.text
+        logger.info("Vertex AI Grounding response received successfully")
+        return result
+        
+    except Exception as e:
+        logger.error(f"Vertex AI call failed: {e}")
+        return None
+
+
+async def call_vertex_ai_basic(prompt: str) -> Optional[str]:
+    """
+    Vertex AI SDK를 사용한 기본 Gemini 호출 (Grounding 없음).
+    
+    Args:
+        prompt: 프롬프트 텍스트
+        
+    Returns:
+        AI 응답 텍스트 또는 None (실패 시)
+    """
+    if not _init_vertex_ai():
+        return None
+    
+    try:
+        from vertexai.generative_models import GenerativeModel
+        
+        model = GenerativeModel("gemini-1.5-flash")
+        
+        logger.info("Calling Vertex AI (basic, no grounding)...")
+        
+        loop = asyncio.get_event_loop()
+        response = await loop.run_in_executor(
+            None,
+            lambda: model.generate_content(
+                prompt,
+                generation_config={
+                    "temperature": 0.7,
+                    "max_output_tokens": 2048,
+                }
+            )
+        )
+        
+        result = response.text
+        logger.info("Vertex AI basic response received")
+        return result
+        
+    except Exception as e:
+        logger.error(f"Vertex AI basic call failed: {e}")
+        return None
+
+
+# =============================================================================
+# Fallback: Gemini API Key 방식 (REST API)
+# =============================================================================
+
+async def _call_gemini_api_rest(prompt: str, use_grounding: bool = False) -> Optional[str]:
+    """
+    REST API를 사용한 Gemini 호출 (API Key 방식).
+    Vertex AI 실패 시 fallback으로 사용.
+    
+    Args:
+        prompt: 프롬프트 텍스트
+        use_grounding: Google Search Grounding 사용 여부
+        
+    Returns:
+        AI 응답 텍스트 또는 None (실패 시)
+    """
+    import httpx
+    
     api_key = os.getenv("GEMINI_API_KEY")
     if not api_key:
-        logger.error("GEMINI_API_KEY is missing")
-        return "AI 분석을 사용할 수 없습니다 (API Key 누락)."
-
+        logger.warning("GEMINI_API_KEY not set")
+        return None
+    
     url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={api_key}"
-
+    
     payload = {
         "contents": [{
             "parts": [{"text": prompt}]
         }]
     }
-
+    
+    if use_grounding:
+        payload["tools"] = [{"google_search": {}}]
+    
     async with httpx.AsyncClient() as client:
         try:
+            timeout = 20.0 if use_grounding else 15.0
             response = await client.post(
                 url, 
                 json=payload, 
                 headers={"Content-Type": "application/json"}, 
-                timeout=15.0
+                timeout=timeout
             )
             
             if response.status_code != 200:
-                logger.error(f"Gemini API Error: {response.status_code} - {response.text}")
-                return "AI 분석을 가져오는 중 오류가 발생했습니다."
-                
+                logger.warning(f"Gemini REST API error: {response.status_code}")
+                return None
+            
             data = response.json()
-            # 안전하게 응답 추출
-            try:
-                return data["candidates"][0]["content"]["parts"][0]["text"]
-            except (KeyError, IndexError) as e:
-                logger.error(f"Gemini Response parsing error: {e}")
-                return "AI 응답을 처리할 수 없습니다."
-                
-        except httpx.RequestError as e:
-            logger.error(f"Gemini API Request Error: {e}")
-            return "AI 서비스 연결 실패."
+            return data["candidates"][0]["content"]["parts"][0]["text"]
+            
+        except Exception as e:
+            logger.error(f"Gemini REST API failed: {e}")
+            return None
+
+
+# =============================================================================
+# 통합 API: Vertex AI 우선, REST API Fallback
+# =============================================================================
+
+async def call_gemini_api(prompt: str) -> str:
+    """
+    Gemini API 통합 호출 함수.
+    
+    호출 순서 (Fallback Chain):
+    1. Vertex AI + Google Search Grounding
+    2. Vertex AI (Grounding 없음)
+    3. REST API + Google Search Grounding  
+    4. REST API (Grounding 없음)
+    5. 에러 메시지 반환
+    
+    Args:
+        prompt: 프롬프트 텍스트
+        
+    Returns:
+        AI 응답 텍스트
+    """
+    # 1단계: Vertex AI + Grounding 시도
+    result = await call_vertex_ai_with_grounding(prompt)
+    if result:
+        return result
+    
+    logger.info("Vertex AI Grounding failed, trying Vertex AI basic...")
+    
+    # 2단계: Vertex AI (Grounding 없음) 시도
+    result = await call_vertex_ai_basic(prompt)
+    if result:
+        return result
+    
+    logger.info("Vertex AI failed, falling back to REST API...")
+    
+    # 3단계: REST API + Grounding 시도
+    result = await _call_gemini_api_rest(prompt, use_grounding=True)
+    if result:
+        return result
+    
+    # 4단계: REST API (Grounding 없음) 시도
+    result = await _call_gemini_api_rest(prompt, use_grounding=False)
+    if result:
+        return result
+    
+    # 5단계: 모든 방법 실패
+    logger.error("All AI service methods failed")
+    return "AI 서비스를 사용할 수 없습니다. 잠시 후 다시 시도해주세요."
+
+
+# Legacy alias for backward compatibility
+async def call_gemini_api_with_grounding(prompt: str) -> str:
+    """Legacy alias - use call_gemini_api instead"""
+    return await call_gemini_api(prompt)
+
+
+# =============================================================================
+# 리포트 프롬프트 생성
+# =============================================================================
 
 def generate_report_prompt(report_type: str, data: Dict[str, Any]) -> str:
     """
     CEO/C-Level 대상의 프리미엄 전략 보고서 생성을 위한 AI 프롬프트.
-    HTML 슬라이드 자동 생성을 위해 엄격한 마크다운 구조를 사용합니다.
+    YAML 설정 파일에서 프롬프트 템플릿을 로드합니다.
     """
+    from app.config import get_report_prompt
+    
+    # YAML에서 기본 프롬프트 로드
+    base_prompt = get_report_prompt("strategic_report")
+    if not base_prompt:
+        # Fallback: YAML 로드 실패 시 기본 프롬프트
+        base_prompt = """Role: Senior Strategic Consultant & BI Developer
+당신은 데이터의 비즈니스 가치를 극대화하는 전략 컨설턴트입니다.
+제공된 데이터를 분석하여 Executive Summary, Consumer Insight, Partnership Strategy를 작성하십시오."""
+    
+    # 동적 데이터 삽입
     categories_text = "\n".join([
         f"- {cat['name']}: {int(cat['amount']):,}원 ({cat['percent']:.1f}%)" 
         for cat in data.get("top_categories", [])
@@ -64,14 +295,8 @@ def generate_report_prompt(report_type: str, data: Dict[str, Any]) -> str:
         max_tx = data['max_transaction']
         max_tx_text = f"{max_tx['merchant_name']} ({int(max_tx['amount']):,}원) - {max_tx['category']} 분야"
 
-    return f"""
-Role: Senior Strategic Consultant & BI Developer
-Context: 'Caffeine' Project (Vertex AI-based Financial Command Center)
-
-당신은 데이터의 비즈니스 가치를 극대화하는 **전략 컨설턴트**입니다.
-제공된 [Raw 데이터]를 분석하여 아래 **4가지 핵심 섹션**에 대한 내용을 작성하십시오.
-각 섹션은 HTML 슬라이드로 변환되므로 **지정된 헤더(##)**를 정확히 지켜야 합니다.
-
+    # 데이터 컨텍스트 추가
+    data_context = f"""
 [분석 데이터 (Fact)]
 - 기간: {data['period_start']} ~ {data['period_end']}
 - 총 지출: {int(data['total_amount']):,}원 (전기 대비 {data['change_rate']}%)
@@ -79,28 +304,6 @@ Context: 'Caffeine' Project (Vertex AI-based Financial Command Center)
 {categories_text}
 - 최대 지출 트랜잭션: {max_tx_text}
 
-[작성 섹션 및 가이드]
-
-## 1. Executive Summary
-- 단순 현황 보고가 아닌, **리스크와 기회 요인**을 짚어주는 경영진 요약.
-- 줄글 금지. **핵심 3가지를 불렛 포인트(-)**로 요약할 것.
-
-## 2. B2C Consumer Insight
-- 유저 데이터({categories_text})를 기반으로 '소비 맥락'과 '라이프스타일' 분석.
-- **긴 문단 절대 금지**. 3~4개의 핵심 인사이트를 **불렛 포인트(-)**로 명확히 분리하여 작성.
-- 예: "- (Insight 1) 교통비 비중 35% -> 모빌리티 중심의 라이프스타일..."
-
-## 3. B2B Partnership Strategy
-- 지출 비중이 높은 분야에서 실제 수익을 창출할 수 있는 **구체적 제휴 대상** 제안.
-- 카카오T, 쿠팡, 배달의민족, 스타벅스 등 실존 기업명과 **제휴 아이템** 명시.
-- 각 제안은 **불렛 포인트(-)**로 구분하여 가독성 확보.
-
-## 4. Partnership Metrics
-- 위 B2B 전략 실행 시 기대되는 KPI 변화를 반드시 **Markdown Table**로 작성.
-| 타겟 기업 | 예상 수익 모델 | 기대 KPI (ROAS/Lock-in) |
-|---|---|---|
-| (기업명) | (모델명) | (수치) |
-
-※ **Tone & Manner**: 객관적, 비판적, 수치 기반(Evidence-based).
-※ **Format**: **모든 섹션은 가독성을 위해 불렛 포인트(-) 위주로 작성.** 한 문단이 3줄을 넘지 않도록 문장 길이를 조절하십시오.
 """
+    
+    return base_prompt + "\n\n" + data_context

@@ -30,6 +30,11 @@ markdown>=3.5.0                  # Markdown to HTML conversion
 # 기타
 python-dotenv>=1.0.0              # 환경 변수
 httpx>=0.25.2                     # HTTP 클라이언트
+pyyaml>=6.0                       # YAML 설정 파일 파싱
+
+# Google Vertex AI (LLM)
+google-cloud-aiplatform>=1.38.0   # Vertex AI SDK
+google-generativeai>=0.3.0        # Gemini API (fallback용)
 
 # ML & Data Processing
 scikit-learn>=1.3.0
